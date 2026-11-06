@@ -207,6 +207,32 @@ html.lenis body {
   }
 }
 
+/* Slow drift for background parts (inner element; outer one takes scroll parallax). */
+@keyframes sa-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate3d(14px, -18px, 0) rotate(6deg);
+  }
+  66% {
+    transform: translate3d(-10px, 10px, 0) rotate(-4deg);
+  }
+}
+.sa-drift {
+  animation: sa-drift var(--dur, 16s) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes sa-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
 /* Hide native cursor only while the hex cursor is mounted. */
 html.has-hex-cursor,
 html.has-hex-cursor * {

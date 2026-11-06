@@ -111,4 +111,7 @@ export const categories = [
   },
 ]
 
+/** The bolt that threads into the plate in the hero. */
+export const heroBolt = { type: 'bolt', head: 'hex', diameter: 12, length: 30, pitch: 1.75, finish: 'zinc', grade: '8.8' } // PLACEHOLDER
+
 export default categories

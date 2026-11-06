@@ -34,6 +34,7 @@ export function SmoothScrollProvider({ children }) {
 
     if (document.documentElement.classList.contains('is-loading')) instance.stop()
     setLenis(instance)
+    if (import.meta.env.DEV) window.__lenis = instance
 
     return () => {
       gsap.ticker.remove(update)

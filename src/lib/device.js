@@ -19,5 +19,18 @@ export const isLowEnd = () => {
   return saveData || cores <= 4 || mem <= 3
 }
 
-/** Cap devicePixelRatio for WebGL canvases. */
-export const dprCap = () => (isLowEnd() ? [1, 1.25] : [1, 1.75])
+export const isSmallScreen = () => !!mq('(max-width: 767px)')
+
+/** Cap devicePixelRatio for WebGL canvases: 1.5 on phones, 1.25 on low-end hardware. */
+export const dprCap = () => (isLowEnd() ? [1, 1.25] : isSmallScreen() || isTouch() ? [1, 1.5] : [1, 1.75])
+
+export const hasWebGL = () => {
+  try {
+    const c = document.createElement('canvas')
+    const gl = c.getContext('webgl2') || c.getContext('webgl')
+    gl?.getExtension('WEBGL_lose_context')?.loseContext()
+    return !!gl
+  } catch {
+    return false
+  }
+}

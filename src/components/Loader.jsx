@@ -143,6 +143,8 @@ export default function Loader({ onDone }) {
     }
     document.documentElement.classList.remove('is-loading')
     lenisRef.current?.start()
+    window.__saIntro = 'done'
+    window.dispatchEvent(new Event('sa:intro-done'))
     setDone(true)
     onDone?.()
   }
@@ -187,7 +189,11 @@ export default function Loader({ onDone }) {
         // Split open along the rod's axis
         .to(q('.ld-top'), { yPercent: -100, duration: 0.95, ease: 'expo.inOut' }, '+=0.15')
         .to(q('.ld-bottom'), { yPercent: 100, duration: 0.95, ease: 'expo.inOut' }, '<')
-        .add(() => document.documentElement.classList.remove('is-loading'), '-=0.6')
+        .add(() => {
+          document.documentElement.classList.remove('is-loading')
+          window.__saIntro = 'reveal'
+          window.dispatchEvent(new Event('sa:intro-reveal'))
+        }, '-=0.75')
     },
     { scope: root },
   )

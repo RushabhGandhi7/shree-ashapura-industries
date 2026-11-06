@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Hero from './components/hero/Hero.jsx'
 import { SmoothScrollProvider } from './lib/smoothScroll.jsx'
 import { content } from './data/content.js'
 import { categories } from './data/products.js'
@@ -12,39 +13,6 @@ import MonoLabel from './components/ui/MonoLabel.jsx'
 import DimensionLine from './components/ui/DimensionLine.jsx'
 import { ArrowUpRight, WhatsAppIcon } from './components/ui/Icons.jsx'
 import { whatsappHref } from './lib/contact.js'
-
-// PLACEHOLDER hero — replaced by the 3D threading hero in Phase 2.
-function HeroPlaceholder() {
-  const h = content.hero
-  return (
-    <section id="top" aria-labelledby="hero-title" className="relative flex min-h-[100svh] items-center overflow-hidden pt-[var(--nav-h)]">
-      <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0" aria-hidden />
-      <div className="container-x relative py-16">
-        <MonoLabel dot>{h.eyebrow}</MonoLabel>
-        <h1 id="hero-title" className="display-wide mt-8 text-display-xl">
-          {h.title[0]}
-          <br />
-          <span className="text-red">{h.title[1]}</span>
-        </h1>
-        <DimensionLine length="min(100%, 34rem)" label="L 40" className="mt-8" trigger="mount" delay={0.2} />
-        <p className="mt-8 max-w-[46ch] text-body-lg text-steel-700">{h.lead}</p>
-        <div className="mt-10 flex flex-wrap gap-3">
-          <Button href={whatsappHref(content.whatsappMessages.general)} size="lg" icon={<WhatsAppIcon />}>
-            {h.primaryCta}
-          </Button>
-          <Button href="#products" variant="outline" size="lg" icon={<ArrowUpRight />}>
-            {h.secondaryCta}
-          </Button>
-        </div>
-        <div className="pointer-events-none absolute top-24 right-[var(--gutter)] hidden flex-col items-end gap-3 md:flex" aria-hidden>
-          <MonoLabel>M8 × 1.25</MonoLabel>
-          <MonoLabel>Ø12</MonoLabel>
-          <MonoLabel tone="red">L 40</MonoLabel>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function PlaceholderSections() {
   const s = content.placeholderSections
@@ -92,7 +60,7 @@ export default function App() {
       <Cursor />
       <Navbar />
       <main id="main" tabIndex={-1} className="outline-none">
-        <HeroPlaceholder />
+        <Hero />
         <PlaceholderSections />
       </main>
       <Footer />

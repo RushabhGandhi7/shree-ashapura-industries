@@ -43,12 +43,22 @@ const en = {
     skip: 'Skip intro',
   },
   hero: {
-    // PLACEHOLDER — final hero copy arrives in Phase 2
-    eyebrow: 'Est. Mumbai · Fastener manufacturers',
-    title: ['Precision', 'in motion.'],
-    lead: 'Screws, nuts, bolts, washers, turned, pressed and moulded components, made to drawing and delivered on time.',
-    primaryCta: 'Request a quote',
-    secondaryCta: 'See what we make',
+    eyebrow: 'Fasteners · Turned · Pressed · Moulded', // PLACEHOLDER
+    title: ['Precision', 'in motion.'], // PLACEHOLDER
+    lead: 'Screws, nuts, bolts and washers, plus precision turned, press and plastic moulded parts. Made to drawing in Mumbai, threaded to tolerance, delivered on time.', // PLACEHOLDER
+    callCta: 'Call now',
+    whatsappCta: 'WhatsApp us',
+    tolerance: 'TOL ± 0.02 mm',
+    scrollCue: 'Scroll to thread it in',
+    posterAlt: 'Steel bolt above a tapped steel plate',
+    dims: { dia: 'Ø12', len: 'L 30', thread: 'M12 × 1.75', pitch: 'P 1.75', af: 'AF 18' },
+    readout: {
+      aria: 'Torque readout for the bolt being threaded into the plate',
+      torque: 'Torque',
+      turns: 'Turns',
+      spec: 'M12 · 8.8',
+      phases: { align: 'Aligning', thread: 'Threading', seat: 'Torquing', seated: 'Seated ✓' },
+    },
   },
   placeholderSections: {
     // PLACEHOLDER — temporary anchors so navigation can be tested in Phase 1

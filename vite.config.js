@@ -2,16 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+// No manual chunking: three / R3F / drei are only reachable through the lazy
+// HeroScene import, so they split into their own async chunk automatically.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules/three') || id.includes('@react-three')) return 'three'
-          if (id.includes('node_modules/gsap') || id.includes('node_modules/lenis')) return 'motion'
-        },
-      },
-    },
+    chunkSizeWarningLimit: 1100,
   },
 })

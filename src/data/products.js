@@ -63,69 +63,141 @@ export const sizes = {
   lengths: [6, 8, 10, 12, 16, 20, 25, 30, 40, 50, 60, 80, 100],
 }
 
+// The 7 "What we make" cards. `parts` are rendered with the procedural library
+// (src/three, detail "low"); `pose.tilt` angles the group in the card, and the spin
+// on hover turns it about its own axis. Everything here is PLACEHOLDER copy.
 export const categories = [
   {
     slug: 'screws',
-    name: 'Screws',
     code: '01',
-    blurb: 'Machine, self-tapping and furniture screws in every common head and drive.', // PLACEHOLDER
-    callout: 'M5 × 0.8',
-    specs: ['M3 – M12', 'Pan / CSK / Button', 'Zinc · Black · SS'], // PLACEHOLDER
-    model: { type: 'screw', head: 'pan', diameter: 5, length: 30, pitch: 0.8, finish: 'zinc' },
+    name: 'Screws',
+    blurb: 'Self-tapping, machine and chipboard screws in every common head and drive.', // PLACEHOLDER
+    callout: 'ST 4.2 × 25',
+    parts: [{ type: 'screw', head: 'pan', diameter: 4.2, length: 25, finish: 'zinc' }],
+    pose: { tilt: [0, 0, -1.05] },
+    specs: [
+      ['Sizes', 'ST 2.9 – 6.3, M3 – M8'],
+      ['Heads', 'Pan, countersunk, wafer, hex washer'],
+      ['Drives', 'Phillips, Pozi, Torx, slot'],
+      ['Points', 'Sharp, drill, blunt'],
+    ], // PLACEHOLDER
+    materials: ['Case-hardened steel', 'Stainless SS 304', 'Brass'], // PLACEHOLDER
+    sizes: ['ST 2.9', 'ST 3.5', 'ST 4.2', 'ST 4.8', 'ST 5.5', 'ST 6.3'], // PLACEHOLDER
+    finishes: ['zinc', 'blackOxide', 'yellowZinc', 'stainless'],
   },
   {
-    slug: 'bolts',
-    name: 'Bolts',
+    slug: 'nuts-bolts',
     code: '02',
-    blurb: 'Hex and socket bolts, fully or partly threaded, in standard and high-tensile grades.', // PLACEHOLDER
-    callout: 'M8 × 1.25',
-    specs: ['M6 – M20', 'Grade 4.6 – 10.9', 'L 16 – 150'], // PLACEHOLDER
-    model: { type: 'bolt', head: 'hex', diameter: 8, length: 40, pitch: 1.25, finish: 'zinc' },
-  },
-  {
-    slug: 'nuts',
-    name: 'Nuts',
-    code: '03',
-    blurb: 'Hex, nyloc, flange, dome and insert nuts, made to match every bolt we make.', // PLACEHOLDER
+    name: 'Nuts & Bolts',
+    blurb: 'Hex and socket bolts with matching hex, nyloc, flange and wing nuts.', // PLACEHOLDER
     callout: 'M10 × 1.5',
-    specs: ['M3 – M24', 'Hex / Nyloc / Flange', 'Class 6 – 10'], // PLACEHOLDER
-    model: { type: 'nut', head: 'hex', diameter: 10, length: 8, pitch: 1.5, finish: 'blackOxide' },
+    parts: [
+      { type: 'bolt', head: 'hex', diameter: 10, length: 30, finish: 'zinc' },
+      { type: 'nut', head: 'hex', diameter: 10, finish: 'zinc', position: [0, -1.6, 0], rotation: [0, 0.4, 0] },
+    ],
+    pose: { tilt: [0, 0, -1.1] },
+    specs: [
+      ['Sizes', 'M5 – M24'],
+      ['Grades', '4.6, 8.8, 10.9 · nut class 6 – 10'],
+      ['Lengths', '10 – 150 mm'],
+      ['Standards', 'ISO 4014 / 4017 / 4762 / 4032'],
+    ], // PLACEHOLDER
+    materials: ['Mild steel', 'High tensile steel', 'Stainless SS 304 / 316'], // PLACEHOLDER
+    sizes: ['M5', 'M6', 'M8', 'M10', 'M12', 'M16', 'M20', 'M24'], // PLACEHOLDER
+    finishes: ['zinc', 'blackOxide', 'yellowZinc', 'stainless'],
   },
   {
     slug: 'washers',
+    code: '03',
     name: 'Washers',
-    code: '04',
-    blurb: 'Plain, spring and star washers stamped flat and true.', // PLACEHOLDER
-    callout: 'Ø12 × 1.6',
-    specs: ['Ø3 – Ø30', 'Plain / Spring / Star', 'MS · SS · Brass'], // PLACEHOLDER
-    model: { type: 'washer', head: 'flat', diameter: 12, length: 1.6, pitch: 0, finish: 'stainless' },
+    blurb: 'Plain, spring and star washers, stamped flat and true.', // PLACEHOLDER
+    callout: 'Ø12 × 2.2',
+    parts: [
+      { type: 'washer', head: 'flat', diameter: 12, finish: 'stainless', position: [-0.75, 0, 0] },
+      { type: 'washer', head: 'spring', diameter: 12, finish: 'blackOxide', position: [1.05, 0.05, 0.2] },
+    ],
+    pose: { tilt: [0.75, 0, 0] },
+    specs: [
+      ['Types', 'Plain, spring, star, fender'],
+      ['Inner Ø', '3.2 – 25 mm'],
+      ['Thickness', '0.5 – 4 mm'],
+      ['Standards', 'ISO 7089, DIN 127'],
+    ], // PLACEHOLDER
+    materials: ['Mild steel', 'Spring steel', 'Stainless', 'Brass'], // PLACEHOLDER
+    sizes: ['M3', 'M4', 'M5', 'M6', 'M8', 'M10', 'M12', 'M16'], // PLACEHOLDER
+    finishes: ['zinc', 'blackOxide', 'stainless', 'brass'],
   },
   {
     slug: 'turned',
-    name: 'Precision Turned Components',
-    code: '05',
+    code: '04',
+    name: 'Precision Turned',
     blurb: 'CNC and traub-turned parts held to tight tolerances, made to your drawing.', // PLACEHOLDER
     callout: 'Ø16 h7',
-    specs: ['± 0.02 mm', 'Brass · MS · SS · Al', 'To drawing'], // PLACEHOLDER
-    model: { type: 'turned', head: 'stepped', diameter: 16, length: 32, pitch: 1, finish: 'brass' },
+    parts: [{ type: 'turned', diameter: 16, length: 40, finish: 'brass' }],
+    pose: { tilt: [0, 0, -1.3] },
+    specs: [
+      ['Diameters', '2 – 40 mm'],
+      ['Tolerance', '± 0.02 mm'],
+      ['Operations', 'Turning, grooving, knurling, threading'],
+      ['Supply', 'To your drawing or sample'],
+    ], // PLACEHOLDER
+    materials: ['Brass', 'Free-cutting steel', 'Stainless', 'Aluminium'], // PLACEHOLDER
+    sizes: ['Ø2 – Ø10', 'Ø10 – Ø25', 'Ø25 – Ø40'], // PLACEHOLDER
+    finishes: ['brass', 'zinc', 'stainless'],
   },
   {
     slug: 'pressed',
+    code: '05',
     name: 'Press Components',
-    code: '06',
     blurb: 'Brackets, clips and stampings from progressive and single-stage tools.', // PLACEHOLDER
     callout: 't 2.0',
-    specs: ['0.5 – 4 mm sheet', 'Blank / Pierce / Form', 'Plated or raw'], // PLACEHOLDER
-    model: { type: 'bracket', head: 'angle', diameter: 20, length: 40, pitch: 0, finish: 'yellowZinc' },
+    parts: [{ type: 'bracket', diameter: 20, length: 40, finish: 'yellowZinc' }],
+    pose: { tilt: [0.35, 0.6, 0] },
+    specs: [
+      ['Sheet', '0.5 – 4 mm'],
+      ['Operations', 'Blank, pierce, form, bend'],
+      ['Tooling', 'Progressive & single-stage'],
+      ['Batch', 'Prototype to high volume'],
+    ], // PLACEHOLDER
+    materials: ['CRCA', 'Spring steel', 'Stainless', 'Aluminium'], // PLACEHOLDER
+    sizes: ['To drawing'], // PLACEHOLDER
+    finishes: ['yellowZinc', 'zinc', 'blackOxide'],
   },
   {
-    slug: 'moulded-furniture',
-    name: 'Plastic Moulded & Furniture Kit Specials',
+    slug: 'moulded',
+    code: '06',
+    name: 'Plastic Moulded',
+    blurb: 'Injection-moulded clips, caps, inserts and spacers in engineering plastics.', // PLACEHOLDER
+    callout: 'Ø6 PA6',
+    parts: [{ type: 'clip', diameter: 6, length: 18, finish: 'nylon' }],
+    pose: { tilt: [0, 0, -1.2] },
+    specs: [
+      ['Parts', 'Clips, caps, bushes, spacers'],
+      ['Polymers', 'PA6, PA66, PP, ABS, POM'],
+      ['Colours', 'Natural, black, to order'],
+      ['Tooling', 'In-house mould maintenance'],
+    ], // PLACEHOLDER
+    materials: ['Nylon PA6 / PA66', 'Polypropylene', 'ABS', 'Acetal (POM)'], // PLACEHOLDER
+    sizes: ['To drawing'], // PLACEHOLDER
+    finishes: ['nylon', 'nylonBlack'],
+  },
+  {
+    slug: 'furniture',
     code: '07',
-    blurb: 'Moulded caps, inserts and connectors, plus complete fittings packs for furniture kits.', // PLACEHOLDER
-    callout: 'Ø10 PA6',
-    specs: ['Nylon · PP · ABS', 'Cam locks · Dowels', 'Kit packing'], // PLACEHOLDER
-    model: { type: 'clip', head: 'tree', diameter: 10, length: 20, pitch: 0, finish: 'nylon' },
+    name: 'Furniture Kits',
+    blurb: 'Cam locks, connecting bolts, dowels and complete fittings packs for flat-pack kits.', // PLACEHOLDER
+    callout: 'Ø15 cam',
+    parts: [{ type: 'connector', diameter: 5, finish: 'zinc' }],
+    pose: { tilt: [0.5, -0.5, 0] },
+    specs: [
+      ['Fittings', 'Cam locks, connecting bolts, dowels'],
+      ['Cam Ø', '12, 15, 20 mm'],
+      ['Packing', 'Counted kit packs, labelled'],
+      ['Supply', 'Loose or kitted to BOM'],
+    ], // PLACEHOLDER
+    materials: ['Zinc alloy', 'Steel', 'Nylon'], // PLACEHOLDER
+    sizes: ['Cam 12', 'Cam 15', 'Cam 20'], // PLACEHOLDER
+    finishes: ['zinc', 'blackOxide', 'brass'],
   },
 ]
 

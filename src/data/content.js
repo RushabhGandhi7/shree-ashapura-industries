@@ -60,6 +60,36 @@ const en = {
       phases: { align: 'Aligning', thread: 'Threading', seat: 'Torquing', seated: 'Seated ✓' },
     },
   },
+  products: {
+    label: '03 / What we make',
+    title: 'Seven product lines, one workshop.', // PLACEHOLDER
+    lead: 'From a single M3 screw to complete furniture fitting kits, made, finished and packed under one roof in Dahisar.', // PLACEHOLDER
+    open: 'Specs',
+    hint: 'Hover to turn the part. Tap a card for sizes and materials.',
+    hintTouch: 'Tap a card for sizes and materials.',
+    drawer: {
+      close: 'Close',
+      specs: 'Specifications',
+      materials: 'Materials',
+      sizes: 'Common sizes',
+      finishes: 'Finishes',
+      enquire: 'Enquire on WhatsApp',
+      enquireMsg: (name) => `Hello Shree Ashapura Industries, I would like a quote for ${name}. Size / quantity: `,
+      note: 'Placeholder specifications. Final ranges to be confirmed.', // PLACEHOLDER
+    },
+  },
+  exploded: {
+    label: '04 / Exploded view',
+    title: ['Every part,', 'to drawing.'], // PLACEHOLDER
+    lead: 'Bolt, washer and nut are made to the same thread standard, so every set fits first time, every time.', // PLACEHOLDER
+    scrollCue: 'Scroll to take it apart',
+    parts: [
+      { name: 'Hex bolt', std: 'ISO 4017 · 8.8' },
+      { name: 'Flat washer', std: 'ISO 7089 · 200 HV' },
+      { name: 'Hex nut', std: 'ISO 4032 · class 8' },
+    ], // PLACEHOLDER
+    dims: { dia: 'Ø8', len: 'L 25', thread: 'M8 × 1.25', washer: 'Ø16', nut: 'AF 13', nutH: 'm 6.8' },
+  },
   placeholderSections: {
     // PLACEHOLDER — temporary anchors so navigation can be tested in Phase 1
     products: { label: '03 / What we make', title: 'Product range', customCell: 'Need a part to drawing? We make specials.' },

@@ -61,3 +61,10 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 
 ## Workflow
 - Work in phases. After each phase, summarise what was built and what remains.
+
+## 3D part library (src/three)
+- Use `<Fastener type head diameter length pitch finish detail />` (or `Bolt`, `Nut`, `Washer`, `Screw`, `Bracket`, `TurnedPart`, `MouldedClip`, `FurnitureConnector`, `TappedPlate`) from `src/three/Fastener.jsx`. Never hand-build fastener meshes in sections.
+- Units: 1 = 10 mm, Y is the part axis, origin on the bearing face. Angle convention: `x = r·sin φ, z = r·cos φ`. Thread phase `v = y/P − φ/2π`, shared by external and internal threads so parts mate. Rotating a bolt by α while lifting α/2π·P is a physically correct screw motion.
+- `detail: 'low'` on phones / low-end devices (fewer segments plus a standard material). Geometry is memoised in `buildPart`, and materials are shared per (finish, role, quality).
+- Finishes live in `src/data/products.js` (`finishes`). Dimension tables live in `src/three/specs.js`.
+- Inspect parts at `/lab` (deep links: `/lab?type=nut&head=wing&finish=brass&normals=1`).

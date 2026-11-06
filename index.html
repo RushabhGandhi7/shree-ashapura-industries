@@ -12,7 +12,8 @@
       // Decide before first paint whether the intro loader will run, so the page never flashes.
       try {
         var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        if (!rm && !sessionStorage.getItem('sa-intro-seen')) document.documentElement.classList.add('is-loading')
+        var lab = location.pathname.replace(/\/+$/, '') === '/lab'
+        if (!rm && !lab && !sessionStorage.getItem('sa-intro-seen')) document.documentElement.classList.add('is-loading')
       } catch (e) {}
     </script>
   </head>

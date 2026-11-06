@@ -3,10 +3,9 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { createStudioEnvironment } from '../../three/studioEnv.js'
-import Bolt from '../../three/Bolt.jsx'
-import Plate from '../../three/Plate.jsx'
-import { blobShadowTexture } from '../../three/geometry.js'
+import { Bolt, TappedPlate } from '../../three/Fastener.jsx'
+import StudioEnvironment from '../../three/StudioEnvironment.jsx'
+import { blobShadowTexture } from '../../three/lib/shadow.js'
 import { heroBolt } from '../../data/products.js'
 import { heroStore, boltStateAt, dimsAt, BOLT } from '../../lib/heroStore.js'
 
@@ -145,8 +144,8 @@ function Rig({ tilt }) {
 
   return (
     <group ref={root}>
-      <Plate spec={heroBolt} width={PLATE.w} depth={PLATE.d} thickness={BOLT.plateT} detail={heroStore.detail} />
-      <Bolt ref={bolt} spec={heroBolt} detail={heroStore.detail} />
+      <TappedPlate diameter={heroBolt.diameter} pitch={heroBolt.pitch} width={PLATE.w} depth={PLATE.d} thickness={BOLT.plateT} detail={heroStore.detail} />
+      <Bolt ref={bolt} head={heroBolt.head} diameter={heroBolt.diameter} length={heroBolt.length} pitch={heroBolt.pitch} finish={heroBolt.finish} detail={heroStore.detail} />
 
       {/* Contact shadow of the bolt on the plate */}
       <mesh ref={boltShadow} rotation-x={-Math.PI / 2} position-y={0.004} renderOrder={1}>
@@ -161,15 +160,15 @@ function Rig({ tilt }) {
 
       {/* Torque witness mark, painted in one stroke. alpha = 0 when seated, so it lives in plate space.
           Each stroke is a group at its start point; the mesh is offset by half its length. */}
-      <group ref={markHead} position={[0, 0.031 + BOLT.K + 0.003, 0]}>
+      <group ref={markHead} position={[0, BOLT.K + 0.003, 0]}>
         <mesh position-z={BOLT.AF / 4}>
           <boxGeometry args={[markW, 0.006, BOLT.AF / 2]} />
           <meshBasicMaterial color={red} />
         </mesh>
       </group>
-      <group ref={markFlat} position={[0, 0.031 + BOLT.K + 0.003, BOLT.AF / 2 + 0.004]}>
-        <mesh position-y={-(BOLT.K + 0.03) / 2}>
-          <boxGeometry args={[markW, BOLT.K + 0.03, 0.006]} />
+      <group ref={markFlat} position={[0, BOLT.K + 0.003, BOLT.AF / 2 + 0.004]}>
+        <mesh position-y={-BOLT.K / 2}>
+          <boxGeometry args={[markW, BOLT.K, 0.006]} />
           <meshBasicMaterial color={red} />
         </mesh>
       </group>
@@ -184,21 +183,12 @@ function Rig({ tilt }) {
 }
 
 function Lights({ lowEnd }) {
-  const { gl, scene, invalidate } = useThree()
-  useEffect(() => {
-    const rt = createStudioEnvironment(gl, { size: lowEnd ? 64 : 128 })
-    scene.environment = rt.texture
-    invalidate()
-    return () => {
-      scene.environment = null
-      rt.dispose()
-    }
-  }, [gl, scene, invalidate, lowEnd])
   return (
     <>
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[4, 9, 6]} intensity={1.4} />
-      <directionalLight position={[-6, 3, -4]} intensity={0.35} />
+      <StudioEnvironment resolution={lowEnd ? 64 : 128} intensity={0.95} warm />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[4, 9, 6]} intensity={1.2} />
+      <directionalLight position={[-6, 3, -4]} intensity={0.3} />
     </>
   )
 }

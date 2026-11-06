@@ -1,18 +1,25 @@
 // Product catalogue. Everything here is PLACEHOLDER data, safe to swap later.
 // `model` holds the parameters the procedural 3D fastener generator reads (Phase 2+):
-//   type: 'bolt' | 'screw' | 'nut' | 'washer' | 'turned' | 'pressed' | 'moulded'
-//   head: 'hex' | 'socket' | 'pan' | 'countersunk' | 'button' | 'none'
+//   type: 'bolt' | 'screw' | 'nut' | 'washer' | 'turned' | 'bracket' | 'clip' | 'connector'
+//   head: variant key from `variants[type]` below
 //   diameter / length / pitch in mm, finish: key of `finishes`.
 
+// Surface finishes. Colours / PBR values are read by src/three/materials.js.
+// `aniso` = strength of the brushed/turned highlight; `clearcoat` / `iridescence` are optional extras.
 export const finishes = {
-  // PLACEHOLDER
-  zinc: { label: 'Zinc plated', color: '#C9CCCF', metalness: 0.9, roughness: 0.32 },
-  black: { label: 'Black oxide', color: '#2B2C2E', metalness: 0.7, roughness: 0.45 },
-  ss: { label: 'Stainless steel', color: '#B8B9B6', metalness: 1, roughness: 0.22 },
-  brass: { label: 'Brass', color: '#C9A45C', metalness: 1, roughness: 0.3 },
-  yellowZinc: { label: 'Yellow zinc', color: '#D8C27A', metalness: 0.85, roughness: 0.35 },
-  nylon: { label: 'Nylon (natural)', color: '#ECE7DA', metalness: 0, roughness: 0.6 },
+  zinc: { label: 'Zinc plated', color: '#D9DCDE', metalness: 1, roughness: 0.24, aniso: 0.35 },
+  blackOxide: { label: 'Black oxide', color: '#2E2F31', metalness: 0.85, roughness: 0.42, aniso: 0.25 },
+  brass: { label: 'Brass', color: '#D8B26A', metalness: 1, roughness: 0.26, aniso: 0.4 },
+  stainless: { label: 'Stainless steel', color: '#C6C7C4', metalness: 1, roughness: 0.17, aniso: 0.45 },
+  redAnodised: { label: 'Red anodised', color: '#A3202F', metalness: 0.55, roughness: 0.3, aniso: 0.2, clearcoat: 0.45 },
+  yellowZinc: { label: 'Yellow zinc', color: '#DCC47E', metalness: 0.92, roughness: 0.3, aniso: 0.3, iridescence: 0.35 },
+  mildSteel: { label: 'Bright mild steel', color: '#C4C6C7', metalness: 0.92, roughness: 0.36, aniso: 0.5 },
+  nylon: { label: 'Nylon (natural)', color: '#EEE8D9', metalness: 0, roughness: 0.55 },
+  nylonBlack: { label: 'Nylon (black)', color: '#2A2A2B', metalness: 0, roughness: 0.6 },
 }
+
+/** The five finishes offered for metal parts (customiser, lab). */
+export const metalFinishes = ['zinc', 'blackOxide', 'brass', 'stainless', 'redAnodised']
 
 export const heads = {
   // PLACEHOLDER
@@ -20,7 +27,18 @@ export const heads = {
   socket: 'Socket cap',
   pan: 'Pan',
   countersunk: 'Countersunk',
-  button: 'Button',
+}
+
+/** Variants per part type (the `head` prop of <Fastener />). */
+export const variants = {
+  bolt: { hex: 'Hex head', socket: 'Socket head', pan: 'Pan head', countersunk: 'Countersunk' },
+  nut: { hex: 'Hex nut', nyloc: 'Nyloc', flange: 'Flange nut', wing: 'Wing nut' },
+  washer: { flat: 'Flat', spring: 'Spring' },
+  screw: { pan: 'Pan head', countersunk: 'Countersunk' },
+  bracket: { angle: 'Angle bracket' },
+  turned: { stepped: 'Stepped shaft' },
+  clip: { tree: 'Tree clip' },
+  connector: { cam: 'Cam + connecting bolt' },
 }
 
 export const threads = {
@@ -71,7 +89,7 @@ export const categories = [
     blurb: 'Hex, nyloc, flange, dome and insert nuts, made to match every bolt we make.', // PLACEHOLDER
     callout: 'M10 × 1.5',
     specs: ['M3 – M24', 'Hex / Nyloc / Flange', 'Class 6 – 10'], // PLACEHOLDER
-    model: { type: 'nut', head: 'hex', diameter: 10, length: 8, pitch: 1.5, finish: 'black' },
+    model: { type: 'nut', head: 'hex', diameter: 10, length: 8, pitch: 1.5, finish: 'blackOxide' },
   },
   {
     slug: 'washers',
@@ -80,7 +98,7 @@ export const categories = [
     blurb: 'Plain, spring and star washers stamped flat and true.', // PLACEHOLDER
     callout: 'Ø12 × 1.6',
     specs: ['Ø3 – Ø30', 'Plain / Spring / Star', 'MS · SS · Brass'], // PLACEHOLDER
-    model: { type: 'washer', head: 'none', diameter: 12, length: 1.6, pitch: 0, finish: 'ss' },
+    model: { type: 'washer', head: 'flat', diameter: 12, length: 1.6, pitch: 0, finish: 'stainless' },
   },
   {
     slug: 'turned',
@@ -89,7 +107,7 @@ export const categories = [
     blurb: 'CNC and traub-turned parts held to tight tolerances, made to your drawing.', // PLACEHOLDER
     callout: 'Ø16 h7',
     specs: ['± 0.02 mm', 'Brass · MS · SS · Al', 'To drawing'], // PLACEHOLDER
-    model: { type: 'turned', head: 'none', diameter: 16, length: 32, pitch: 1, finish: 'brass' },
+    model: { type: 'turned', head: 'stepped', diameter: 16, length: 32, pitch: 1, finish: 'brass' },
   },
   {
     slug: 'pressed',
@@ -98,7 +116,7 @@ export const categories = [
     blurb: 'Brackets, clips and stampings from progressive and single-stage tools.', // PLACEHOLDER
     callout: 't 2.0',
     specs: ['0.5 – 4 mm sheet', 'Blank / Pierce / Form', 'Plated or raw'], // PLACEHOLDER
-    model: { type: 'pressed', head: 'none', diameter: 20, length: 40, pitch: 0, finish: 'yellowZinc' },
+    model: { type: 'bracket', head: 'angle', diameter: 20, length: 40, pitch: 0, finish: 'yellowZinc' },
   },
   {
     slug: 'moulded-furniture',
@@ -107,7 +125,7 @@ export const categories = [
     blurb: 'Moulded caps, inserts and connectors, plus complete fittings packs for furniture kits.', // PLACEHOLDER
     callout: 'Ø10 PA6',
     specs: ['Nylon · PP · ABS', 'Cam locks · Dowels', 'Kit packing'], // PLACEHOLDER
-    model: { type: 'moulded', head: 'none', diameter: 10, length: 20, pitch: 0, finish: 'nylon' },
+    model: { type: 'clip', head: 'tree', diameter: 10, length: 20, pitch: 0, finish: 'nylon' },
   },
 ]
 

@@ -123,6 +123,7 @@ Drop photos into `public/gallery/real/` (JPG / WebP / PNG, about 1600 px on the 
 
 Every fastener is generated in code. There are no model files.
 `<Fastener type head diameter length pitch finish detail />` is in `src/three/Fastener.jsx`, and the geometry builders are in `src/three/lib/` (real helical threads, chamfered hex heads, recesses).
+The configurator on `/custom` also draws a live **top view** (SVG, `src/components/customise/TopView.jsx`). Its head proportions come from `src/three/headGeometry.js`, the same numbers `head()` in `src/three/parts.js` builds the 3D heads from, so the drawing and the model always match (checked to 0.01 % for every head at M5, M8 and M16). Change a head proportion there and both update.
 Phones get `detail="low"` and a lighter material. All 3D canvases are lazy-loaded, cap the pixel ratio, and only render while visible or animating.
 
 ## Performance notes

@@ -7,6 +7,8 @@ import { dprCap, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from 
 import Button from '../ui/Button.jsx'
 import { WhatsAppIcon } from '../ui/Icons.jsx'
 import Annotations from '../annotate/Annotations.jsx'
+import TopView from './TopView.jsx'
+import { topView } from '../../three/headGeometry.js'
 
 const CustomiserScene = lazy(() => import('./CustomiserScene.jsx'))
 const t = content.customise
@@ -28,9 +30,18 @@ export function describe(o) {
   const material = C.materials.find((m) => m.key === o.material)
   const pitch = pitchFor(o.diameter, o.fine)
   const thread = `M${o.diameter} × ${pitch}${o.fine ? ' fine' : ''}`
-  const dwg = `SA-${head.code}-M${o.diameter}${o.fine ? 'F' : ''}-${o.length}-${material.short.replace(/[^A-Z0-9]/gi, '')}-${C.finishCodes[o.finish]}`
+  const tv = topView({ head: o.head, diameter: o.diameter, pitch })
+  const r1 = (v) => String(Math.round(v * 10) / 10)
+  // key top-view dimension: across flats for hex heads, head Ø for round heads
+  const keyDim = tv.outline === 'hex' ? `AF ${r1(tv.af)}` : `Ø${r1(tv.dk)}`
+  const dwg = `SA-${head.code}-M${o.diameter}${o.fine ? 'F' : ''}-${keyDim.replace(/[ Ø.]/g, (c) => (c === '.' ? 'P' : c === 'Ø' ? 'D' : ''))}-${o.length}-${material.short.replace(/[^A-Z0-9]/gi, '')}-${C.finishCodes[o.finish]}`
+  const headSpec = content.customise.headSpec[o.head]({ af: r1(tv.af ?? 0), dk: r1(tv.dk ?? 0), key: r1(tv.key ?? 0), height: r1(tv.height) })
   return {
     head,
+    tv,
+    keyDim,
+    headSpec,
+    root: r1(tv.root),
     material,
     pitch,
     thread,
@@ -78,6 +89,7 @@ export default function Customiser({ h1 = false } = {}) {
   const [mount3D, setMount3D] = useState(false)
   const [visible, setVisible] = useState(false)
   const [ready, setReady] = useState(false)
+  const [view, setView] = useState('front') // phones / tablets: Front (3D) or Top
   const d = describe(o)
   const [lmin, lmax] = C.lengthRange(o.diameter)
 
@@ -106,7 +118,7 @@ export default function Customiser({ h1 = false } = {}) {
       return n
     })
 
-  const message = t.message({ part: d.part, thread: d.thread, length: d.lengthLabel, material: d.material.label, finish: d.finishLabel, dwg: d.dwg })
+  const message = t.message({ part: d.part, head: d.headSpec, root: d.root, thread: d.thread, length: d.lengthLabel, material: d.material.label, finish: d.finishLabel, dwg: d.dwg })
 
   const items = useMemo(
     () => [
@@ -136,9 +148,19 @@ export default function Customiser({ h1 = false } = {}) {
         <div className="mt-10 grid gap-px border border-steel-300 bg-steel-300 md:mt-14 lg:grid-cols-12">
           {/* Stage */}
           <div className="relative bg-paper lg:col-span-8">
+            {/* Fixed-size box: top view card (left on desktop, toggled on phones) + 3D cell */}
+            <div className="relative aspect-square overflow-hidden sm:aspect-[4/3] lg:grid lg:aspect-auto lg:h-[min(72svh,640px)] lg:grid-cols-[minmax(0,34%)_1fr]">
+            <div
+              id="cu-top"
+              role="tabpanel"
+              aria-label={t.views.top}
+              className={`absolute inset-0 z-10 border-steel-300 lg:relative lg:z-auto lg:border-r ${view === 'top' ? 'visible' : 'invisible lg:visible'}`}
+            >
+              <TopView opts={o} pitch={d.pitch} thread={d.thread.replace(' fine', '')} reduced={profile.reduced} />
+            </div>
             <div
               ref={stage}
-              className="relative aspect-square touch-pan-y overflow-hidden select-none sm:aspect-[4/3] lg:aspect-auto lg:h-[min(72svh,640px)]"
+              className={`absolute inset-0 touch-pan-y overflow-hidden select-none lg:relative ${view === 'front' ? 'visible' : 'invisible lg:visible'}`}
               aria-label={`${d.part}, ${d.thread}, ${d.lengthLabel}, ${d.finishLabel}`}
               role="img"
             >
@@ -176,6 +198,24 @@ export default function Customiser({ h1 = false } = {}) {
               </div>
               <p className="label-mono pointer-events-none absolute top-4 left-4 text-steel-500">{t.dragHint}</p>
             </div>
+            </div>
+
+            {/* Front / Top switch (below lg; the box above keeps its height) */}
+            <div role="tablist" aria-label={t.views.label} className="flex border-t border-steel-300 lg:hidden">
+              {['front', 'top'].map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  role="tab"
+                  aria-selected={view === k}
+                  aria-controls={k === 'top' ? 'cu-top' : undefined}
+                  onClick={() => setView(k)}
+                  className={`label-mono flex-1 py-3 text-[11px] transition-colors ${view === k ? 'bg-ink text-paper' : 'bg-paper text-ink hover:text-red'} ${k === 'top' ? 'border-l border-steel-300' : ''}`}
+                >
+                  {t.views[k]}
+                </button>
+              ))}
+            </div>
 
             {/* Title block */}
             <dl className="grid grid-cols-2 border-t border-steel-300 font-mono text-[12px] sm:grid-cols-4" aria-live="polite">
@@ -187,6 +227,8 @@ export default function Customiser({ h1 = false } = {}) {
                 [t.block.material, d.material.short],
                 [t.block.finish, d.finishLabel],
                 [t.block.head, d.head.std, 'col-span-2'],
+                [t.block.headDim, `${d.head.label} · ${d.keyDim}`, 'col-span-2'],
+                [t.block.view, t.views.block, 'col-span-2'],
                 [t.block.scale, d.scale],
                 [t.block.rev, 'A'],
               ].map(([k, v, cls = '']) => (

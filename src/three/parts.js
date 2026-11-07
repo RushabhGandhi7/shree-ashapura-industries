@@ -14,6 +14,7 @@ import { hexSocket, crossRecess } from './lib/recess.js'
 import { plate, roundedRect2, circle2, slot2, helicalSweep, roundedSection } from './lib/sheet.js'
 import { boltDims, nutDims, washerDims, pitchFor, tappingPitch, DEFAULTS } from './specs.js'
 import { EXTRA } from './parts-extra.js'
+import { HEAD } from './headGeometry.js'
 
 export const mm = (v) => v / 10
 export const SEGMENTS = { high: 48, low: 24 }
@@ -97,7 +98,7 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
         ],
         { segments: N },
       )
-      const hp = hexPrism(main, { s: S, y0: WF, y1: K, chamferTop: true, detail })
+      const hp = hexPrism(main, { s: S, y0: WF, y1: K, chamferTop: true, rCh: HEAD.hex.chamfer * S, detail })
       stitch(main, hp.botLoop, ring(DW / 2, WF, N), down)
       stitch(main, hp.topLoop, [[0, K, 0]], up)
       return K
@@ -106,8 +107,8 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
       const { dk, k, key, t } = dims.socket
       const DK = mm(dk) / 2
       const K = mm(k)
-      const c = DK * 0.05
-      const rr = DK * 0.14
+      const c = DK * HEAD.socket.edge
+      const rr = DK * HEAD.socket.round
       lathe(
         [
           { pts: [...shankPts, [DK - c, 0]], builder: main },
@@ -128,7 +129,7 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
       // pan family: phhd = Phillips pan (chipboard), combi = pan with slot + cross,
       // umbrella = wide low dome, button = ISO 7380 button head with hex socket
       const shape = {
-        pan: [dims.pan.dk, dims.pan.k, 0.3, 2.6],
+        pan: [dims.pan.dk, dims.pan.k, HEAD.pan.dome, HEAD.pan.n],
         phhd: [dims.pan.dk, dims.pan.k, 0.3, 2.6],
         combi: [dims.pan.dk * 1.05, dims.pan.k, 0.34, 2.8],
         umbrella: [d * 3, d * 0.5, 0.22, 2.2],
@@ -137,7 +138,7 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
       const Rh = mm(shape[0]) / 2
       const K = mm(shape[1])
       const dome = domeHead(Rh, K * shape[2], K, shape[3])
-      const rA = Rh * (kind === 'button' ? 0.42 : 0.72)
+      const rA = Rh * (kind === 'button' ? 0.42 : HEAD.pan.recess)
       lathe(
         [
           { pts: [...shankPts, [Rh, 0]], builder: main },
@@ -150,9 +151,9 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
         hexSocket(B, { rOuter: rA, y: dome.surfaceY(rA), N, s: mm(dims.socket.key) * 0.62, depth: K * 0.7, detail })
         return K
       }
-      const arm = Rh * (kind === 'umbrella' ? 0.36 : 0.54)
+      const arm = Rh * (kind === 'umbrella' ? 0.36 : HEAD.pan.arm)
       const slot = kind === 'combi' ? Rh * 0.86 : arm // combi: slot runs across the head
-      crossRecess(B, { rOuter: rA, N, surfaceY: dome.surfaceY, surfaceN: dome.surfaceN, armX: slot, armZ: arm, w: Rh * 0.11, depth: K * 0.55, rings: hi ? 3 : 1, detail })
+      crossRecess(B, { rOuter: rA, N, surfaceY: dome.surfaceY, surfaceN: dome.surfaceN, armX: slot, armZ: arm, w: Rh * HEAD.pan.armW, depth: K * 0.55, rings: hi ? 3 : 1, detail })
       return K
     }
     case 'allenFlat':
@@ -161,8 +162,8 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
       const Rk = mm(dims.csk.dk) / 2
       const rS = shankPts[0][0]
       const hc = Rk - rS // 90° head
-      const band = D * 0.04
-      const ch = D * 0.025
+      const band = D * HEAD.csk.band
+      const ch = D * HEAD.csk.chamfer
       const K = hc + band + ch
       lathe(
         [

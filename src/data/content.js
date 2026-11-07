@@ -127,14 +127,31 @@ const en = {
     lead: 'Pick a head, size, length, material and finish. The part on the stage updates as you go, and the title block below becomes your enquiry.',
     controls: { head: 'Head', size: 'Thread size', pitch: 'Pitch', coarse: 'Coarse', fine: 'Fine', length: 'Length', material: 'Material', finish: 'Finish' },
     note: 'Visual preview only. Options are examples; final specification follows your drawing.', // CONFIRM options with the client
-    block: { part: 'Part', thread: 'Thread', length: 'Length', head: 'Standard', material: 'Material', finish: 'Finish', dwg: 'Dwg no.', scale: 'Scale', rev: 'Rev', company: 'Shree Ashapura Industries' },
+    block: { part: 'Part', thread: 'Thread', length: 'Length', head: 'Standard', headDim: 'Head', view: 'View', material: 'Material', finish: 'Finish', dwg: 'Dwg no.', scale: 'Scale', rev: 'Rev', company: 'Shree Ashapura Industries' },
     cta: 'Request a custom order',
     dragHint: 'Drag to turn',
-    message: ({ part, thread, length, material, finish, dwg }) =>
+    views: { label: 'View', front: 'Front (3D)', top: 'Top', block: 'Front (3D) / Top' },
+    topView: {
+      title: 'View A · Top',
+      scale: (r) => `Scale ${r}`,
+      root: 'root',
+      drive: { hex: (k) => `Hex S${k}`, cross: 'Phillips', none: 'Plain top' },
+      csk: '90° CSK',
+      aria: (x) => `Top view of the ${x.head}: ${x.key}, ${x.thread} thread, root diameter ${x.root} mm.`,
+    },
+    headSpec: {
+      hex: (v) => `Hex head (AF ${v.af} mm, head height ${v.height} mm)`,
+      socket: (v) => `Socket cap (head Ø${v.dk} mm, hex key ${v.key} mm)`,
+      pan: (v) => `Pan head (head Ø${v.dk} mm, Phillips)`,
+      countersunk: (v) => `Countersunk (head Ø${v.dk} mm, 90°, hex key ${v.key} mm)`,
+    },
+    message: ({ part, head, thread, root, length, material, finish, dwg }) =>
       [
         'Hello Shree Ashapura Industries, I would like a quote for a custom part:',
         `• Part: ${part}`,
+        `• Head: ${head}`,
         `• Thread: ${thread}`,
+        `• Root Ø: ${root} mm`,
         `• Length: ${length}`,
         `• Material: ${material}`,
         `• Finish: ${finish}`,

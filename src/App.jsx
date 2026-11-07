@@ -2,6 +2,8 @@ import { useState } from 'react'
 import Hero from './components/hero/Hero.jsx'
 import Products from './components/products/Products.jsx'
 import Exploded from './components/exploded/Exploded.jsx'
+import Customiser from './components/customise/Customiser.jsx'
+import Process from './components/process/Process.jsx'
 import { SmoothScrollProvider } from './lib/smoothScroll.jsx'
 import { content } from './data/content.js'
 import Loader, { shouldShowLoader } from './components/Loader.jsx'
@@ -15,9 +17,6 @@ function PlaceholderSections() {
   const s = content.placeholderSections
   return (
     <>
-      <Section id="process" label={s.process.label} title={s.process.title} tone="paper-2">
-        <DimensionLine length="100%" label="WIRE → HEADING → ROLLING → HEAT → PLATING → QC" className="mt-12" />
-      </Section>
       <Section id="industries" label={s.industries.label} title={s.industries.title}>
         <div className="mt-12 flex items-end gap-10">
           <DimensionLine orientation="vertical" length="12rem" label="Ø12" tone="red" />
@@ -44,6 +43,8 @@ export default function App() {
         <Hero />
         <Products />
         <Exploded />
+        <Customiser />
+        <Process />
         <PlaceholderSections />
       </main>
       <Footer />

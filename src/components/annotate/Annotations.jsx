@@ -29,6 +29,10 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
       sub: q(`${it.id}-sub`),
     }))
     const k = compact ? 0.55 : 1
+    // cached overlay width (reading clientWidth per frame would force layout)
+    let W = root.clientWidth
+    const ro = new ResizeObserver(() => (W = root.clientWidth))
+    ro.observe(root)
 
     const line = (el, A, B, d) => {
       el.setAttribute('x1', A.x)
@@ -70,7 +74,6 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
           const P = a[it.anchor]
           if (!P) continue
           const dir = it.side === 'left' ? -1 : 1
-          const W = root.clientWidth
           const elbow = { x: P.x + dir * it.dx * k, y: P.y + it.dy * k }
           const end = { x: elbow.x + dir * (compact ? 54 : it.len ?? 120), y: elbow.y }
           // keep the label inside the canvas: shift elbow/end back if the text would overflow
@@ -104,6 +107,7 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
     store.onFrame = render
     render(store.p ?? 0)
     return () => {
+      ro.disconnect()
       if (store.onFrame === render) store.onFrame = null
     }
   }, [store, items, compact, id])

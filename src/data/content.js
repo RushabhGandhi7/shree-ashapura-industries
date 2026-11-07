@@ -90,6 +90,41 @@ const en = {
     ], // PLACEHOLDER
     dims: { dia: 'Ø8', len: 'L 25', thread: 'M8 × 1.25', washer: 'Ø16', nut: 'AF 13', nutH: 'm 6.8' },
   },
+  customise: {
+    label: '05 / Customise',
+    title: ['Specify it.', 'We make it.'], // PLACEHOLDER
+    lead: 'Pick a head, size, length, material and finish. The part on the stage updates as you go, and the title block below becomes your enquiry.', // PLACEHOLDER
+    controls: { head: 'Head', size: 'Thread size', pitch: 'Pitch', coarse: 'Coarse', fine: 'Fine', length: 'Length', material: 'Material', finish: 'Finish' },
+    note: 'Visual preview. Final dimensions follow the standard and your drawing.', // PLACEHOLDER
+    block: { part: 'Part', thread: 'Thread', length: 'Length', head: 'Standard', material: 'Material', finish: 'Finish', dwg: 'Dwg no.', scale: 'Scale', rev: 'Rev', company: 'Shree Ashapura Industries' },
+    cta: 'Request a custom order',
+    dragHint: 'Drag to turn',
+    message: ({ part, thread, length, material, finish, dwg }) =>
+      [
+        'Hello Shree Ashapura Industries, I would like a quote for a custom part:',
+        `• Part: ${part}`,
+        `• Thread: ${thread}`,
+        `• Length: ${length}`,
+        `• Material: ${material}`,
+        `• Finish: ${finish}`,
+        `• Ref: ${dwg}`,
+        'Quantity: ',
+      ].join('\n'),
+  },
+  process: {
+    label: '06 / Manufacturing',
+    title: 'From wire coil to inspection.', // PLACEHOLDER
+    lead: 'Six stations, one part. Follow a bolt through the shop floor.', // PLACEHOLDER
+    stations: [
+      { key: 'coil', name: 'Wire coil', spec: 'SAE 1018 · Ø 6.9 mm', text: 'Drawn steel wire is de-scaled, straightened and fed off the coil at a controlled tension.' },
+      { key: 'heading', name: 'Cold heading', spec: '3-blow header · 180 pcs/min', text: 'A blank is cut and struck between dies until the head forms, cold, with unbroken grain flow.' },
+      { key: 'rolling', name: 'Thread rolling', spec: 'Flat dies · ISO 6g', text: 'Two flat dies roll the thread into the blank. No material is cut away, so the thread is stronger.' },
+      { key: 'heat', name: 'Heat treatment', spec: 'Harden 870 °C · temper 425 °C', text: 'Parts are hardened, quenched and tempered to reach their property class.' },
+      { key: 'plating', name: 'Plating', spec: 'Zinc · yellow · black', text: 'Parts are plated or coated for corrosion resistance, in the finish the job calls for.' },
+      { key: 'inspection', name: 'Quality inspection', spec: 'GO / NO-GO · 100% visual', text: 'Every lot is gauged, sampled and checked against the drawing before it is packed.' },
+    ], // PLACEHOLDER
+    track: 'Part journey',
+  },
   placeholderSections: {
     // PLACEHOLDER — temporary anchors so navigation can be tested in Phase 1
     products: { label: '03 / What we make', title: 'Product range', customCell: 'Need a part to drawing? We make specials.' },

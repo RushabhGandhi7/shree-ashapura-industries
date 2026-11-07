@@ -224,6 +224,15 @@ html.lenis body {
   animation: sa-drift var(--dur, 16s) ease-in-out var(--delay, 0s) infinite;
 }
 
+@keyframes sa-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
 @keyframes sa-cue {
   0% {
     transform: translateY(-100%);

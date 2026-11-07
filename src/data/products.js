@@ -201,6 +201,29 @@ export const categories = [
   },
 ]
 
+/** Options for the customisation showcase (visual only). PLACEHOLDER ranges. */
+export const customiser = {
+  heads: [
+    { key: 'hex', label: 'Hex head', part: 'Hex head bolt', std: 'ISO 4014 / 4017', code: 'HX' },
+    { key: 'socket', label: 'Socket cap', part: 'Socket head cap screw', std: 'ISO 4762', code: 'SC' },
+    { key: 'pan', label: 'Pan head', part: 'Pan head machine screw', std: 'ISO 7045', code: 'PN' },
+    { key: 'countersunk', label: 'Countersunk', part: 'Countersunk socket screw', std: 'ISO 10642', code: 'CS' },
+  ],
+  sizes: [5, 6, 8, 10, 12, 16],
+  lengthRange: (d) => [Math.max(10, Math.ceil((d * 1.5) / 5) * 5), Math.min(100, Math.ceil((d * 8) / 5) * 5)],
+  lengthStep: 5,
+  materials: [
+    { key: 'ms46', label: 'Mild steel 4.6', short: 'MS 4.6', finishes: ['zinc', 'blackOxide', 'redAnodised'] },
+    { key: 'ht88', label: 'High tensile 8.8', short: 'HT 8.8', finishes: ['zinc', 'blackOxide', 'redAnodised'] },
+    { key: 'ht109', label: 'High tensile 10.9', short: 'HT 10.9', finishes: ['blackOxide', 'zinc'] },
+    { key: 'a2', label: 'Stainless A2-70 (304)', short: 'A2-70', finishes: ['stainless'] },
+    { key: 'a4', label: 'Stainless A4-80 (316)', short: 'A4-80', finishes: ['stainless'] },
+    { key: 'brass', label: 'Brass CZ121', short: 'BRASS', finishes: ['brass'] },
+  ],
+  finishCodes: { zinc: 'ZN', blackOxide: 'BO', brass: 'BR', stainless: 'SS', redAnodised: 'RA' },
+  defaults: { head: 'hex', diameter: 8, length: 40, fine: false, material: 'ht88', finish: 'zinc' },
+}
+
 /** The bolt that threads into the plate in the hero. */
 export const heroBolt = { type: 'bolt', head: 'hex', diameter: 12, length: 30, pitch: 1.75, finish: 'zinc', grade: '8.8' } // PLACEHOLDER
 

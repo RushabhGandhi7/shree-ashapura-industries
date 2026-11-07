@@ -9,6 +9,7 @@
 // pitch:    mm (defaults to ISO coarse, or ST pitch for self-tapping screws)
 // finish:   zinc | blackOxide | brass | stainless | redAnodised | yellowZinc | mildSteel | nylon | nylonBlack
 // detail:   'high' | 'low' (fewer segments + standard material for phones)
+// materialFor(role): optional override returning a material per role (e.g. animated finishes)
 //
 // Local origin: the bearing face (under the head / bottom of a nut or washer) at y = 0.
 import { forwardRef, useMemo } from 'react'
@@ -16,7 +17,7 @@ import { buildPart } from './parts.js'
 import { getMaterial } from './materials.js'
 
 export const Fastener = forwardRef(function Fastener(
-  { type = 'bolt', head, variant, diameter, length, pitch, finish = 'zinc', detail = 'high', quality, wireframe = false, children, ...props },
+  { type = 'bolt', head, variant, diameter, length, pitch, finish = 'zinc', detail = 'high', quality, wireframe = false, materialFor, children, ...props },
   ref,
 ) {
   const part = useMemo(
@@ -27,7 +28,7 @@ export const Fastener = forwardRef(function Fastener(
   return (
     <group ref={ref} {...props}>
       {Object.entries(part.geos).map(([role, geo]) => (
-        <mesh key={role} geometry={geo} material={wireframe ? undefined : getMaterial(finish, role, q)}>
+        <mesh key={role} geometry={geo} material={wireframe ? undefined : (materialFor?.(role) ?? getMaterial(finish, role, q))}>
           {wireframe && <meshBasicMaterial wireframe color="#55575A" />}
         </mesh>
       ))}

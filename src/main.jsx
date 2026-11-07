@@ -6,6 +6,8 @@ import App from './App.jsx'
 // /lab is an internal inspection page for the 3D part library (lazy, not linked).
 const Lab = lazy(() => import('./lab/Lab.jsx'))
 const isLab = window.location.pathname.replace(/\/+$/, '') === '/lab'
+// The static shell (if present) already painted the hero text; Hero skips its fade-in then.
+window.__saShell = !!document.getElementById('sa-shell')
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

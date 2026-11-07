@@ -125,13 +125,90 @@ const en = {
     ], // PLACEHOLDER
     track: 'Part journey',
   },
+  // Kept for the products grid's 8th cell.
   placeholderSections: {
-    // PLACEHOLDER — temporary anchors so navigation can be tested in Phase 1
-    products: { label: '03 / What we make', title: 'Product range', customCell: 'Need a part to drawing? We make specials.' },
-    process: { label: '06 / Manufacturing', title: 'From wire coil to inspection' },
-    industries: { label: '07 / Industries', title: 'Industries & why us' },
-    gallery: { label: '08 / Gallery', title: 'Gallery' },
-    contact: { label: '09 / Contact', title: 'Send an enquiry' },
+    products: { customCell: 'Need a part to drawing? We make specials.' }, // PLACEHOLDER
+  },
+  industries: {
+    label: '07 / Industries & why us',
+    title: 'Trusted on the shop floor.', // PLACEHOLDER
+    lead: 'Fasteners and components for manufacturers who cannot afford a line stoppage.', // PLACEHOLDER
+    // PLACEHOLDER numbers: replace with real figures before launch.
+    counters: [
+      { value: 25, suffix: '+', label: 'Years making fasteners' }, // PLACEHOLDER
+      { value: 1200, suffix: '+', label: 'Part numbers in production' }, // PLACEHOLDER
+      { value: 40, suffix: ' M', label: 'Pieces shipped a year' }, // PLACEHOLDER
+      { value: 0.02, decimals: 2, prefix: '±', suffix: ' mm', label: 'Turning tolerance' }, // PLACEHOLDER
+    ],
+    whyTitle: 'Why Ashapura',
+    why: [
+      { icon: 'gear', title: 'Made in-house', text: 'Heading, rolling, turning and pressing under one roof.' }, // PLACEHOLDER
+      { icon: 'drawing', title: 'To your drawing', text: 'Specials made from your drawing or a sample part.' }, // PLACEHOLDER
+      { icon: 'caliper', title: 'Tight tolerance', text: 'Gauged to the standard, lot by lot.' }, // PLACEHOLDER
+      { icon: 'clock', title: 'Quick turnaround', text: 'Stock sizes dispatched fast; specials on a clear date.' }, // PLACEHOLDER
+      { icon: 'check', title: 'Every lot inspected', text: 'GO / NO-GO, hardness and finish checks before packing.' }, // PLACEHOLDER
+      { icon: 'box', title: 'Kitted & packed', text: 'Counted kit packs for furniture and assembly lines.' }, // PLACEHOLDER
+    ],
+    listTitle: 'Industries we supply',
+    list: [
+      { key: 'furniture', name: 'Furniture', parts: 'Cam locks · connecting bolts · kit packs' }, // PLACEHOLDER
+      { key: 'electrical', name: 'Electrical', parts: 'Brass terminals · earthing screws · inserts' }, // PLACEHOLDER
+      { key: 'automotive', name: 'Automotive', parts: 'High tensile bolts · flange nuts · brackets' }, // PLACEHOLDER
+      { key: 'appliances', name: 'Appliances', parts: 'Self-tapping screws · clips · spacers' }, // PLACEHOLDER
+      { key: 'construction', name: 'Construction', parts: 'Anchor bolts · washers · structural nuts' }, // PLACEHOLDER
+    ],
+  },
+  gallery: {
+    label: '08 / Gallery',
+    title: 'Inside the workshop.', // PLACEHOLDER
+    lead: 'A look at the parts, the machines and the people. Real photos coming soon.', // PLACEHOLDER
+    open: 'Open image',
+    close: 'Close',
+    prev: 'Previous image',
+    next: 'Next image',
+    count: (i, n) => `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`,
+  },
+  contact: {
+    label: '09 / Contact',
+    title: ['Send us your', 'requirement.'], // PLACEHOLDER
+    lead: 'Tell us the part, size and quantity. We reply on WhatsApp, usually the same working day.', // PLACEHOLDER
+    form: {
+      name: 'Your name',
+      company: 'Company',
+      phone: 'Phone',
+      requirement: 'Requirement',
+      requirementHint: 'Part, size, material, finish, drawing reference…',
+      quantity: 'Quantity',
+      quantityHint: 'e.g. 5,000 pcs',
+      optional: 'optional',
+      submit: 'Send on WhatsApp',
+      email: 'Send by email instead',
+      sent: 'WhatsApp should have opened in a new tab. If it did not, send the same message by email.',
+      errors: { name: 'Please enter your name.', phone: 'Please enter a phone number we can reach.', requirement: 'Please describe the part you need.' },
+      message: ({ name, company, phone, requirement, quantity }) =>
+        [
+          'Hello Shree Ashapura Industries, I have an enquiry:',
+          `Name: ${name}`,
+          company && `Company: ${company}`,
+          `Phone: ${phone}`,
+          `Requirement: ${requirement}`,
+          quantity && `Quantity: ${quantity}`,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      subject: (name) => `Enquiry from ${name}`,
+    },
+    addressTitle: 'Visit the works',
+    callTitle: 'Call',
+    call: 'Call now',
+    whatsapp: 'WhatsApp',
+    directions: 'Get directions',
+    hoursTitle: 'Hours',
+    hours: [
+      ['Mon – Sat', '9:30 am – 7:00 pm'],
+      ['Sunday', 'Closed'],
+    ], // PLACEHOLDER
+    mapTitle: 'Map showing Shree Ashapura Industries, Dahisar East, Mumbai',
   },
   footer: {
     blurb: 'Manufacturers of all kinds of fasteners, precision turned, press and plastic moulded components, and special items for furniture kits.',

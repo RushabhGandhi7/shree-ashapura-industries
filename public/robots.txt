@@ -1,0 +1,6 @@
+# SITE URL PLACEHOLDER: replace the domain below with the live one.
+User-agent: *
+Allow: /
+Disallow: /lab
+
+Sitemap: https://www.shreeashapura.in/sitemap.xml

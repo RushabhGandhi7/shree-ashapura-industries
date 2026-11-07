@@ -5,7 +5,11 @@ import { useLenis, scrollToTarget } from '../../lib/smoothScroll.jsx'
 import Logo from '../ui/Logo.jsx'
 import Button from '../ui/Button.jsx'
 import { PhoneIcon, WhatsAppIcon } from '../ui/Icons.jsx'
-import MobileMenu from './MobileMenu.jsx'
+import { Suspense, lazy } from 'react'
+
+// Framer Motion only ships with the menu, loaded on first open (prefetched when idle).
+const loadMenu = () => import('./MobileMenu.jsx')
+const MobileMenu = lazy(loadMenu)
 
 const t = content.nav
 
@@ -15,6 +19,14 @@ export default function Navbar() {
   const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
   const lastY = useRef(0)
+  const [menuLoaded, setMenuLoaded] = useState(false)
+  useEffect(() => {
+    if (open) setMenuLoaded(true)
+  }, [open])
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((f) => setTimeout(f, 2500))
+    idle(() => loadMenu())
+  }, [])
   const menuBtn = useRef(null)
 
   useEffect(() => {
@@ -53,8 +65,9 @@ export default function Navbar() {
         } ${scrolled ? 'bg-paper/85 shadow-[0_1px_0_var(--color-steel-300)] backdrop-blur-md' : 'bg-transparent'}`}
       >
         <div className="container-x flex h-[var(--nav-h)] items-center justify-between gap-6">
-          <a href="#top" onClick={(e) => go(e, 'top')} aria-label={t.homeLabel} className="-ml-1 p-1">
+          <a href="#top" onClick={(e) => go(e, 'top')} className="-ml-1 p-1">
             <Logo />
+            <span className="sr-only">, back to top</span>
           </a>
 
           <nav aria-label={t.label} className="hidden lg:block">
@@ -125,7 +138,11 @@ export default function Navbar() {
         </div>
       </header>
 
-      <MobileMenu open={open} onClose={() => setOpen(false)} onNavigate={go} returnFocusRef={menuBtn} />
+      {menuLoaded && (
+        <Suspense fallback={null}>
+          <MobileMenu open={open} onClose={() => setOpen(false)} onNavigate={go} returnFocusRef={menuBtn} />
+        </Suspense>
+      )}
     </>
   )
 }

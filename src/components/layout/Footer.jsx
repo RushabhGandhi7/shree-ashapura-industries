@@ -21,13 +21,13 @@ export default function Footer() {
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-70" aria-hidden />
 
       <div className="container-x relative pt-20 pb-10 md:pt-28">
-        <div className="grid gap-12 md:grid-cols-12">
-          <div className="md:col-span-5">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="sm:col-span-2 lg:col-span-5">
             <Logo />
             <p className="mt-6 max-w-[38ch] text-steel-700">{t.blurb}</p>
           </div>
 
-          <div className="md:col-span-3">
+          <div className="lg:col-span-3">
             <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.addressTitle}</h2>
             <address className="not-italic leading-relaxed text-ink">
               {company.address.lines.map((l) => (
@@ -38,20 +38,20 @@ export default function Footer() {
             </address>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="lg:col-span-2">
             <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.contactTitle}</h2>
             <dl className="space-y-3 text-small">
               <div>
                 <dt className="text-steel-700">{t.mobile}</dt>
                 <dd className="flex flex-col">
-                  <a href={telHref()} className="font-medium whitespace-nowrap hover:text-red">
+                  <a href={telHref()} className="inline-block py-1 font-medium whitespace-nowrap hover:text-red">
                     {company.phone.display}
                   </a>
                   <a
                     href={whatsappHref(content.whatsappMessages.general)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-red hover:text-red-deep"
+                    className="inline-block py-1 font-medium text-red hover:text-red-deep"
                   >
                     {content.nav.whatsapp} →
                   </a>
@@ -60,7 +60,7 @@ export default function Footer() {
               <div>
                 <dt className="text-steel-700">{t.landline}</dt>
                 <dd>
-                  <a href={telHref(company.landline.e164)} className="font-medium hover:text-red">
+                  <a href={telHref(company.landline.e164)} className="inline-block py-1 font-medium hover:text-red">
                     {company.landline.display}
                   </a>
                 </dd>
@@ -68,7 +68,7 @@ export default function Footer() {
               <div>
                 <dt className="text-steel-700">{t.email}</dt>
                 <dd>
-                  <a href={mailtoHref()} className="font-medium break-all hover:text-red">
+                  <a href={mailtoHref()} className="inline-block py-1 font-medium [overflow-wrap:anywhere] hover:text-red">
                     {company.email}
                   </a>
                 </dd>
@@ -76,7 +76,7 @@ export default function Footer() {
             </dl>
           </div>
 
-          <nav aria-label="Footer" className="md:col-span-2">
+          <nav aria-label="Footer" className="lg:col-span-2">
             <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.linksTitle}</h2>
             <ul className="space-y-2 text-small">
               {content.nav.links.map((l) => (

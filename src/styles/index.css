@@ -12,7 +12,7 @@
   --color-paper-2: #eeebe4;
   --color-steel-100: #e2e1dd;
   --color-steel-300: #bdbcb7;
-  --color-steel-500: #8a8b8c;
+  --color-steel-500: #68696b; /* ≥ 4.5:1 on paper and paper-2 for small text */
   --color-steel-700: #55575a;
   --color-ink: #1c1d1f;
   --color-red: #c8102e;
@@ -112,6 +112,18 @@
   p {
     text-wrap: pretty;
   }
+}
+
+/* Static first-paint shell (scripts/static-shell.js): hero text, or the loader's first
+   frame when the intro will run. React replaces it on mount. */
+#sa-shell .sa-shell-loader {
+  display: none;
+}
+html.is-loading #sa-shell .sa-shell-loader {
+  display: block;
+}
+html.is-lab #sa-shell {
+  display: none;
 }
 
 /* Lenis recommended CSS */
@@ -222,6 +234,15 @@ html.lenis body {
 }
 .sa-drift {
   animation: sa-drift var(--dur, 16s) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes sa-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes sa-slide {

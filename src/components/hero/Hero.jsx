@@ -124,13 +124,18 @@ export default function Hero() {
 
       // Copy entrance: lines rise out of their masks once the loader reveals the page.
       const q = gsap.utils.selector(copy)
-      gsap.set(q('[data-line]'), { yPercent: 105 })
-      gsap.set(q('[data-fade]'), { autoAlpha: 0, y: 16 })
+      // The headline is the LCP element. It only rises out of its mask when the intro
+      // loader is covering the page; otherwise it paints immediately (fast LCP) and just
+      // the smaller elements fade in.
+      const withIntro = document.documentElement.classList.contains('is-loading')
+      if (withIntro) gsap.set(q('[data-line]'), { yPercent: 105 })
+      // after a static-shell paint the copy is already on screen: don't hide it again
+      const fade = withIntro || !window.__saShell
+      if (fade) gsap.set(q('[data-fade]'), { autoAlpha: 0, y: 16 })
       const cleanup = onIntro('reveal', () => {
-        gsap
-          .timeline({ defaults: { ease: 'expo.out' } })
-          .to(q('[data-line]'), { yPercent: 0, duration: 1.1, stagger: 0.09 })
-          .to(q('[data-fade]'), { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.07 }, 0.25)
+        const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
+        if (withIntro) tl.to(q('[data-line]'), { yPercent: 0, duration: 1.1, stagger: 0.09 })
+        if (fade) tl.to(q('[data-fade]'), { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.07 }, withIntro ? 0.25 : 0.05)
       })
       const fonts = document.fonts?.ready.then(() => ScrollTrigger.refresh())
       return () => {
@@ -181,7 +186,7 @@ export default function Hero() {
             <div data-fade>
               <MonoLabel dot>{t.eyebrow}</MonoLabel>
             </div>
-            <h1 id="hero-title" className="display-wide mt-5 text-[clamp(2.6rem,1.2rem+5.6vw,6.9rem)] leading-[0.92] tracking-[-0.03em] md:mt-8">
+            <h1 id="hero-title" className="display-wide mt-5 text-[clamp(2.6rem,1.2rem+5.6vw,6.9rem)] leading-[0.92] tracking-[-0.03em] md:mt-8 md:max-lg:text-[3.3rem]">
               <span className="block overflow-hidden pb-[0.06em]">
                 <span data-line className="block">
                   {t.title[0]}

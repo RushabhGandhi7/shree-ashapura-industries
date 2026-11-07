@@ -3,7 +3,9 @@ import { content } from '../../data/content.js'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { dprCap, hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
-import ProductDrawer from './ProductDrawer.jsx'
+// Drawer (and Framer Motion) load on first open, prefetched when idle.
+const loadDrawer = () => import('./ProductDrawer.jsx')
+const ProductDrawer = lazy(loadDrawer)
 
 // One shared canvas for all seven cards, loaded lazily when the section gets close.
 const ProductViews = lazy(() => import('./ProductViews.jsx'))
@@ -89,6 +91,14 @@ export default function Products() {
   const [slots, setSlots] = useState(null)
   const [mount3D, setMount3D] = useState(false)
   const [openSlug, setOpenSlug] = useState(null)
+  const [drawerLoaded, setDrawerLoaded] = useState(false)
+  useEffect(() => {
+    if (openSlug) setDrawerLoaded(true)
+  }, [openSlug])
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((f) => setTimeout(f, 2500))
+    idle(() => loadDrawer())
+  }, [])
 
   const profile = useMemo(
     () => ({
@@ -168,7 +178,11 @@ export default function Products() {
         </div>
       </div>
 
-      <ProductDrawer category={active} onClose={() => setOpenSlug(null)} />
+      {drawerLoaded && (
+        <Suspense fallback={null}>
+          <ProductDrawer category={active} onClose={() => setOpenSlug(null)} />
+        </Suspense>
+      )}
     </section>
   )
 }

@@ -158,7 +158,7 @@ export default function Products({ h1 = false } = {}) {
           {mount3D && slots && (
             <Boundary onFail={() => setGlFailed(true)}>
               <Suspense fallback={null}>
-                <ProductViews slots={slots} container={grid} dpr={profile.dpr} quality={profile.quality} reduced={profile.reduced} />
+                <ProductViews slots={slots} container={grid} touch={profile.touch} quality={profile.quality} reduced={profile.reduced} />
               </Suspense>
             </Boundary>
           )}

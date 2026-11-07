@@ -1,8 +1,17 @@
 // Lazy 3D layer for the category grid: ONE canvas, eight drei <View>s (gl.scissor).
 // Each View is portalled into its card's slot element, so it tracks the card's box.
-// The canvas covers the grid and scrolls with it, so nothing re-renders on scroll;
-// frames are only drawn while a part is spinning or settling (frameloop="demand").
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+//
+// The canvas is position:absolute over the grid, so the browser scrolls the canvas and
+// the cards together. drei places a view at (slot rect − canvas rect); R3F only
+// re-measures the canvas rect 50 ms after scrolling stops, so any frame drawn mid-scroll
+// used a stale offset and the models drifted (Phase 8C). SyncCanvasRect writes the live
+// canvas rect into the store each frame, before the views render, so both rects come
+// from the same moment and cannot disagree.
+//
+// Rendering runs on GSAP's ticker (the same tick that drives Lenis), only when something
+// changed (a spin, a scroll, a resize) and only while the grid is on screen.
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import gsap from 'gsap'
 import { createPortal } from 'react-dom'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerspectiveCamera, View } from '@react-three/drei'
@@ -11,11 +20,15 @@ import { CARD_FOV as FOV, fitDistance, measure } from '../../three/categoryFit.j
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
+import { useLenis } from '../../lib/smoothScroll.jsx'
+
+// one render request flag, shared by the DOM side and the canvas
+const loop = { dirty: true, onScreen: true }
+const requestRender = () => (loop.dirty = true)
 
 function CardScene({ c, quality, reduced }) {
   const inner = useRef(null)
   const st = useRef({ angle: 0, vel: 0 })
-  const { invalidate } = useThree()
   const cam = useRef(null)
   const { c: center, radius, height } = useMemo(() => measure(c.parts), [c.parts])
 
@@ -24,8 +37,8 @@ function CardScene({ c, quality, reduced }) {
 
   useLayoutEffect(() => {
     cam.current?.lookAt(0, 0, 0)
-    invalidate()
-  }, [dist, invalidate])
+    requestRender()
+  }, [dist])
 
   useFrame((_, dt) => {
     const spinning = !reduced && spinStore.isSpinning(c.slug)
@@ -35,7 +48,7 @@ function CardScene({ c, quality, reduced }) {
     if (Math.abs(s.vel) < 0.002 && !spinning) s.vel = 0
     s.angle += s.vel * Math.min(dt, 0.05)
     inner.current.rotation.y = s.angle
-    if (spinning || s.vel !== 0) invalidate()
+    if (spinning || s.vel !== 0) requestRender()
   })
 
   return (
@@ -57,29 +70,100 @@ function CardScene({ c, quality, reduced }) {
   )
 }
 
-function Bridge() {
-  const { invalidate } = useThree()
-  useEffect(() => {
-    spinStore.invalidate = invalidate
-    const onResize = () => invalidate()
-    window.addEventListener('resize', onResize)
-    document.fonts?.ready.then(() => invalidate())
-    invalidate()
-    return () => {
-      spinStore.invalidate = null
-      window.removeEventListener('resize', onResize)
-    }
-  }, [invalidate])
+/** Live canvas rect into the store, before any View renders (priority −1). */
+function SyncCanvasRect() {
+  useFrame((state) => {
+    const r = state.gl.domElement.getBoundingClientRect()
+    state.size.top = r.top
+    state.size.left = r.left
+  }, -1)
   return null
 }
 
-export default function ProductViews({ slots, dpr, quality, reduced }) {
+/** Drives R3F from gsap.ticker: advance() only when dirty and the grid is on screen. */
+function TickerBridge() {
+  const advance = useThree((s) => s.advance)
+  useEffect(() => {
+    spinStore.invalidate = requestRender
+    const tick = () => {
+      if (!loop.dirty || !loop.onScreen) return
+      loop.dirty = false
+      advance(performance.now())
+    }
+    gsap.ticker.add(tick)
+    window.addEventListener('resize', requestRender)
+    document.fonts?.ready.then(requestRender)
+    requestRender()
+    return () => {
+      gsap.ticker.remove(tick)
+      spinStore.invalidate = null
+      window.removeEventListener('resize', requestRender)
+    }
+  }, [advance])
+  return null
+}
+
+const MAX_BUFFER = 4096 // keep the drawing buffer inside WebGL's usual size limit (Safari clamps above it)
+
+export default function ProductViews({ slots, container, touch, quality, reduced }) {
+  const lenis = useLenis()
+  const [dpr, setDpr] = useState(1)
+  const [onScreen, setOnScreen] = useState({})
+
+  // DPR: 1.5 desktop / 1.25 touch, clamped so neither buffer side exceeds MAX_BUFFER
+  useEffect(() => {
+    const el = container.current
+    const ro = new ResizeObserver(() => {
+      const cap = Math.min(touch ? 1.25 : 1.5, window.devicePixelRatio || 1)
+      const fit = MAX_BUFFER / Math.max(el.offsetHeight, el.offsetWidth, 1)
+      setDpr(Math.max(0.75, Math.min(cap, fit)))
+      requestRender()
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [container, touch])
+
+  // Whole canvas: pause while the grid is off screen. Each view: render only near the viewport.
+  useEffect(() => {
+    const grid = new IntersectionObserver(([e]) => {
+      loop.onScreen = e.isIntersecting
+      if (e.isIntersecting) requestRender()
+    })
+    grid.observe(container.current)
+    const cards = new IntersectionObserver(
+      (entries) => {
+        setOnScreen((m) => {
+          const n = { ...m }
+          entries.forEach((e) => (n[e.target.dataset.slug] = e.isIntersecting))
+          return n
+        })
+        requestRender()
+      },
+      { rootMargin: '120px 0px' },
+    )
+    Object.entries(slots).forEach(([slug, el]) => {
+      el.dataset.slug = slug
+      cards.observe(el)
+    })
+    return () => (grid.disconnect(), cards.disconnect())
+  }, [container, slots])
+
+  // Scrolling moves canvas and cards together; re-render so the views stay in sync anyway.
+  useEffect(() => {
+    if (!lenis) {
+      window.addEventListener('scroll', requestRender, { passive: true })
+      return () => window.removeEventListener('scroll', requestRender)
+    }
+    lenis.on('scroll', requestRender)
+    return () => lenis.off('scroll', requestRender)
+  }, [lenis])
+
   return (
     <>
       {categories.map((c) =>
         slots[c.slug]
           ? createPortal(
-              <View className="pointer-events-none absolute inset-0">
+              <View className="pointer-events-none absolute inset-0" visible={onScreen[c.slug] !== false}>
                 <CardScene c={c} quality={quality} reduced={reduced} />
               </View>,
               slots[c.slug],
@@ -88,13 +172,15 @@ export default function ProductViews({ slots, dpr, quality, reduced }) {
           : null,
       )}
       <Canvas
-        frameloop="demand"
+        frameloop="never"
         dpr={dpr}
+        eventSource={container.current}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
         aria-hidden
       >
-        <Bridge />
+        <SyncCanvasRect />
+        <TickerBridge />
         <View.Port />
       </Canvas>
     </>

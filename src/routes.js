@@ -2,8 +2,9 @@
 // (scripts/prerender.mjs, scripts/sitemap.mjs) can import it in Node too.
 import { company, content } from './data/content.js'
 import { categories } from './data/products.js'
+import { SITE_URL } from './config.js'
 
-export const SITE = 'https://www.shreeashapura.in' // SITE URL PLACEHOLDER: replace with the live domain
+export const SITE = SITE_URL // from VITE_SITE_URL (src/config.js)
 const P = content.pages
 
 const page = (path, key, extra = {}) => ({

@@ -7,10 +7,10 @@ export const whatsappHref = (message = '') => {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base
 }
 
-export const mailtoHref = ({ subject = '', body = '' } = {}) => {
+export const mailtoHref = ({ subject = '', body = '', to = company.email } = {}) => {
   const params = new URLSearchParams()
   if (subject) params.set('subject', subject)
   if (body) params.set('body', body)
   const qs = params.toString().replace(/\+/g, '%20')
-  return `mailto:${company.email}${qs ? `?${qs}` : ''}`
+  return `mailto:${to}${qs ? `?${qs}` : ''}`
 }

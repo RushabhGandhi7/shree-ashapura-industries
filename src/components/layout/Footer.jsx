@@ -68,9 +68,11 @@ export default function Footer() {
               <div>
                 <dt className="text-steel-700">{t.email}</dt>
                 <dd>
-                  <a href={mailtoHref()} className="inline-block py-1 font-medium [overflow-wrap:anywhere] hover:text-red">
-                    {company.email}
-                  </a>
+                  {company.emails.map((e) => (
+                    <a key={e} href={mailtoHref({ to: e })} className="block py-1 font-medium [overflow-wrap:anywhere] hover:text-red">
+                      {e}
+                    </a>
+                  ))}
                 </dd>
               </div>
             </dl>

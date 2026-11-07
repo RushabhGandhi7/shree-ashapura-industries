@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { content } from '../../data/content.js'
+import { content, yearsInBusiness } from '../../data/content.js'
+import { SHOW_CUSTOMERS } from '../../data/products.js'
+import Customers from './Customers.jsx'
 import { prefersReducedMotion } from '../../lib/device.js'
 import { gearPath } from '../ui/gear.js'
 import DimensionLine from '../ui/DimensionLine.jsx'
 
 const t = content.industries
+const counters = t.counters.map((c) => ({ ...c, value: c.value === 'years' ? yearsInBusiness() : c.value }))
 const fmt = (v, d = 0) => v.toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d })
 
 // Micro-animations run on hover, keyboard focus, or once in view on touch (data-in).
@@ -94,6 +97,20 @@ function IndustryGlyph({ k }) {
         </>
       )}
       {k === 'construction' && <path d="M6 34 H34 M10 34 V14 H30 V34 M10 14 L20 6 L30 14 M16 34 V24 H24 V34" {...p} />}
+      {k === 'locks' && (
+        <>
+          <rect x="9" y="18" width="22" height="16" rx="2" {...p} />
+          <path d="M14 18 V13 a6 6 0 0 1 12 0 V18" {...p} />
+          <path d="M20 24 v4" {...p} />
+        </>
+      )}
+      {k === 'networking' && (
+        <>
+          <rect x="6" y="8" width="28" height="10" rx="1.5" {...p} />
+          <path d="M11 13 h2 M16 13 h2 M21 13 h2" {...p} />
+          <path d="M20 18 V24 M10 24 H30 M10 24 V30 M20 24 V30 M30 24 V30" {...p} />
+        </>
+      )}
     </svg>
   )
 }
@@ -107,7 +124,7 @@ export default function Industries() {
     () => {
       const els = nums.current
       if (prefersReducedMotion()) return
-      t.counters.forEach((c, i) => {
+      counters.forEach((c, i) => {
         const o = { v: 0 }
         els[i].textContent = fmt(0, c.decimals)
         gsap.to(o, {
@@ -150,16 +167,31 @@ export default function Industries() {
 
         {/* counters */}
         <dl className="mt-12 grid grid-cols-2 gap-y-10 border-y border-steel-300 py-10 md:mt-16 lg:grid-cols-4">
-          {t.counters.map((c, i) => (
+          {counters.map((c, i) => (
             <div key={c.label} className="flex flex-col gap-3 px-1 lg:px-6 lg:not-first:border-l lg:not-first:border-steel-300">
-              <dt className="label-mono order-2 text-steel-700">{c.label}</dt>
+              <dt className="label-mono order-2 text-steel-700">
+                {c.label}
+                {c.note && <span className="mt-1 block text-steel-500">{c.note}</span>}
+              </dt>
               <dd className="display-wide order-1 text-[clamp(2.3rem,1.4rem+2.6vw,3.6rem)] leading-none tracking-[-0.03em] whitespace-nowrap tabular-nums">
-                {c.prefix && <span className="text-red">{c.prefix}</span>}
                 <span ref={(el) => (nums.current[i] = el)}>{fmt(c.value, c.decimals)}</span>
-                <span className="text-[0.5em] tracking-normal text-steel-500">{c.suffix}</span>
+                {c.suffix && <span className="text-[0.5em] tracking-normal text-red">{c.suffix}</span>}
               </dd>
             </div>
           ))}
+          {/* ISO badge (a certification, not a count) */}
+          <div className="flex flex-col gap-3 px-1 lg:border-l lg:border-steel-300 lg:px-6">
+            <dt className="label-mono order-2 text-steel-700">{t.iso.note}</dt>
+            <dd className="order-1">
+              <span className="inline-flex items-center gap-2.5 rounded-xs border border-ink px-3 py-2">
+                <svg viewBox="0 0 24 24" className="size-6 text-red" aria-hidden>
+                  <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M7.5 12.5 l3 3 l6 -7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="display-wide text-[clamp(1.1rem,0.8rem+0.9vw,1.5rem)] leading-none">{t.iso.title}</span>
+              </span>
+            </dd>
+          </div>
         </dl>
 
         <div className="mt-16 grid gap-14 lg:grid-cols-12 lg:gap-10">
@@ -189,15 +221,14 @@ export default function Industries() {
                   <span className="absolute bottom-[-1px] left-0 h-px w-full origin-left scale-x-0 bg-red transition-transform duration-500 ease-[var(--ease-out)] group-hover:scale-x-100" aria-hidden />
                   <span className="font-mono text-small text-red">0{i + 1}</span>
                   <IndustryGlyph k={ind.key} />
-                  <div className="min-w-0">
-                    <p className="font-display text-[1.2rem] font-[760] transition-transform duration-500 [font-stretch:115%] group-hover:translate-x-1">{ind.name}</p>
-                    <p className="label-mono mt-1 truncate text-steel-700">{ind.parts}</p>
-                  </div>
+                  <p className="min-w-0 font-display text-[1.2rem] font-[760] transition-transform duration-500 [font-stretch:115%] group-hover:translate-x-1">{ind.name}</p>
                 </li>
               ))}
             </ol>
           </div>
         </div>
+
+        {SHOW_CUSTOMERS && <Customers title={t.customersTitle} more={t.customersMore} />}
       </div>
     </section>
   )

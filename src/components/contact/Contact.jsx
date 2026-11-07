@@ -152,16 +152,20 @@ export default function Contact() {
                 </a>
               </div>
               <div>
-                <h3 className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.hoursTitle}</h3>
-                <dl className="space-y-1 text-small">
-                  {t.hours.map(([d, h]) => (
-                    <div key={d} className="flex justify-between gap-4">
-                      <dt className="text-steel-700">{d}</dt>
-                      <dd className="font-medium">{h}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <h3 className="label-mono mt-5 mb-2 font-medium [font-stretch:100%] text-steel-500">{t.callTitle}</h3>
+                {t.hours && (
+                  <>
+                    <h3 className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.hoursTitle}</h3>
+                    <dl className="mb-5 space-y-1 text-small">
+                      {t.hours.map(([d, h]) => (
+                        <div key={d} className="flex justify-between gap-4">
+                          <dt className="text-steel-700">{d}</dt>
+                          <dd className="font-medium">{h}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </>
+                )}
+                <h3 className="label-mono mb-2 font-medium [font-stretch:100%] text-steel-500">{t.callTitle}</h3>
                 <p className="text-small">
                   <a href={telHref()} className="inline-block py-1 font-medium hover:text-red">
                     {company.phone.display}
@@ -170,6 +174,14 @@ export default function Contact() {
                   <a href={telHref(company.landline.e164)} className="inline-block py-1 font-medium hover:text-red">
                     {company.landline.display}
                   </a>
+                </p>
+                <h3 className="label-mono mt-5 mb-2 font-medium [font-stretch:100%] text-steel-500">{t.emailTitle}</h3>
+                <p className="text-small">
+                  {company.emails.map((e) => (
+                    <a key={e} href={mailtoHref({ to: e })} className="block py-1 font-medium [overflow-wrap:anywhere] hover:text-red">
+                      {e}
+                    </a>
+                  ))}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-1">

@@ -3,14 +3,16 @@
 Premium, motion-heavy marketing website for **Shree Ashapura Industries**, a fastener manufacturer in Mumbai.
 
 ## Client
+> **Real client content lives in [`client-assets/CLIENT_FACTS.md`](client-assets/CLIENT_FACTS.md).** It is the source of truth for copy, products, capability and contact details; its OVERRIDES win. Never invent numbers or claims; CONFIRM items carry `// CONFIRM` in code.
+
 Shree Ashapura Industries, manufacturers of: all kinds of fasteners (screws, nuts, bolts, washers), precision turned components, press components, plastic moulded components, and special items in all types of furniture kits.
 
-- **Address:** Gala No. 24/25, Agrawal Industrial Estate, Near Dahisar Petrol Pump, S.V. Road, Dahisar (E), Mumbai - 400068
+- **Address:** Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump, Dahisar (East), Mumbai 400068
 - **Phone/WhatsApp:** +91 70215 80583
   - Call link: `tel:+917021580583`
   - WhatsApp link: `https://wa.me/917021580583` (no leading 0)
 - **Landline:** 022-2089 1665
-- **Email:** ashapura56@gmail.com
+- **Email:** ashapura56@gmail.com, b_jaan@hotmail.com
 - **Logo:** red triangular "SA" mark. The client will supply the file later; until then use a clean SVG placeholder wordmark.
 
 ## Concept: "Precision in motion"

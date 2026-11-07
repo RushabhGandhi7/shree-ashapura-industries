@@ -13,10 +13,11 @@ import { hexPrism } from './lib/hex.js'
 import { hexSocket, crossRecess } from './lib/recess.js'
 import { plate, roundedRect2, circle2, slot2, helicalSweep, roundedSection } from './lib/sheet.js'
 import { boltDims, nutDims, washerDims, pitchFor, tappingPitch, DEFAULTS } from './specs.js'
+import { EXTRA } from './parts-extra.js'
 
 export const mm = (v) => v / 10
 export const SEGMENTS = { high: 48, low: 24 }
-const ROLES = ['main', 'dark', 'nylon', 'knurl']
+const ROLES = ['main', 'dark', 'nylon', 'knurl', 'black', 'cream']
 
 /* ───────────────────────── shared pieces ───────────────────────── */
 
@@ -24,7 +25,7 @@ const ROLES = ['main', 'dark', 'nylon', 'knurl']
  * External thread + plain shank + under-head fillet. Returns the shank's lathe points
  * (ending on the bearing face at y = 0) so the head can continue the same profile.
  */
-function threadedShank(B, { R, L, P, threadLen, N, detail, profile = 'iso', pointed = false, fillet = 0, shankR }) {
+export function threadedShank(B, { R, L, P, threadLen, N, detail, profile = 'iso', pointed = false, fillet = 0, shankR }) {
   const yTip = -L
   const yRun = threadLen >= L - 1e-6 ? -Math.min(L * 0.5, 1.2 * P) : -(L - threadLen)
   const rS = shankR ?? R * 0.995
@@ -55,7 +56,7 @@ function threadedShank(B, { R, L, P, threadLen, N, detail, profile = 'iso', poin
 }
 
 // Pan / dome head surface: super-ellipse, flat top with a rounded edge.
-function domeHead(Rh, ys, k, n = 2.6) {
+export function domeHead(Rh, ys, k, n = 2.6) {
   const surfaceY = (r) => ys + (k - ys) * Math.max(0, 1 - (Math.min(r, Rh) / Rh) ** n) ** (1 / n)
   const surfaceN = (p) => {
     const r = Math.hypot(p[0], p[2])
@@ -78,7 +79,7 @@ function domeHead(Rh, ys, k, n = 2.6) {
 }
 
 /** Heads sit on y = 0 (bearing face) and rise upward. `drive`: 'hex' | 'cross'. */
-function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
+export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
   const hi = detail !== 'low'
   const dims = boltDims(d)
   const main = B.main
@@ -119,12 +120,24 @@ function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
       hexSocket(B, { rOuter: DK - rr, y: K, N, s: mm(key), depth: mm(t), detail })
       return K
     }
-    case 'pan': {
-      const { dk, k } = dims.pan
-      const Rh = mm(dk) / 2
-      const K = mm(k)
-      const dome = domeHead(Rh, K * 0.3, K)
-      const rA = Rh * 0.72
+    case 'pan':
+    case 'phhd':
+    case 'combi':
+    case 'umbrella':
+    case 'button': {
+      // pan family: phhd = Phillips pan (chipboard), combi = pan with slot + cross,
+      // umbrella = wide low dome, button = ISO 7380 button head with hex socket
+      const shape = {
+        pan: [dims.pan.dk, dims.pan.k, 0.3, 2.6],
+        phhd: [dims.pan.dk, dims.pan.k, 0.3, 2.6],
+        combi: [dims.pan.dk * 1.05, dims.pan.k, 0.34, 2.8],
+        umbrella: [d * 3, d * 0.5, 0.22, 2.2],
+        button: [d * 1.75, d * 0.55, 0.12, 2.1],
+      }[kind]
+      const Rh = mm(shape[0]) / 2
+      const K = mm(shape[1])
+      const dome = domeHead(Rh, K * shape[2], K, shape[3])
+      const rA = Rh * (kind === 'button' ? 0.42 : 0.72)
       lathe(
         [
           { pts: [...shankPts, [Rh, 0]], builder: main },
@@ -133,11 +146,18 @@ function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
         ],
         { segments: N },
       )
-      const arm = Rh * 0.54
-      crossRecess(B, { rOuter: rA, N, surfaceY: dome.surfaceY, surfaceN: dome.surfaceN, armX: arm, armZ: arm, w: Rh * 0.11, depth: K * 0.55, rings: hi ? 3 : 1, detail })
+      if (kind === 'button') {
+        hexSocket(B, { rOuter: rA, y: dome.surfaceY(rA), N, s: mm(dims.socket.key) * 0.62, depth: K * 0.7, detail })
+        return K
+      }
+      const arm = Rh * (kind === 'umbrella' ? 0.36 : 0.54)
+      const slot = kind === 'combi' ? Rh * 0.86 : arm // combi: slot runs across the head
+      crossRecess(B, { rOuter: rA, N, surfaceY: dome.surfaceY, surfaceN: dome.surfaceN, armX: slot, armZ: arm, w: Rh * 0.11, depth: K * 0.55, rings: hi ? 3 : 1, detail })
       return K
     }
+    case 'allenFlat':
     case 'countersunk': {
+      if (kind === 'allenFlat') drive = 'hex'
       const Rk = mm(dims.csk.dk) / 2
       const rS = shankPts[0][0]
       const hc = Rk - rS // 90° head
@@ -187,14 +207,25 @@ function bolt(B, p) {
   head(B, p.head, { d, D, R, N, detail: p.detail, shankPts, drive: 'hex' })
 }
 
+/**
+ * Screws. `thread`: 'tapping' (self-tapping, default), 'chipboard' (coarse, sharp, for
+ * board), 'machine' (ISO metric, blunt chamfered tip). `washer: true` adds a captive
+ * flat washer under the head (Phillips combi washer screw).
+ */
 function screw(B, p) {
   const d = p.diameter
   const D = mm(d)
   const R = D / 2
   const N = SEGMENTS[p.detail]
   const L = mm(p.length)
-  const P = mm(p.pitch ?? tappingPitch(d))
-  const minor = minorRadius(R, P, 'tapping')
+  // catalogue aliases: CSK Phillips chipboard, Phillips combi washer screw
+  const alias = { cskPhillips: ['countersunk', 'chipboard', false], combiWasher: ['combi', 'machine', true] }[p.head]
+  if (alias) p = { ...p, head: alias[0], thread: p.thread ?? alias[1], washer: p.washer ?? alias[2] }
+  const kind = p.thread ?? (p.head === 'phhd' ? 'chipboard' : 'tapping')
+  const profile = kind === 'machine' ? 'iso' : kind === 'chipboard' ? 'wood' : 'tapping'
+  const P = mm(p.pitch ?? (kind === 'machine' ? pitchFor(d) : kind === 'chipboard' ? tappingPitch(d) * 1.25 : tappingPitch(d)))
+  const minor = minorRadius(R, P, profile)
+  const flatHead = p.head === 'countersunk' || p.head === 'allenFlat'
   const shankPts = threadedShank(B, {
     R,
     L,
@@ -202,12 +233,16 @@ function screw(B, p) {
     threadLen: L,
     N,
     detail: p.detail,
-    profile: 'tapping',
-    pointed: true,
-    fillet: p.head === 'countersunk' ? 0 : D * 0.05,
-    shankR: minor + (R - minor) * 0.35,
+    profile,
+    pointed: kind !== 'machine',
+    fillet: flatHead ? 0 : D * 0.05,
+    shankR: kind === 'machine' ? undefined : minor + (R - minor) * 0.35,
   })
-  head(B, p.head, { d, D, R, N, detail: p.detail, shankPts, drive: 'cross' })
+  head(B, p.head, { d, D, R, N, detail: p.detail, shankPts, drive: p.head === 'button' || p.head === 'allenFlat' ? 'hex' : 'cross' })
+  if (p.washer && !flatHead) {
+    const t = D * 0.16
+    lathe([{ pts: roundedRectProfile(R * 1.06, D * 1.15, -t, 0, t * 0.25, 2), closed: true, builder: B.main }], { segments: N })
+  }
 }
 
 function nut(B, p) {
@@ -332,6 +367,7 @@ function washer(B, p) {
   const d = p.diameter
   const N = SEGMENTS[p.detail]
   const wd = washerDims(d)
+  if (EXTRA.washerVariant[p.head]) return EXTRA.washerVariant[p.head](B, p)
   if (p.head === 'spring') {
     const { d1, s, b } = wd.spring
     const S = mm(s)
@@ -357,6 +393,7 @@ function washer(B, p) {
 
 /** Stamped angle bracket: two legs with a hole and a slot, joined by a radiused bend. */
 function bracket(B, p) {
+  if (EXTRA.bracketVariant[p.head]) return EXTRA.bracketVariant[p.head](B, p)
   const N = SEGMENTS[p.detail]
   const W = mm(p.diameter) // width
   const L1 = mm(p.length) // long leg
@@ -364,7 +401,7 @@ function bracket(B, p) {
   const t = W * 0.1
   const R = t // inner bend radius
   const main = B.main
-  const hole = circle2(L1 * 0.62, 0, W * 0.17, N)
+  const hole = p.head === 'door' ? slot2(L1 * 0.62, 0, L1 * 0.36, W * 0.28, 10) : circle2(L1 * 0.62, 0, W * 0.17, N)
   plate(main, {
     outline: roundedRect2(0, -W / 2, L1, W / 2, W * 0.22, 8, [1, 1, 0, 0]),
     holes: [hole],
@@ -537,6 +574,8 @@ function connector(B, p) {
     m.quad(m.vert(P(R, phi, yw0), n), m.vert(P(R, phi, yw1), n), m.vert(P(ri, phi, yw1), n), m.vert(P(ri, phi, yw0), n))
   }
 
+  if (p.camOnly) return {}
+
   // ── connecting bolt, built upright then laid into the window
   const bolt = makeBuilders()
   const rT = u(3.1)
@@ -617,11 +656,11 @@ function tappedPlate(B, p) {
   threadSurface(B.dark, { major: R, pitch: P, y0: -t, y1: 0, segments: N, detail: p.detail, internal: true, csTop: cs, csBot: cs })
 }
 
-const BUILDERS = { bolt, screw, nut, washer, bracket, turned, clip, connector, plate: tappedPlate }
+const BUILDERS = { bolt, screw, nut, washer, bracket, turned, clip, connector, plate: tappedPlate, cam: (B, p) => connector(B, { ...p, camOnly: true }), ...EXTRA.builders }
 
 /* ───────────────────────── public API ───────────────────────── */
 
-function appendGeometry(b, geo, matrix) {
+export function appendGeometry(b, geo, matrix) {
   const g = matrix ? geo.clone().applyMatrix4(matrix) : geo
   const pos = g.attributes.position
   const nrm = g.attributes.normal
@@ -666,6 +705,7 @@ export function buildPart(params) {
     const parts = []
     if (!B[role].empty) parts.push(B[role].build())
     if (res.extra && !res.extra[role].empty) parts.push(res.extra[role].build().applyMatrix4(res.extraMatrix))
+    for (const x of res.extras ?? []) if (!x.B[role].empty) parts.push(x.B[role].build().applyMatrix4(x.matrix))
     if (parts.length) {
       const g = parts.length === 1 ? parts[0] : mergeGeometries(parts)
       g.computeBoundingBox()

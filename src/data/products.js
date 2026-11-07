@@ -1,7 +1,7 @@
-// Product catalogue. Everything here is PLACEHOLDER data, safe to swap later.
-// `model` holds the parameters the procedural 3D fastener generator reads (Phase 2+):
-//   type: 'bolt' | 'screw' | 'nut' | 'washer' | 'turned' | 'bracket' | 'clip' | 'connector'
-//   head: variant key from `variants[type]` below
+// Product catalogue: real categories and lists from the client's catalogue
+// (client-assets/CLIENT_FACTS.md), plus the parameters the procedural 3D library reads:
+//   type: see `variants` below (bolt, screw, nut, washer, bracket, insert, castor, ...)
+//   head: variant key from `variants[type]`
 //   diameter / length / pitch in mm, finish: key of `finishes`.
 
 // Surface finishes. Colours / PBR values are read by src/three/materials.js.
@@ -21,187 +21,193 @@ export const finishes = {
 /** The five finishes offered for metal parts (customiser, lab). */
 export const metalFinishes = ['zinc', 'blackOxide', 'brass', 'stainless', 'redAnodised']
 
-export const heads = {
-  // PLACEHOLDER
-  hex: 'Hex',
-  socket: 'Socket cap',
-  pan: 'Pan',
-  countersunk: 'Countersunk',
-}
-
 /** Variants per part type (the `head` prop of <Fastener />). */
 export const variants = {
   bolt: { hex: 'Hex head', socket: 'Socket head', pan: 'Pan head', countersunk: 'Countersunk' },
   nut: { hex: 'Hex nut', nyloc: 'Nyloc', flange: 'Flange nut', wing: 'Wing nut' },
-  washer: { flat: 'Flat', spring: 'Spring' },
-  screw: { pan: 'Pan head', countersunk: 'Countersunk' },
-  bracket: { angle: 'Angle bracket' },
+  washer: { flat: 'Plain', spring: 'Spring', star: 'Star', circlip: 'Circlip', cap: 'Cap' },
+  screw: {
+    pan: 'Pan head',
+    countersunk: 'Countersunk',
+    cskPhillips: 'CSK Phillips chipboard',
+    phhd: 'PHHD chipboard',
+    combi: 'Combi head',
+    combiWasher: 'Phillips combi washer',
+    umbrella: 'Umbrella head',
+    button: 'Allen button head',
+    allenFlat: 'Allen flat head',
+  },
+  bracket: { angle: 'L bracket', door: 'Door bracket', T: 'T bracket', square: 'Square plate', hook: 'Hook' },
   turned: { stepped: 'Stepped shaft' },
   clip: { tree: 'Tree clip' },
   connector: { cam: 'Cam + connecting bolt' },
+  cam: { cam: 'Cam lock' },
+  rivet: { round: 'Round head rivet' },
+  maleFemale: { button: 'Male-female screw' },
+  stud: { collar: 'Stud with hex collar' },
+  cotterPin: { split: 'Cotter pin' },
+  leveller: { hex: 'Leveller' },
+  insert: { threaded: 'Threaded insert', knurled: 'Knurled insert', pin: 'Brass pin', bush: 'Ferrule / bush' },
+  castor: { plate: 'Plate castor', stem: 'Threaded-stem castor' },
 }
 
-export const threads = {
-  // PLACEHOLDER — ISO metric coarse / fine
-  coarse: { label: 'Metric coarse', pitchFactor: 1 },
-  fine: { label: 'Metric fine', pitchFactor: 0.75 },
-}
-
-export const materials = [
-  // PLACEHOLDER
-  'Mild steel',
-  'High tensile steel (8.8 / 10.9)',
-  'Stainless steel SS 304 / 316',
-  'Brass',
-  'Aluminium',
-  'Nylon / PP / ABS',
-]
-
-export const sizes = {
-  // PLACEHOLDER
-  metric: ['M3', 'M4', 'M5', 'M6', 'M8', 'M10', 'M12', 'M16', 'M20'],
-  lengths: [6, 8, 10, 12, 16, 20, 25, 30, 40, 50, 60, 80, 100],
-}
-
-// The 7 "What we make" cards. `parts` are rendered with the procedural library
-// (src/three, detail "low"); `pose.tilt` angles the group in the card, and the spin
-// on hover turns it about its own axis. Everything here is PLACEHOLDER copy.
+// The 8 "What we make" cards, from the client's catalogue (client-assets/CLIENT_FACTS.md).
+// `items` / `materials` / `notes` are the client's own lists (shown in the drawer).
+// `parts` are rendered with the procedural library (src/three, detail "low"); `pose.tilt`
+// angles the group in the card and the hover spin turns it about its own axis.
+// `image` is rendered from /lab by `npm run render:products` (never a catalogue photo).
 export const categories = [
   {
-    slug: 'screws',
+    slug: 'screws-fasteners',
     code: '01',
-    name: 'Screws',
-    blurb: 'Self-tapping, machine and chipboard screws in every common head and drive.', // PLACEHOLDER
-    callout: 'ST 4.2 × 25',
-    parts: [{ type: 'screw', head: 'pan', diameter: 4.2, length: 25, finish: 'zinc' }],
-    pose: { tilt: [0, 0, -1.05] },
-    specs: [
-      ['Sizes', 'ST 2.9 – 6.3, M3 – M8'],
-      ['Heads', 'Pan, countersunk, wafer, hex washer'],
-      ['Drives', 'Phillips, Pozi, Torx, slot'],
-      ['Points', 'Sharp, drill, blunt'],
-    ], // PLACEHOLDER
-    materials: ['Case-hardened steel', 'Stainless SS 304', 'Brass'], // PLACEHOLDER
-    sizes: ['ST 2.9', 'ST 3.5', 'ST 4.2', 'ST 4.8', 'ST 5.5', 'ST 6.3'], // PLACEHOLDER
-    finishes: ['zinc', 'blackOxide', 'yellowZinc', 'stainless'],
-  },
-  {
-    slug: 'nuts-bolts',
-    code: '02',
-    name: 'Nuts & Bolts',
-    blurb: 'Hex and socket bolts with matching hex, nyloc, flange and wing nuts.', // PLACEHOLDER
-    callout: 'M10 × 1.5',
+    name: 'Screws & Fasteners',
+    blurb: 'Chipboard, Allen, combi, machine and self-tapping screws, rivets, nuts and high-tensile items.',
+    callout: 'CSK · PHHD',
     parts: [
-      { type: 'bolt', head: 'hex', diameter: 10, length: 30, finish: 'zinc' },
-      { type: 'nut', head: 'hex', diameter: 10, finish: 'zinc', position: [0, -1.6, 0], rotation: [0, 0.4, 0] },
+      { type: 'screw', head: 'cskPhillips', diameter: 4.2, length: 30, finish: 'zinc', position: [-0.6, 0, 0] },
+      { type: 'screw', head: 'combiWasher', diameter: 5, length: 16, finish: 'zinc', position: [0.7, 0.9, 0] },
     ],
-    pose: { tilt: [0, 0, -1.1] },
-    specs: [
-      ['Sizes', 'M5 – M24'],
-      ['Grades', '4.6, 8.8, 10.9 · nut class 6 – 10'],
-      ['Lengths', '10 – 150 mm'],
-      ['Standards', 'ISO 4014 / 4017 / 4762 / 4032'],
-    ], // PLACEHOLDER
-    materials: ['Mild steel', 'High tensile steel', 'Stainless SS 304 / 316'], // PLACEHOLDER
-    sizes: ['M5', 'M6', 'M8', 'M10', 'M12', 'M16', 'M20', 'M24'], // PLACEHOLDER
-    finishes: ['zinc', 'blackOxide', 'yellowZinc', 'stainless'],
+    pose: { tilt: [0, 0, -1.05] },
+    items: [
+      'CSK Phillips chipboard screw',
+      'PHHD chipboard screw',
+      'Allen flat head screw',
+      'Allen button head screw',
+      'Combi head screw',
+      'Phillips combi washer screw',
+      'Male-female screw',
+      'Rivet',
+      'Pan head slotted screw',
+      'Hex head screw',
+      'Hex nut',
+      'Wood screw',
+      'Self-tapping screw',
+      'Machine screw',
+      'Hex flange head screw',
+      'Locking screw',
+      'Umbrella screw',
+      'High-tensile items',
+    ],
+    materials: [],
+    notes: ['Special sizes made to your drawing.'],
   },
   {
     slug: 'washers',
-    code: '03',
+    code: '02',
     name: 'Washers',
-    blurb: 'Plain, spring and star washers, stamped flat and true.', // PLACEHOLDER
-    callout: 'Ø12 × 2.2',
+    blurb: 'Plain, spring, circlip, star and cap washers.',
+    callout: 'Ø12',
     parts: [
-      { type: 'washer', head: 'flat', diameter: 12, finish: 'stainless', position: [-0.75, 0, 0] },
-      { type: 'washer', head: 'spring', diameter: 12, finish: 'blackOxide', position: [1.05, 0.05, 0.2] },
+      { type: 'washer', head: 'flat', diameter: 12, finish: 'zinc', position: [-1.2, 0, 0.2] },
+      { type: 'washer', head: 'spring', diameter: 12, finish: 'blackOxide', position: [0.35, 0.05, -0.5] },
+      { type: 'washer', head: 'star', diameter: 12, finish: 'zinc', position: [1.15, 0, 0.75] },
     ],
     pose: { tilt: [0.75, 0, 0] },
-    specs: [
-      ['Types', 'Plain, spring, star, fender'],
-      ['Inner Ø', '3.2 – 25 mm'],
-      ['Thickness', '0.5 – 4 mm'],
-      ['Standards', 'ISO 7089, DIN 127'],
-    ], // PLACEHOLDER
-    materials: ['Mild steel', 'Spring steel', 'Stainless', 'Brass'], // PLACEHOLDER
-    sizes: ['M3', 'M4', 'M5', 'M6', 'M8', 'M10', 'M12', 'M16'], // PLACEHOLDER
-    finishes: ['zinc', 'blackOxide', 'stainless', 'brass'],
+    items: ['Plain washer', 'Spring washer', 'Circlip', 'Star washer', 'Cap washer'],
+    materials: [],
+    notes: [],
   },
   {
-    slug: 'turned',
+    slug: 'plastic-components',
+    code: '03',
+    name: 'Plastic Components',
+    blurb: 'Levellers, leg tube caps and male-female parts, moulded in the colour you need.',
+    callout: 'M8 stud',
+    parts: [{ type: 'leveller', diameter: 8, length: 28, finish: 'zinc' }],
+    pose: { tilt: [0.35, 0, 0] },
+    items: ['Leveller', 'Leg tube cap', 'Male-female parts'],
+    materials: ['PP', 'LD', 'ABS', 'HD-Nylon', 'EPDM'], // CONFIRM EPDM
+    notes: ['Colour as required.'],
+  },
+  {
+    slug: 'brackets-press-parts',
     code: '04',
-    name: 'Precision Turned',
-    blurb: 'CNC and traub-turned parts held to tight tolerances, made to your drawing.', // PLACEHOLDER
-    callout: 'Ø16 h7',
-    parts: [{ type: 'turned', diameter: 16, length: 40, finish: 'brass' }],
-    pose: { tilt: [0, 0, -1.3] },
-    specs: [
-      ['Diameters', '2 – 40 mm'],
-      ['Tolerance', '± 0.02 mm'],
-      ['Operations', 'Turning, grooving, knurling, threading'],
-      ['Supply', 'To your drawing or sample'],
-    ], // PLACEHOLDER
-    materials: ['Brass', 'Free-cutting steel', 'Stainless', 'Aluminium'], // PLACEHOLDER
-    sizes: ['Ø2 – Ø10', 'Ø10 – Ø25', 'Ø25 – Ø40'], // PLACEHOLDER
-    finishes: ['brass', 'zinc', 'stainless'],
+    name: 'Brackets & Press Parts',
+    blurb: 'L, T, door, square and hook brackets pressed from sheet.',
+    callout: 'L · T',
+    parts: [
+      { type: 'bracket', head: 'angle', diameter: 20, length: 40, finish: 'zinc', position: [-2.2, 0, 0] },
+      { type: 'bracket', head: 'T', diameter: 14, length: 50, finish: 'zinc', position: [2.0, 0.2, 0.5], rotation: [0, 0.4, 0] },
+    ],
+    pose: { tilt: [0.35, 0.5, 0] },
+    items: ['L bracket', 'Door bracket', 'T bracket', 'Square bracket', 'Hook'],
+    materials: [],
+    notes: [],
   },
   {
-    slug: 'pressed',
+    slug: 'brass-parts',
     code: '05',
-    name: 'Press Components',
-    blurb: 'Brackets, clips and stampings from progressive and single-stage tools.', // PLACEHOLDER
-    callout: 't 2.0',
-    parts: [{ type: 'bracket', diameter: 20, length: 40, finish: 'yellowZinc' }],
-    pose: { tilt: [0.35, 0.6, 0] },
-    specs: [
-      ['Sheet', '0.5 – 4 mm'],
-      ['Operations', 'Blank, pierce, form, bend'],
-      ['Tooling', 'Progressive & single-stage'],
-      ['Batch', 'Prototype to high volume'],
-    ], // PLACEHOLDER
-    materials: ['CRCA', 'Spring steel', 'Stainless', 'Aluminium'], // PLACEHOLDER
-    sizes: ['To drawing'], // PLACEHOLDER
-    finishes: ['yellowZinc', 'zinc', 'blackOxide'],
+    name: 'Brass Parts',
+    blurb: 'Brass pins and knurled inserts, turned to the size you need.',
+    callout: 'Ø6 knurl',
+    parts: [
+      { type: 'insert', head: 'knurled', diameter: 6, length: 12, finish: 'brass', position: [-0.6, 0, 0] },
+      { type: 'insert', head: 'pin', diameter: 5, length: 30, finish: 'brass', position: [0.7, 0, 0] },
+    ],
+    pose: { tilt: [0, 0, -0.5] },
+    items: ['Brass pins', 'Knurled inserts'],
+    materials: ['Brass'],
+    notes: ['Size as required.'],
   },
   {
-    slug: 'moulded',
+    slug: 'studs-pins-turned',
     code: '06',
-    name: 'Plastic Moulded',
-    blurb: 'Injection-moulded clips, caps, inserts and spacers in engineering plastics.', // PLACEHOLDER
-    callout: 'Ø6 PA6',
-    parts: [{ type: 'clip', diameter: 6, length: 18, finish: 'nylon' }],
-    pose: { tilt: [0, 0, -1.2] },
-    specs: [
-      ['Parts', 'Clips, caps, bushes, spacers'],
-      ['Polymers', 'PA6, PA66, PP, ABS, POM'],
-      ['Colours', 'Natural, black, to order'],
-      ['Tooling', 'In-house mould maintenance'],
-    ], // PLACEHOLDER
-    materials: ['Nylon PA6 / PA66', 'Polypropylene', 'ABS', 'Acetal (POM)'], // PLACEHOLDER
-    sizes: ['To drawing'], // PLACEHOLDER
-    finishes: ['nylon', 'nylonBlack'],
+    name: 'Studs, Pins & Turned Parts',
+    blurb: 'Studs, cotter pins, machine parts and precision turned parts.',
+    callout: 'M10 stud',
+    parts: [
+      { type: 'stud', diameter: 10, length: 60, finish: 'zinc', position: [-1.5, 0, 0] },
+      { type: 'cotterPin', diameter: 3, length: 28, finish: 'zinc', position: [0, 1.6, 0] },
+      { type: 'turned', diameter: 14, length: 34, finish: 'brass', position: [1.4, -0.2, 0] },
+    ],
+    pose: { tilt: [0, 0, -0.35] },
+    items: ['Stud', 'Cotter pin', 'Machine parts', 'Precision turned parts'],
+    materials: [],
+    notes: ['Made to your drawing or sample.'],
   },
   {
-    slug: 'furniture',
+    slug: 'castors',
     code: '07',
-    name: 'Furniture Kits',
-    blurb: 'Cam locks, connecting bolts, dowels and complete fittings packs for flat-pack kits.', // PLACEHOLDER
-    callout: 'Ø15 cam',
-    parts: [{ type: 'connector', diameter: 5, finish: 'zinc' }],
-    pose: { tilt: [0.5, -0.5, 0] },
-    specs: [
-      ['Fittings', 'Cam locks, connecting bolts, dowels'],
-      ['Cam Ø', '12, 15, 20 mm'],
-      ['Packing', 'Counted kit packs, labelled'],
-      ['Supply', 'Loose or kitted to BOM'],
-    ], // PLACEHOLDER
-    materials: ['Zinc alloy', 'Steel', 'Nylon'], // PLACEHOLDER
-    sizes: ['Cam 12', 'Cam 15', 'Cam 20'], // PLACEHOLDER
-    finishes: ['zinc', 'blackOxide', 'brass'],
+    name: 'Castors',
+    blurb: 'Plate castors with wheel and threaded-stem castors.',
+    callout: 'Ø50 wheel',
+    parts: [{ type: 'castor', head: 'plate', diameter: 50, finish: 'zinc' }],
+    pose: { tilt: [0.25, 0.6, 0] },
+    items: ['Plate castor with wheel', 'Threaded-stem castor'],
+    materials: [],
+    notes: [],
   },
+  {
+    slug: 'furniture-fittings',
+    code: '08',
+    name: 'Furniture Fittings & Cams',
+    blurb: 'Cams, cam locks, threaded inserts, ferrules and complete furniture fitting kits.',
+    callout: 'Ø15 cam',
+    parts: [
+      { type: 'cam', diameter: 5, finish: 'zinc', position: [-0.75, 0, 0] },
+      { type: 'insert', head: 'threaded', diameter: 6, length: 13, finish: 'zinc', position: [0.85, 0.3, 0] },
+    ],
+    pose: { tilt: [0.5, -0.5, 0] },
+    items: ['Cam', 'Furniture fitting kits', 'Cam lock', 'Threaded insert', 'Ferrule / bush', 'Locks'],
+    materials: [],
+    notes: [],
+  },
+].map((c) => ({ ...c, image: `/products/${c.slug}.webp` }))
+
+/** Customers named in the catalogue (approved for the site). Add `logo: '/brand/customers/<file>.svg'` when files arrive. */
+export const SHOW_CUSTOMERS = true
+export const customers = [
+  { name: 'Godrej Interio', logo: null },
+  { name: 'IFB', logo: null },
+  { name: 'Elica', logo: null },
+  { name: 'Crompton Greaves', logo: null },
+  { name: 'Belden', logo: null },
+  { name: 'SmartLink', logo: null },
+  { name: 'Saakshi', logo: null },
+  { name: 'CA.BE Springs & Fasteners', logo: null },
 ]
 
-/** Options for the customisation showcase (visual only). PLACEHOLDER ranges. */
+/** Options for the customisation showcase (visual only). // CONFIRM: illustrative heads, sizes, grades and finishes, not supplied by the client. */
 export const customiser = {
   heads: [
     { key: 'hex', label: 'Hex head', part: 'Hex head bolt', std: 'ISO 4014 / 4017', code: 'HX' },
@@ -225,6 +231,6 @@ export const customiser = {
 }
 
 /** The bolt that threads into the plate in the hero. */
-export const heroBolt = { type: 'bolt', head: 'hex', diameter: 12, length: 30, pitch: 1.75, finish: 'zinc', grade: '8.8' } // PLACEHOLDER
+export const heroBolt = { type: 'bolt', head: 'hex', diameter: 12, length: 30, pitch: 1.75, finish: 'zinc' } // visual only
 
 export default categories

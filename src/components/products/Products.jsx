@@ -1,5 +1,6 @@
 import { Component, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { content } from '../../data/content.js'
+import { whatsappHref } from '../../lib/contact.js'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { dprCap, hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
@@ -7,7 +8,7 @@ import { dprCap, hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, prefersReduc
 const loadDrawer = () => import('./ProductDrawer.jsx')
 const ProductDrawer = lazy(loadDrawer)
 
-// One shared canvas for all seven cards, loaded lazily when the section gets close.
+// One shared canvas for all eight cards, loaded lazily when the section gets close.
 const ProductViews = lazy(() => import('./ProductViews.jsx'))
 const t = content.products
 
@@ -57,7 +58,7 @@ function Card({ c, onOpen, setSlot, touch }) {
         <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-steel-300/70">
           <div className="bp-grid bp-grid-fade absolute inset-0 opacity-70" aria-hidden />
           <span
-            className="display-wide pointer-events-none absolute top-1/2 left-1/2 max-sm:hidden -translate-x-1/2 -translate-y-1/2 text-[4.5rem] leading-none text-steel-100/70 select-none"
+            className="display-wide pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[4.5rem] leading-none text-steel-100/70 select-none"
             aria-hidden
           >
             {c.code}
@@ -71,7 +72,7 @@ function Card({ c, onOpen, setSlot, touch }) {
         <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">
           <span className="font-mono text-small font-medium text-red">{c.code}</span>
           <h3 className="text-[1.15rem] leading-tight sm:text-h3">{c.name}</h3>
-          <p className="text-small leading-relaxed text-steel-700 max-sm:hidden">{c.blurb}</p>
+          <p className="text-small leading-relaxed text-steel-700">{c.blurb}</p>
           <span className="label-mono mt-auto inline-flex items-center gap-2 pt-2 text-ink group-hover:text-red">
             {t.open}
             <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
@@ -159,14 +160,10 @@ export default function Products() {
         </div>
 
         <div ref={grid} className="relative mt-12 md:mt-16">
-          <ul className="grid grid-cols-2 gap-px border border-steel-300 bg-steel-300 lg:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-px border border-steel-300 bg-steel-300 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((c) => (
               <Card key={c.slug} c={c} onOpen={setOpenSlug} setSlot={setSlot} touch={profile.touch} />
             ))}
-            <li className="flex flex-col justify-between gap-6 bg-paper-2 p-4 sm:p-6">
-              <p className="label-mono text-steel-500">08</p>
-              <p className="max-w-[22ch] text-body-lg text-steel-700">{content.placeholderSections.products.customCell}</p>
-            </li>
           </ul>
           {mount3D && slots && (
             <Boundary>
@@ -175,6 +172,28 @@ export default function Products() {
               </Suspense>
             </Boundary>
           )}
+        </div>
+      </div>
+
+      <div className="container-x relative mt-px">
+        <div className="relative flex flex-col gap-5 overflow-hidden border border-t-0 border-steel-300 bg-paper-2 p-5 sm:p-7 md:flex-row md:items-center md:justify-between">
+          <div className="bp-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
+          <div className="relative">
+            <p className="label-mono mb-2 flex items-center gap-2 text-red">
+              <span className="size-1.5 rounded-full bg-red" aria-hidden />
+              DWG → PART
+            </p>
+            <h3 className="text-h3 max-w-[24ch]">{t.custom.title}</h3>
+            <p className="mt-2 max-w-[60ch] text-small leading-relaxed text-steel-700">{t.custom.text}</p>
+          </div>
+          <a
+            href={whatsappHref(t.custom.message)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shine relative inline-flex h-12 shrink-0 items-center justify-center gap-2 self-start rounded-xs bg-red px-6 font-semibold text-paper md:self-center"
+          >
+            <span className="relative z-[2]">{t.custom.cta} →</span>
+          </a>
         </div>
       </div>
 

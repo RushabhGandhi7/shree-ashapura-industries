@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { content, company } from '../../data/content.js'
-import { finishes } from '../../data/products.js'
 import { telHref, whatsappHref } from '../../lib/contact.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
 import { useMediaQuery, useReducedMotion } from '../../hooks/useReducedMotion.js'
@@ -103,67 +102,63 @@ export default function ProductDrawer({ category, onClose }) {
             </header>
 
             <div className="relative flex-1 space-y-7 overflow-y-auto px-6 pb-6 md:px-8">
+              <div className="relative -mx-6 aspect-[4/3] overflow-hidden border-y border-steel-300 bg-paper md:-mx-8">
+                <img
+                  src={category.image}
+                  alt={t.imageAlt(category.name)}
+                  width="1200"
+                  height="900"
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
+                <span className="label-mono absolute right-3 bottom-3 rounded-xs border border-steel-300 bg-paper/85 px-1.5 py-0.5 text-[10px] text-steel-700">
+                  {category.callout}
+                </span>
+              </div>
+
               <p className="text-steel-700">{category.blurb}</p>
 
-              <section aria-labelledby="drawer-specs">
-                <h3 id="drawer-specs" className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">
-                  {t.specs}
+              <section aria-labelledby="drawer-items">
+                <h3 id="drawer-items" className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">
+                  {t.items}
                 </h3>
-                <dl className="divide-y divide-steel-300 border-y border-steel-300">
-                  {category.specs.map(([k, v]) => (
-                    <div key={k} className="grid grid-cols-[8.5rem_1fr] gap-4 py-2.5 text-small">
-                      <dt className="text-steel-700">{k}</dt>
-                      <dd className="font-medium">{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-
-              <section aria-labelledby="drawer-materials">
-                <h3 id="drawer-materials" className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">
-                  {t.materials}
-                </h3>
-                <ul className="flex flex-wrap gap-2">
-                  {category.materials.map((m) => (
-                    <li key={m} className="rounded-xs border border-steel-300 px-2.5 py-1 text-small">
-                      {m}
+                <ul className="grid gap-x-6 border-t border-steel-300 sm:grid-cols-2">
+                  {category.items.map((item, i) => (
+                    <li key={item} className="flex items-baseline gap-3 border-b border-steel-300 py-2 text-small">
+                      <span className="font-mono text-[11px] text-steel-500">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>
               </section>
 
-              <section aria-labelledby="drawer-sizes">
-                <h3 id="drawer-sizes" className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">
-                  {t.sizes}
-                </h3>
-                <ul className="flex flex-wrap gap-1.5">
-                  {category.sizes.map((s) => (
-                    <li key={s}>
-                      <MonoLabel>{s}</MonoLabel>
+              {category.materials.length > 0 && (
+                <section aria-labelledby="drawer-materials">
+                  <h3 id="drawer-materials" className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">
+                    {t.materials}
+                  </h3>
+                  <ul className="flex flex-wrap gap-1.5">
+                    {category.materials.map((m) => (
+                      <li key={m}>
+                        <MonoLabel>{m}</MonoLabel>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {category.notes.length > 0 && (
+                <ul className="space-y-1 text-small text-ink">
+                  {category.notes.map((n) => (
+                    <li key={n} className="flex items-center gap-2">
+                      <span className="size-1.5 rounded-full bg-red" aria-hidden />
+                      {n}
                     </li>
                   ))}
                 </ul>
-              </section>
+              )}
 
-              <section aria-labelledby="drawer-finishes">
-                <h3 id="drawer-finishes" className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">
-                  {t.finishes}
-                </h3>
-                <ul className="flex flex-wrap gap-x-4 gap-y-2">
-                  {category.finishes.map((f) => (
-                    <li key={f} className="inline-flex items-center gap-2 text-small">
-                      <span
-                        className="size-4 rounded-full shadow-[0_0_0_1px_var(--color-steel-300)]"
-                        style={{ background: `radial-gradient(circle at 35% 30%, #fff 0%, ${finishes[f].color} 50%)` }}
-                        aria-hidden
-                      />
-                      {finishes[f].label}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-
-              <p className="label-mono text-steel-500">{t.note}</p>
+              <p className="label-mono text-steel-500">{t.custom}</p>
             </div>
 
             <footer className="relative grid gap-2 border-t border-steel-300 bg-paper px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:grid-cols-[1fr_auto] md:px-8">

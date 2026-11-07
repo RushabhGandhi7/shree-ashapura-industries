@@ -12,9 +12,9 @@ const clamp01 = (v) => Math.min(1, Math.max(0, v))
 const ICON = [
   { fill: '#C4C6C7', head: false, thread: false, check: false }, // wire
   { fill: '#C4C6C7', head: true, thread: false, check: false }, // headed blank
+  { fill: '#C4C6C7', head: true, thread: false, check: false }, // slotted
   { fill: '#C4C6C7', head: true, thread: true, check: false }, // threaded
-  { fill: '#E2561C', head: true, thread: true, check: false }, // hot
-  { fill: '#D9C27E', head: true, thread: true, check: false }, // plated
+  { fill: '#D9C27E', head: true, thread: true, check: false }, // hardened + plated
   { fill: '#D9C27E', head: true, thread: true, check: true }, // passed
 ]
 
@@ -243,7 +243,7 @@ export default function Process() {
                           i === 0 ? 'left-0' : i === t.stations.length - 1 ? 'right-0' : 'left-1/2 -translate-x-1/2'
                         }`}
                       >
-                        {s.name}
+                        {s.short ?? s.name}
                       </span>
                     </span>
                   ))}

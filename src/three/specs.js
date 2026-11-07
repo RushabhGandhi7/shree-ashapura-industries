@@ -78,4 +78,12 @@ export const DEFAULTS = {
   turned: { head: 'stepped', diameter: 16, length: 40, finish: 'brass' }, // diameter = largest Ø
   clip: { head: 'tree', diameter: 6, length: 18, finish: 'nylon' }, // diameter = stem Ø
   connector: { head: 'cam', diameter: 5, length: 34, finish: 'zinc' }, // diameter = bolt shank Ø
+  cam: { head: 'cam', diameter: 5, finish: 'zinc' }, // cam lock alone (size scales with diameter)
+  rivet: { head: 'round', diameter: 5, length: 14, finish: 'zinc' },
+  maleFemale: { head: 'button', diameter: 6, length: 24, finish: 'zinc' }, // length = barrel
+  stud: { head: 'collar', diameter: 10, length: 60, finish: 'zinc' }, // length = overall
+  cotterPin: { head: 'split', diameter: 3, length: 28, finish: 'zinc' }, // diameter = wire Ø
+  leveller: { head: 'hex', diameter: 8, length: 28, finish: 'zinc' }, // diameter = stud Ø
+  insert: { head: 'threaded', diameter: 6, length: 13, finish: 'zinc' }, // diameter = inner thread / pin Ø
+  castor: { head: 'plate', diameter: 50, finish: 'zinc' }, // diameter = wheel Ø
 }

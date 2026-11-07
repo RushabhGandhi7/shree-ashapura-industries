@@ -97,6 +97,8 @@ export const makeBuilders = () => ({
   dark: new MeshBuilder(),
   nylon: new MeshBuilder(),
   knurl: new MeshBuilder(),
+  black: new MeshBuilder(), // moulded black plastic (levellers, castor housings)
+  cream: new MeshBuilder(), // natural nylon (castor tyres)
 })
 
 /** Ring of N points at radius r, height y, angles phi0 + TAU·j/N (j < N). */

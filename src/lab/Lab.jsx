@@ -1,14 +1,15 @@
 // /lab — internal inspection stage for the procedural part library.
 // Not linked from the site; marked noindex.
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { ContactShadows, Html, OrbitControls } from '@react-three/drei'
+import { ContactShadows, Html, OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
 import { Fastener, buildPart } from '../three/Fastener.jsx'
 import StudioEnvironment from '../three/StudioEnvironment.jsx'
 import { DEFAULTS, metricSizes, pitchFor } from '../three/specs.js'
-import { finishes, metalFinishes, variants } from '../data/products.js'
+import { categories, finishes, metalFinishes, variants } from '../data/products.js'
+import { CARD_FOV, fitDistance, measure } from '../three/categoryFit.js'
 
 const TYPES = {
   bolt: 'Bolt',
@@ -19,6 +20,14 @@ const TYPES = {
   turned: 'Turned part',
   clip: 'Moulded clip',
   connector: 'Furniture connector',
+  cam: 'Cam lock',
+  rivet: 'Rivet',
+  maleFemale: 'Male-female screw',
+  stud: 'Stud',
+  cotterPin: 'Cotter pin',
+  leveller: 'Leveller',
+  insert: 'Insert / pin / bush',
+  castor: 'Castor',
 }
 const DIAMETERS = {
   bolt: metricSizes,
@@ -29,8 +38,28 @@ const DIAMETERS = {
   turned: [10, 12, 16, 20, 25],
   clip: [4, 5, 6, 8],
   connector: [4, 5, 6],
+  cam: [4, 5, 6],
+  rivet: [3, 4, 5, 6, 8],
+  maleFemale: [4, 5, 6, 8],
+  stud: metricSizes,
+  cotterPin: [1.6, 2, 2.5, 3, 4, 5],
+  leveller: [6, 8, 10, 12],
+  insert: [4, 5, 6, 8, 10],
+  castor: [30, 40, 50, 65, 75],
 }
-const LENGTHS = { bolt: [6, 100], screw: [10, 60], bracket: [20, 80], turned: [20, 80], clip: [10, 30] }
+const LENGTHS = {
+  bolt: [6, 100],
+  screw: [10, 60],
+  bracket: [20, 80],
+  turned: [20, 80],
+  clip: [10, 30],
+  rivet: [6, 30],
+  maleFemale: [12, 50],
+  stud: [20, 120],
+  cotterPin: [10, 60],
+  leveller: [12, 60],
+  insert: [6, 40],
+}
 const FINISH_KEYS = [...metalFinishes, 'yellowZinc', 'mildSteel', 'nylon', 'nylonBlack']
 
 const GALLERY = [
@@ -50,6 +79,31 @@ const GALLERY = [
   { type: 'turned', finish: 'brass' },
   { type: 'clip', finish: 'nylon' },
   { type: 'connector', finish: 'zinc' },
+  { type: 'screw', head: 'cskPhillips', diameter: 4.2, length: 30, finish: 'zinc' },
+  { type: 'screw', head: 'phhd', diameter: 4.2, length: 25, finish: 'blackOxide' },
+  { type: 'screw', head: 'combiWasher', diameter: 5, length: 16, finish: 'zinc' },
+  { type: 'screw', head: 'umbrella', diameter: 4.2, length: 20, finish: 'zinc' },
+  { type: 'screw', head: 'button', diameter: 6, length: 20, finish: 'blackOxide' },
+  { type: 'screw', head: 'allenFlat', diameter: 6, length: 25, finish: 'zinc' },
+  { type: 'rivet', finish: 'zinc' },
+  { type: 'maleFemale', finish: 'zinc' },
+  { type: 'washer', head: 'star', finish: 'zinc' },
+  { type: 'washer', head: 'circlip', finish: 'blackOxide' },
+  { type: 'washer', head: 'cap', finish: 'zinc' },
+  { type: 'leveller', finish: 'zinc' },
+  { type: 'bracket', head: 'T', diameter: 14, length: 50, finish: 'zinc' },
+  { type: 'bracket', head: 'hook', diameter: 14, length: 40, finish: 'zinc' },
+  { type: 'bracket', head: 'square', diameter: 30, finish: 'zinc' },
+  { type: 'bracket', head: 'door', finish: 'zinc' },
+  { type: 'insert', head: 'threaded', finish: 'zinc' },
+  { type: 'insert', head: 'knurled', length: 12, finish: 'brass' },
+  { type: 'insert', head: 'pin', diameter: 5, length: 30, finish: 'brass' },
+  { type: 'insert', head: 'bush', diameter: 8, length: 12, finish: 'brass' },
+  { type: 'stud', finish: 'zinc' },
+  { type: 'cotterPin', finish: 'zinc' },
+  { type: 'castor', head: 'plate', finish: 'zinc' },
+  { type: 'castor', head: 'stem', finish: 'zinc' },
+  { type: 'cam', finish: 'zinc' },
 ]
 
 const label = (it) => `${TYPES[it.type]} · ${variants[it.type]?.[it.head ?? DEFAULTS[it.type].head] ?? ''}`
@@ -120,7 +174,7 @@ function CameraRig({ mode, radius, cy }) {
   const { camera, controls } = useThree()
   useEffect(() => {
     if (mode === 'all') {
-      camera.position.set(13, 15, 23)
+      camera.position.set(16, 24, 34)
       controls?.target.set(0, 0.6, 0.6)
     } else {
       const d = Math.max(2.2, radius * 3.2)
@@ -171,13 +225,13 @@ function Stage({ mode, item, setItem, toggles, statsRef }) {
 
       {mode === 'all' ? (
         GALLERY.map((g, i) => {
-          const col = i % 4
-          const row = Math.floor(i / 4)
+          const col = i % 6
+          const row = Math.floor(i / 6)
           return (
             <Placed
               key={i}
               params={g}
-              position={[(col - 1.5) * 3.8 + 2.6, 0, (row - 1.5) * 3.6]}
+              position={[(col - 2.5) * 3.8 + 2.6, 0, (row - 3) * 3.6]}
               showLabel
               wireframe={toggles.wireframe}
               onPick={() => setItem({ ...DEFAULTS[g.type], ...g })}
@@ -243,7 +297,72 @@ function fromQuery() {
   }
 }
 
+/* ─────────── render mode: /lab?render=<category slug> ───────────
+   Used by scripts/render-products.mjs. Frames the category's parts exactly like its
+   card (pose, fit) on a plain paper background, with no UI, then sets
+   window.__renderReady so the script can screenshot the canvas. */
+function RenderScene({ category }) {
+  const { invalidate } = useThree()
+  const frames = useRef(0)
+  const fit = useMemo(() => measure(category.parts, 'high'), [category])
+  const dist = useMemo(() => fitDistance(category.pose.tilt, fit, 4 / 3, 1.04), [category, fit])
+  const cam = useRef(null)
+  const posed = useRef(null)
+  // A still image does not spin, so frame the posed group's actual bounds (tighter than the card).
+  useLayoutEffect(() => {
+    const box = new THREE.Box3().setFromObject(posed.current)
+    const c = box.getCenter(new THREE.Vector3())
+    const s = box.getSize(new THREE.Vector3())
+    const tan = Math.tan(((CARD_FOV / 2) * Math.PI) / 180)
+    const d = Math.max(s.y / (2 * tan), s.x / (2 * tan * (4 / 3))) * 1.22 + s.z / 2
+    cam.current.position.set(c.x, c.y + d * 0.16, c.z + d)
+    cam.current.far = d * 4
+    cam.current.lookAt(c)
+    cam.current.updateProjectionMatrix()
+    invalidate()
+  }, [dist, invalidate])
+  useFrame(() => {
+    if (++frames.current === 12) window.__renderReady = true
+    else invalidate()
+  })
+  return (
+    <>
+      <PerspectiveCamera ref={cam} makeDefault fov={CARD_FOV} position={[0, dist * 0.16, dist]} near={0.05} far={dist * 4} />
+      <color attach="background" args={['#F6F4EF']} />
+      <StudioEnvironment />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[3, 6, 5]} intensity={1} />
+      <group ref={posed} rotation={category.pose.tilt}>
+        <group position={[-fit.c.x, -fit.c.y, -fit.c.z]}>
+          {category.parts.map((p, i) => (
+            <Fastener key={i} {...p} detail="high" quality="high" />
+          ))}
+        </group>
+      </group>
+    </>
+  )
+}
+
+function RenderMode({ slug }) {
+  const category = categories.find((c) => c.slug === slug)
+  if (!category) return <p className="p-6 font-mono">Unknown category: {slug}</p>
+  return (
+    <div className="fixed inset-0 bg-paper">
+      <Canvas className="!absolute inset-0" dpr={1} gl={{ antialias: true, preserveDrawingBuffer: true }} frameloop="demand">
+        <Suspense fallback={null}>
+          <RenderScene category={category} />
+        </Suspense>
+      </Canvas>
+    </div>
+  )
+}
+
 export default function Lab() {
+  const renderSlug = useMemo(() => new URLSearchParams(window.location.search).get('render'), [])
+  return renderSlug ? <RenderMode slug={renderSlug} /> : <LabUI />
+}
+
+function LabUI() {
   const initial = useMemo(fromQuery, [])
   const [mode, setMode] = useState(initial.mode)
   const [item, setItemRaw] = useState(initial.item)

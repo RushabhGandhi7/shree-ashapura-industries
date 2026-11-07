@@ -225,14 +225,15 @@ export const Rolling = forwardRef(function Rolling({ label }, ref) {
   )
 })
 
-/* 04 — heat treatment: heat to glowing, quench, temper */
 const HEAT = ['#B8B9B8', '#6B2A20', '#B3261E', '#E2561C', '#F59A2E']
 function heatColor(t) {
   const x = clamp01(t) * (HEAT.length - 1)
   const i = Math.min(HEAT.length - 2, Math.floor(x))
   return mix(HEAT[i], HEAT[i + 1], x - i)
 }
-export const Heat = forwardRef(function Heat({ label }, ref) {
+/* 05 — heat treatment then plating (via approved partners): glow, quench, finish */
+const FINISH = ['#D9DCDE', '#DCC47E']
+export const HeatPlating = forwardRef(function HeatPlating({ label }, ref) {
   const parts = useRef([])
   const glow = useRef(null)
   const steam = useRef(null)
@@ -240,23 +241,23 @@ export const Heat = forwardRef(function Heat({ label }, ref) {
   const out = useRef(null)
   useImperativeHandle(ref, () => ({
     set(p) {
-      const heat = ease(seg(p, 0, 0.5))
-      const quench = seg(p, 0.5, 0.62)
-      const temper = seg(p, 0.66, 1)
-      let tNorm = heat * (1 - quench)
+      const heat = ease(seg(p, 0, 0.36))
+      const quench = seg(p, 0.36, 0.46)
+      const plate = seg(p, 0.55, 0.75)
+      const swap = seg(p, 0.82, 0.92)
+      const tNorm = heat * (1 - quench)
       let col = heatColor(tNorm)
-      if (quench >= 1) col = mix('#3E3F41', '#8A7E74', Math.sin(Math.PI * temper) * 0.6 + temper * 0.2)
+      if (quench >= 1) col = mix('#3E3F41', mix(FINISH[0], FINISH[1], swap), plate)
       parts.current.forEach((el) => el?.setAttribute('fill', col))
       glow.current.style.opacity = String(tNorm * 0.85)
-      steam.current.style.opacity = String(quench > 0 && quench < 1 ? 1 : quench >= 1 ? Math.max(0, 1 - temper * 4) : 0)
+      steam.current.style.opacity = String(quench > 0 && quench < 1 ? 1 : quench >= 1 ? Math.max(0, 1 - seg(p, 0.46, 0.52) * 2) : 0)
       steam.current.setAttribute('transform', `translate(0 ${-quench * 24})`)
       graph.current.style.strokeDashoffset = String(1 - p)
-      const temp = quench < 1 ? lerp(20, 870, heat) * (1 - quench) + 60 * quench : lerp(60, 425, Math.sin(Math.PI * temper * 0.5))
-      out.current.textContent = `${String(Math.round(temp)).padStart(3, '0')} °C`
+      out.current.textContent = p < 0.36 ? 'HARDEN' : p < 0.5 ? 'QUENCH' : p < 0.8 ? 'PLATE ZINC' : 'PLATE YELLOW'
     },
   }))
   return (
-    <Frame label={label} readoutRef={out} readout="020 °C">
+    <Frame label={label} readoutRef={out} readout="HARDEN">
       {() => (
         <>
           <defs>
@@ -299,72 +300,9 @@ export const Heat = forwardRef(function Heat({ label }, ref) {
               T / t
             </text>
           </g>
-        </>
-      )}
-    </Frame>
-  )
-})
-
-/* 05 — plating: dip, lift, finish colour swaps */
-const PLATES = [
-  ['#C9CBCD', 'RAW'],
-  ['#D9DCDE', 'ZINC'],
-  ['#DCC47E', 'YELLOW'],
-  ['#2E2F31', 'BLACK'],
-]
-export const Plating = forwardRef(function Plating({ label }, ref) {
-  const rack = useRef(null)
-  const parts = useRef([])
-  const wave = useRef(null)
-  const chips = useRef([])
-  const out = useRef(null)
-  useImperativeHandle(ref, () => ({
-    set(p) {
-      const dip = Math.sin(Math.PI * seg(p, 0, 0.42))
-      rack.current.setAttribute('transform', `translate(0 ${dip * 92})`)
-      const stage = p < 0.3 ? 0 : p < 0.6 ? 1 : p < 0.8 ? 2 : 3
-      const t = stage === 0 ? 0 : stage === 1 ? seg(p, 0.3, 0.42) : stage === 2 ? seg(p, 0.6, 0.66) : seg(p, 0.8, 0.86)
-      const from = PLATES[Math.max(0, stage - 1)][0]
-      const col = mix(from, PLATES[stage][0], t)
-      parts.current.forEach((el) => el?.setAttribute('fill', col))
-      chips.current.forEach((el, i) => el && (el.dataset.on = String(i === stage)))
-      const w = p * 40
-      wave.current.setAttribute('d', `M60 200 q 30 ${-6 + Math.sin(w) * 3} 60 0 t 60 0 t 60 0 t 60 0 t 60 0 V 270 H 60 Z`)
-      out.current.textContent = `FINISH ${PLATES[stage][1]}`
-    },
-  }))
-  return (
-    <Frame label={label} readoutRef={out} readout="FINISH RAW">
-      {() => (
-        <>
-          {/* tank */}
-          <path ref={wave} d="M60 200 q 30 -6 60 0 t 60 0 t 60 0 t 60 0 t 60 0 V 270 H 60 Z" fill="#D9D3C4" fillOpacity=".8" />
-          <path d="M54 150 V 272 H 366 V 150" fill="none" stroke={INK} strokeWidth="1.4" />
-          {/* rack with three bolts */}
-          <g ref={rack}>
-            <line x1="90" y1="70" x2="330" y2="70" stroke={INK} strokeWidth="2" />
-            <line x1="210" y1="30" x2="210" y2="70" stroke={INK} strokeWidth="1.2" />
-            {[0, 1, 2].map((i) => (
-              <g key={i} transform={`translate(${140 + i * 70} 70)`}>
-                <line y1="0" y2="10" stroke={STEEL} />
-                <rect ref={(el) => (parts.current[i * 2] = el)} x="-16" y="10" width="32" height="14" rx="2" fill="#C9CBCD" stroke="#55575A" strokeOpacity=".3" />
-                <rect ref={(el) => (parts.current[i * 2 + 1] = el)} x="-7" y="24" width="14" height="58" fill="#C9CBCD" stroke="#55575A" strokeOpacity=".3" />
-              </g>
-            ))}
-          </g>
-          {/* finish chips */}
-          <g transform="translate(384 60)">
-            {PLATES.slice(1).map(([c, n], i) => (
-              <g key={n} ref={(el) => (chips.current[i + 1] = el)} data-on="false" className="[&[data-on=true]>rect:last-child]:stroke-[var(--color-red)]">
-                <rect y={i * 46} width="80" height="36" rx="3" fill="var(--color-paper)" />
-                <circle cx="16" cy={i * 46 + 18} r="9" fill={c} stroke="#55575A" strokeOpacity=".3" />
-                <text x="32" y={i * 46 + 22} className="font-mono" fontSize="9.5" letterSpacing="1" fill={INK}>
-                  {n}
-                </text>
-                <rect y={i * 46} width="80" height="36" rx="3" fill="none" stroke="var(--color-steel-300)" strokeWidth="1.5" />
-              </g>
-            ))}
-          </g>
+          <text x="40" y="40" className="font-mono" fontSize="10" letterSpacing="1.5" fill={STEEL}>
+            APPROVED PARTNERS
+          </text>
         </>
       )}
     </Frame>
@@ -372,7 +310,9 @@ export const Plating = forwardRef(function Plating({ label }, ref) {
 })
 
 /* 06 — inspection: GO gauge runs on, NO-GO holds, caliper reads the diameter */
-export const Inspection = forwardRef(function Inspection({ label }, ref) {
+export const InspectionPack = forwardRef(function InspectionPack({ label }, ref) {
+  const box = useRef(null)
+  const flaps = useRef(null)
   const go = useRef(null)
   const nogo = useRef(null)
   const jawT = useRef(null)
@@ -380,7 +320,12 @@ export const Inspection = forwardRef(function Inspection({ label }, ref) {
   const stamp = useRef(null)
   const out = useRef(null)
   useImperativeHandle(ref, () => ({
-    set(p) {
+    set(pAll) {
+      const p = seg(pAll, 0, 0.66)
+      const k = ease(seg(pAll, 0.7, 0.86))
+      box.current.setAttribute('transform', `translate(${lerp(260, 0, k)} 0)`)
+      box.current.style.opacity = String(seg(pAll, 0.68, 0.72))
+      flaps.current.style.opacity = String(seg(pAll, 0.9, 0.96))
       const g = ease(seg(p, 0, 0.38))
       go.current.setAttribute('transform', `translate(${lerp(170, -150, g)} 0)`)
       go.current.style.opacity = String(p < 0.42 ? 1 : 1 - seg(p, 0.42, 0.48))
@@ -392,8 +337,8 @@ export const Inspection = forwardRef(function Inspection({ label }, ref) {
       jawT.current.setAttribute('transform', `translate(0 ${lerp(-34, 0, c)})`)
       jawB.current.setAttribute('transform', `translate(0 ${lerp(34, 0, c)})`)
       stamp.current.style.opacity = String(seg(p, 0.9, 0.98))
-      const reading = c > 0 ? lerp(12.5, 7.972, c) : 0
-      out.current.textContent = p < 0.42 ? 'GO ·  RUNS' : p < 0.72 ? 'NO-GO · HOLDS' : `Ø ${reading.toFixed(3)}`
+      out.current.textContent =
+        pAll >= 0.9 ? 'PACKED · DISPATCH' : pAll >= 0.7 ? 'PACKING' : p < 0.42 ? 'GO ·  RUNS' : p < 0.72 ? 'NO-GO · HOLDS' : 'VERNIER CHECK'
     },
   }))
   const teeth = []
@@ -439,10 +384,81 @@ export const Inspection = forwardRef(function Inspection({ label }, ref) {
               PASS
             </text>
           </g>
+          {/* carton slides in over the part, flaps close */}
+          <g ref={box} style={{ opacity: 0 }}>
+            <rect x="150" y="96" width="210" height="150" rx="2" fill="#D8C9A8" stroke={INK} strokeWidth="1.2" />
+            <rect x="150" y="96" width="210" height="18" fill="#CBB993" stroke={INK} strokeWidth="1.2" />
+            <rect x="180" y="150" width="90" height="44" fill="var(--color-paper)" stroke={STEEL} />
+            <text x="190" y="168" className="font-mono" fontSize="9" letterSpacing="1" fill={INK}>
+              SAI · LOT
+            </text>
+            <line x1="190" y1="180" x2="258" y2="180" stroke={INK} strokeWidth="3" strokeDasharray="2 2" />
+            <g ref={flaps} style={{ opacity: 0 }}>
+              <path d="M150 96 l52 -26 h106 l52 26 Z" fill="#CBB993" stroke={INK} strokeWidth="1.2" />
+            </g>
+          </g>
         </>
       )}
     </Frame>
   )
 })
 
-export const VIGNETTES = { coil: Coil, heading: Heading, rolling: Rolling, heat: Heat, plating: Plating, inspection: Inspection }
+/* 03 — slotting: a saw drops onto the head and cuts the slot */
+export const Slotting = forwardRef(function Slotting({ label }, ref) {
+  const saw = useRef(null)
+  const cut = useRef(null)
+  const chips = useRef(null)
+  const out = useRef(null)
+  useImperativeHandle(ref, () => ({
+    set(p) {
+      const down = ease(seg(p, 0.05, 0.55))
+      const up = ease(seg(p, 0.7, 0.95))
+      const y = lerp(-70, 0, down) - up * 70
+      const spin = p * 2400
+      saw.current.setAttribute('transform', `translate(0 ${y}) rotate(${spin} 220 92)`)
+      const depth = Math.max(0, Math.min(1, (down - 0.55) / 0.45)) * 24
+      cut.current.setAttribute('height', String(depth))
+      chips.current.style.opacity = String(depth > 0 && up === 0 && p < 0.7 ? 1 : 0)
+      out.current.textContent = up > 0 ? 'SLOT ✓' : depth > 0 ? 'CUTTING' : 'INDEX'
+    },
+  }))
+  const teeth = []
+  for (let i = 0; i < 24; i++) teeth.push(i)
+  return (
+    <Frame label={label} readoutRef={out} readout="INDEX">
+      {(steel) => (
+        <>
+          {/* fixture */}
+          <rect x="120" y="230" width="200" height="40" rx="3" fill="#D7D8D5" stroke={INK} strokeWidth="1.2" />
+          {/* screw standing in the fixture, head up */}
+          <rect x="205" y="186" width="30" height="60" fill={steel} />
+          {[192, 202, 212, 222].map((yy) => (
+            <line key={yy} x1="205" y1={yy} x2="235" y2={yy + 6} stroke="#55575A" strokeOpacity=".45" />
+          ))}
+          <rect x="176" y="150" width="88" height="38" rx="4" fill={steel} stroke="#55575A" strokeOpacity=".4" />
+          <rect ref={cut} x="214" y="150" width="12" height="0" fill="#55575A" />
+          {/* slitting saw */}
+          <g ref={saw}>
+            <circle cx="220" cy="92" r="56" fill="#E7E6E2" stroke={INK} strokeWidth="1.2" />
+            {teeth.map((i) => {
+              const a = (i / 24) * Math.PI * 2
+              return <line key={i} x1={220 + Math.sin(a) * 56} y1={92 + Math.cos(a) * 56} x2={220 + Math.sin(a + 0.1) * 62} y2={92 + Math.cos(a + 0.1) * 62} stroke={INK} strokeWidth="1.2" />
+            })}
+            <circle cx="220" cy="92" r="12" fill="#C4C5C3" stroke={INK} />
+            <line x1="220" y1="40" x2="220" y2="56" stroke={RED} strokeWidth="2" />
+          </g>
+          <g ref={chips} stroke={RED} strokeWidth="2" strokeLinecap="round" style={{ opacity: 0 }}>
+            <line x1="250" y1="146" x2="266" y2="132" />
+            <line x1="190" y1="146" x2="174" y2="134" />
+            <line x1="256" y1="152" x2="276" y2="148" />
+          </g>
+          <text x="40" y="40" className="font-mono" fontSize="10" letterSpacing="1.5" fill={STEEL}>
+            SLOTTING · BT
+          </text>
+        </>
+      )}
+    </Frame>
+  )
+})
+
+export const VIGNETTES = { coil: Coil, heading: Heading, slotting: Slotting, rolling: Rolling, heatPlating: HeatPlating, inspection: InspectionPack }

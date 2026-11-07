@@ -12,6 +12,7 @@ import DimensionLine from '../ui/DimensionLine.jsx'
 import { PhoneIcon, WhatsAppIcon } from '../ui/Icons.jsx'
 import DriftingParts from '../DriftingParts.jsx'
 import HeroPoster from './HeroPoster.jsx'
+import { useGLGate, useGLHold } from '../../lib/glGate.js'
 import HeroDimensions from './HeroDimensions.jsx'
 import TorqueReadout from './TorqueReadout.jsx'
 
@@ -50,7 +51,7 @@ export default function Hero() {
   const copy = useRef(null)
   const cue = useRef(null)
   const readout = useRef(null)
-  const [mount3D, setMount3D] = useState(false)
+  const [introDone, setIntroDone] = useState(false)
   const [ready, setReady] = useState(false)
 
   // Device profile, decided once.
@@ -70,11 +71,18 @@ export default function Hero() {
     }
   }, [])
 
-  // Mount the 3D scene after the intro, when the main thread is idle.
+  // Mount the 3D scene after the intro, when the main thread is idle, and only while this
+  // section holds the page's single WebGL slot (src/lib/glGate.js).
   useEffect(() => {
     if (!profile.webgl) return
-    return onIntro('done', () => idle(() => setMount3D(true)))
+    return onIntro('done', () => idle(() => setIntroDone(true)))
   }, [profile.webgl])
+  const allowed = useGLGate('hero', section, { enabled: profile.webgl })
+  const mount3D = introDone && allowed
+  useGLHold('hero', mount3D)
+  useEffect(() => {
+    if (!mount3D) setReady(false) // poster back while the canvas is away
+  }, [mount3D])
 
   useEffect(() => {
     heroStore.onReady = () => setReady(true)

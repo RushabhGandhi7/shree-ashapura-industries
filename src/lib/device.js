@@ -24,13 +24,18 @@ export const isSmallScreen = () => !!mq('(max-width: 767px)')
 /** Cap devicePixelRatio for WebGL canvases: 1.5 on phones, 1.25 on low-end hardware. */
 export const dprCap = () => (isLowEnd() ? [1, 1.25] : isSmallScreen() || isTouch() ? [1, 1.5] : [1, 1.75])
 
+// Probed once per page load: each probe creates a real WebGL context, and Safari warns
+// (then drops the oldest context) when too many have been created.
+let webgl
 export const hasWebGL = () => {
+  if (webgl !== undefined) return webgl
   try {
     const c = document.createElement('canvas')
     const gl = c.getContext('webgl2') || c.getContext('webgl')
     gl?.getExtension('WEBGL_lose_context')?.loseContext()
-    return !!gl
+    webgl = !!gl
   } catch {
-    return false
+    webgl = false
   }
+  return webgl
 }

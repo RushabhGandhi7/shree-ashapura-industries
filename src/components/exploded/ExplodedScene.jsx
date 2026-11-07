@@ -1,6 +1,7 @@
 // Lazy 3D for the exploded view: bolt + washer + nut from the shared part library.
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { useReleaseGL } from '../../lib/glGate.js'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bolt, Nut, Washer } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
@@ -104,8 +105,10 @@ function Rig({ detail, onReady }) {
 }
 
 export default function ExplodedScene({ dpr, detail, onReady }) {
+  const onCreated = useReleaseGL()
   return (
     <Canvas
+      onCreated={onCreated}
       frameloop="demand"
       dpr={dpr}
       camera={{ fov: FOV, near: 0.1, far: 80, position: [4, 1, 9] }}

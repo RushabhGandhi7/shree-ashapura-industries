@@ -12,6 +12,7 @@ import { Bolt, buildPart } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { createTweenMaterial, finishParams, setTweenTargets } from '../../three/materials.js'
 import { blobShadowTexture } from '../../three/lib/shadow.js'
+import { useReleaseGL } from '../../lib/glGate.js'
 
 const FOV = 26
 const TAN = Math.tan(((FOV / 2) * Math.PI) / 180)
@@ -206,8 +207,10 @@ function Stage({ opts, detail, reduced, dragTarget, store, onReady }) {
 }
 
 export default function CustomiserScene({ opts, detail, dpr, reduced, active, dragTarget, store, onReady }) {
+  const onCreated = useReleaseGL()
   return (
     <Canvas
+      onCreated={onCreated}
       // 'demand' when off-screen (not 'never'): the first frame renders at mount, a screen
       // early, so shaders compile before the stage scrolls into view.
       frameloop={active && !reduced ? 'always' : 'demand'}

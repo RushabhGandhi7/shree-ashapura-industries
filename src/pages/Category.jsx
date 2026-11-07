@@ -1,4 +1,4 @@
-import { Component, Suspense, lazy, useMemo, useState } from 'react'
+import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { content } from '../data/content.js'
 import { categories } from '../data/products.js'
@@ -13,6 +13,7 @@ import { PhoneIcon, WhatsAppIcon } from '../components/ui/Icons.jsx'
 import QuoteCTA from '../components/quote/QuoteCTA.jsx'
 import { quoteStore } from '../lib/quoteStore.js'
 import NotFound from './NotFound.jsx'
+import { useGLGate, useGLHold } from '../lib/glGate.js'
 
 const CategoryStage = lazy(() => import('../components/products/CategoryStage.jsx'))
 const t = content.category
@@ -63,6 +64,12 @@ export default function Category() {
     [],
   )
   const [ready, setReady] = useState(false)
+  const stageBox = useRef(null)
+  const allowed = useGLGate('category', stageBox, { enabled: profile.three })
+  useGLHold('category', allowed)
+  useEffect(() => {
+    if (!allowed) setReady(false)
+  }, [allowed])
   if (!c) return <NotFound slug={slug} />
   const page = findPage(`/products/${c.slug}`)
 
@@ -89,7 +96,7 @@ export default function Category() {
             </div>
           </div>
           {/* 3D stage over the rendered image (the image stays as fallback / first paint) */}
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xs border border-steel-300 bg-paper lg:col-span-7">
+          <div ref={stageBox} className="relative aspect-[4/3] overflow-hidden rounded-xs border border-steel-300 bg-paper lg:col-span-7">
             <img
               src={c.image}
               alt={t.imageAlt(c.name)}
@@ -98,7 +105,7 @@ export default function Category() {
               fetchPriority="high"
               className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${ready ? 'opacity-0' : 'opacity-100'}`}
             />
-            {profile.three && (
+            {allowed && (
               <Boundary>
                 <Suspense fallback={null}>
                   <CategoryStage category={c} detail={profile.detail} dpr={profile.dpr} onReady={() => setReady(true)} />

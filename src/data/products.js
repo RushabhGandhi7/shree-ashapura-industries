@@ -218,14 +218,14 @@ export const customiser = {
   lengthRange: (d) => [Math.max(10, Math.ceil((d * 1.5) / 5) * 5), Math.min(100, Math.ceil((d * 8) / 5) * 5)],
   lengthStep: 5,
   materials: [
-    { key: 'ms46', label: 'Mild steel 4.6', short: 'MS 4.6', finishes: ['zinc', 'blackOxide', 'redAnodised'] },
-    { key: 'ht88', label: 'High tensile 8.8', short: 'HT 8.8', finishes: ['zinc', 'blackOxide', 'redAnodised'] },
-    { key: 'ht109', label: 'High tensile 10.9', short: 'HT 10.9', finishes: ['blackOxide', 'zinc'] },
-    { key: 'a2', label: 'Stainless A2-70 (304)', short: 'A2-70', finishes: ['stainless'] },
-    { key: 'a4', label: 'Stainless A4-80 (316)', short: 'A4-80', finishes: ['stainless'] },
-    { key: 'brass', label: 'Brass CZ121', short: 'BRASS', finishes: ['brass'] },
+    // finishes per material: src/data/materialFinishes.js
+    { key: 'ms46', label: 'Mild steel 4.6', short: 'MS 4.6' },
+    { key: 'ht88', label: 'High tensile 8.8', short: 'HT 8.8' },
+    { key: 'ht109', label: 'High tensile 10.9', short: 'HT 10.9' },
+    { key: 'a2', label: 'Stainless A2-70 (304)', short: 'A2-70' },
+    { key: 'a4', label: 'Stainless A4-80 (316)', short: 'A4-80' },
+    { key: 'brass', label: 'Brass CZ121', short: 'BRASS' },
   ],
-  finishCodes: { zinc: 'ZN', blackOxide: 'BO', brass: 'BR', stainless: 'SS', redAnodised: 'RA' },
   defaults: { head: 'hex', diameter: 8, length: 40, fine: false, material: 'ht88', finish: 'zinc' },
 }
 

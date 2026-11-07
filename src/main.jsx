@@ -17,9 +17,27 @@ if (import.meta.env.DEV) {
   HTMLCanvasElement.prototype.getContext = function (type, ...rest) {
     const ctx = get.call(this, type, ...rest)
     if (ctx && /webgl/.test(type) && !this.__counted) {
-      this.__counted = true
+      const canvas = this
+      canvas.__counted = true
       window.__glContexts++
-      this.addEventListener('webglcontextlost', () => window.__glContexts--, { once: true })
+      window.__glMax = Math.max(window.__glMax ?? 0, window.__glContexts) // peak concurrent contexts (QA)
+      const done = () => {
+        if (canvas.__released) return
+        canvas.__released = true
+        window.__glContexts--
+      }
+      // count a release at loseContext() time (the webglcontextlost event arrives later)
+      const getExt = ctx.getExtension.bind(ctx)
+      ctx.getExtension = (name) => {
+        const ext = getExt(name)
+        if (ext && name === 'WEBGL_lose_context' && !ext.__wrapped) {
+          const lose = ext.loseContext.bind(ext)
+          ext.loseContext = () => (done(), lose())
+          ext.__wrapped = true
+        }
+        return ext
+      }
+      canvas.addEventListener('webglcontextlost', done, { once: true })
     }
     return ctx
   }

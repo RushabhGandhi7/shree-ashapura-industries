@@ -5,6 +5,7 @@ import { content } from '../../data/content.js'
 import { explodedStore, range } from '../../lib/explodedStore.js'
 import { dprCap, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
 import Annotations from '../annotate/Annotations.jsx'
+import { useGLGate, useGLHold } from '../../lib/glGate.js'
 
 const ExplodedScene = lazy(() => import('./ExplodedScene.jsx'))
 const t = content.exploded
@@ -44,7 +45,6 @@ export default function Exploded() {
   const stage = useRef(null)
   const legend = useRef(null)
   const cue = useRef(null)
-  const [mount3D, setMount3D] = useState(false)
   const [ready, setReady] = useState(false)
 
   const profile = useMemo(() => {
@@ -58,20 +58,12 @@ export default function Exploded() {
     }
   }, [])
 
+  // Live canvas only while this section holds the page's single WebGL slot.
+  const mount3D = useGLGate('exploded', section, { enabled: profile.webgl })
+  useGLHold('exploded', mount3D)
   useEffect(() => {
-    if (!profile.webgl) return
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setMount3D(true)
-          io.disconnect()
-        }
-      },
-      { rootMargin: '900px 0px' },
-    )
-    io.observe(section.current)
-    return () => io.disconnect()
-  }, [profile.webgl])
+    if (!mount3D) setReady(false)
+  }, [mount3D])
 
   useGSAP(
     () => {

@@ -6,6 +6,7 @@ import { PerspectiveCamera } from '@react-three/drei'
 import { Fastener } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { CARD_FOV, fitDistance, measure } from '../../three/categoryFit.js'
+import { useReleaseGL } from '../../lib/glGate.js'
 
 function Scene({ category, detail, onReady }) {
   const spin = useRef(null)
@@ -39,6 +40,7 @@ function Scene({ category, detail, onReady }) {
 
 export default function CategoryStage({ category, detail, dpr, onReady }) {
   const box = useRef(null)
+  const onCreated = useReleaseGL()
   const [visible, setVisible] = useState(true)
   useEffect(() => {
     const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting))
@@ -47,7 +49,7 @@ export default function CategoryStage({ category, detail, dpr, onReady }) {
   }, [])
   return (
     <div ref={box} className="absolute inset-0">
-      <Canvas frameloop={visible ? 'always' : 'never'} dpr={dpr} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }} aria-hidden>
+      <Canvas onCreated={onCreated} frameloop={visible ? 'always' : 'never'} dpr={dpr} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }} aria-hidden>
         <Scene category={category} detail={detail} onReady={onReady} />
       </Canvas>
     </div>

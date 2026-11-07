@@ -1,5 +1,6 @@
 // Dev check for Phase 8C: drift between product card slots and their drei Views.
-//   node scripts/check-view-drift.mjs <outDir> [tag] [baseUrl]   (needs: npx playwright install webkit chromium)
+//   node scripts/check-view-drift.mjs <outDir> [tag] [baseUrl] [route]   (needs: npx playwright install webkit chromium)
+//   route: page with the product grid, '/products' (default) or '/'
 
 // Measures drift between each product card's 3D slot and where its drei View is drawn.
 // Drawn box = WebGL scissor box at draw time (buffer px, y from bottom) mapped to CSS px.
@@ -8,6 +9,7 @@ const { webkit, chromium } = createRequire(process.cwd() + '/package.json')('pla
 const SP = process.argv[2]
 const tag = process.argv[3] || 'before'
 const BASE = process.argv[4] || 'http://localhost:5173'
+const ROUTE = process.argv[5] || '/products'
 const init = () => {
   sessionStorage.setItem('sa-intro-seen', '1')
   window.__drift = []
@@ -52,8 +54,16 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
   for (const [w, h] of [[1440, 900], [768, 1024], [390, 844]]) {
     const page = await browser.newPage({ viewport: { width: w, height: h } })
     await page.addInitScript(init)
-    await page.goto(BASE + '/products')
-    await page.waitForTimeout(3500)
+    await page.goto(BASE + ROUTE)
+    await page.waitForTimeout(2000)
+    // park just above the grid so its canvas mounts (it only mounts near the viewport), let it draw
+    await page.evaluate(() => {
+      const g = document.querySelector('#products ul')
+      window.scrollTo(0, g.getBoundingClientRect().top + scrollY - innerHeight * 0.5)
+      window.__lenis?.scrollTo(window.scrollY, { immediate: true })
+    })
+    await page.waitForFunction(() => document.querySelector('#products canvas'), null, { timeout: 15000 })
+    await page.waitForTimeout(4500)
     // force a render every frame (what a hover spin or a resize does in real use)
     await page.evaluate(() => {
       const loop = () => (window.dispatchEvent(new Event('resize')), (window.__forceRaf = requestAnimationFrame(loop)))
@@ -65,7 +75,7 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
     for (let i = 0; i < 14; i++) {
       await page.mouse.wheel(0, 120)
       await page.waitForTimeout(16)
-      if (i === 9) await page.screenshot({ path: `${SP}/8c/${tag}-${name}-${w}-mid.png` })
+      if (i === 9) await page.screenshot({ path: `${SP}/${tag}-${name}-${w}-mid.png` })
     }
     await page.waitForTimeout(120)
     const mid = await page.evaluate(() => window.__drift.splice(0))
@@ -73,7 +83,7 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
     await page.evaluate(() => (window.__drift = []))
     await page.waitForTimeout(400)
     const settled = await page.evaluate(() => window.__drift.splice(0))
-    await page.screenshot({ path: `${SP}/8c/${tag}-${name}-${w}-settled.png` })
+    await page.screenshot({ path: `${SP}/${tag}-${name}-${w}-settled.png` })
     const stat = (a) => (a.length ? { n: a.length, maxAbsDy: +Math.max(...a.map((d) => Math.abs(d.dy))).toFixed(1), maxAbsDx: +Math.max(...a.map((d) => Math.abs(d.dx))).toFixed(1) } : { n: 0 })
     out[`${name} ${w}`] = { mid: stat(mid), settled: stat(settled) }
     await page.close()

@@ -113,18 +113,12 @@ export default function Footer() {
           </nav>
         </div>
 
-        {/* Oversized wordmark measured by a dimension line, title block style */}
-        <div className="@container mt-20 md:mt-28">
+        {/* company name on a dimension line, title block style */}
+        <div className="mt-12 md:mt-16">
           <DimensionLine length="100%" label={company.name.toUpperCase()} tone="steel" />
-          <p
-            className="display-wide mt-4 text-[13.4cqi] leading-[0.85] tracking-[-0.04em] text-ink select-none"
-            aria-hidden
-          >
-            ASHAPURA<span className="text-red">.</span>
-          </p>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-steel-300 pt-6 text-small text-steel-700 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-4 border-t border-steel-300 pt-6 text-small text-steel-700 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} {company.name}. {t.rights}
           </p>

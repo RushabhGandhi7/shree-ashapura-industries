@@ -9,6 +9,8 @@ import { WhatsAppIcon } from '../ui/Icons.jsx'
 import Annotations from '../annotate/Annotations.jsx'
 import TopView from './TopView.jsx'
 import { topView } from '../../three/headGeometry.js'
+import { allowedFinishes, customFinishes, resolveFinish } from '../../data/materialFinishes.js'
+import { useGLGate, useGLHold } from '../../lib/glGate.js'
 
 const CustomiserScene = lazy(() => import('./CustomiserScene.jsx'))
 const t = content.customise
@@ -25,7 +27,9 @@ class Boundary extends Component {
 }
 
 /** Everything the stage, the title block and the enquiry need, from the options. */
-export function describe(o) {
+export function describe(input) {
+  // never describe a finish the material does not offer
+  const o = { ...input, finish: resolveFinish(input.material, input.finish) }
   const head = C.heads.find((h) => h.key === o.head)
   const material = C.materials.find((m) => m.key === o.material)
   const pitch = pitchFor(o.diameter, o.fine)
@@ -34,7 +38,7 @@ export function describe(o) {
   const r1 = (v) => String(Math.round(v * 10) / 10)
   // key top-view dimension: across flats for hex heads, head Ø for round heads
   const keyDim = tv.outline === 'hex' ? `AF ${r1(tv.af)}` : `Ø${r1(tv.dk)}`
-  const dwg = `SA-${head.code}-M${o.diameter}${o.fine ? 'F' : ''}-${keyDim.replace(/[ Ø.]/g, (c) => (c === '.' ? 'P' : c === 'Ø' ? 'D' : ''))}-${o.length}-${material.short.replace(/[^A-Z0-9]/gi, '')}-${C.finishCodes[o.finish]}`
+  const dwg = `SA-${head.code}-M${o.diameter}${o.fine ? 'F' : ''}-${keyDim.replace(/[ Ø.]/g, (c) => (c === '.' ? 'P' : c === 'Ø' ? 'D' : ''))}-${o.length}-${material.short.replace(/[^A-Z0-9]/gi, '')}-${customFinishes[o.finish].code}`
   const headSpec = content.customise.headSpec[o.head]({ af: r1(tv.af ?? 0), dk: r1(tv.dk ?? 0), key: r1(tv.key ?? 0), height: r1(tv.height) })
   return {
     head,
@@ -48,7 +52,9 @@ export function describe(o) {
     dwg,
     part: head.part,
     lengthLabel: `${o.length} mm`,
-    finishLabel: finishes[o.finish].label,
+    finish: o.finish,
+    finishes: allowedFinishes(o.material),
+    finishLabel: customFinishes[o.finish].label,
     scale: o.length <= 30 ? '2 : 1' : o.length <= 60 ? '1 : 1' : '1 : 2',
   }
 }
@@ -86,7 +92,6 @@ export default function Customiser({ h1 = false } = {}) {
   const section = useRef(null)
   const stage = useRef(null)
   const [o, setO] = useState(C.defaults)
-  const [mount3D, setMount3D] = useState(false)
   const [visible, setVisible] = useState(false)
   const [ready, setReady] = useState(false)
   const [view, setView] = useState('front') // phones / tablets: Front (3D) or Top
@@ -98,14 +103,18 @@ export default function Customiser({ h1 = false } = {}) {
     return { reduced: prefersReducedMotion(), webgl: hasWebGL(), dpr: dprCap(), detail: low ? 'low' : 'high' }
   }, [])
 
-  // Mount near the viewport, and only render frames while on screen.
+  // Live canvas only while this section holds the page's WebGL slot (near the viewport,
+  // one canvas per page: src/lib/glGate.js); render frames only while on screen.
+  const mount3D = useGLGate('customiser', section, { enabled: profile.webgl })
+  useGLHold('customiser', mount3D)
+  useEffect(() => {
+    if (!mount3D) setReady(false)
+  }, [mount3D])
   useEffect(() => {
     if (!profile.webgl) return
-    const near = new IntersectionObserver(([e]) => e.isIntersecting && setMount3D(true), { rootMargin: '900px 0px' })
     const vis = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: '100px 0px' })
-    near.observe(section.current)
     vis.observe(stage.current)
-    return () => (near.disconnect(), vis.disconnect())
+    return () => vis.disconnect()
   }, [profile.webgl])
 
   const set = (patch) =>
@@ -113,8 +122,7 @@ export default function Customiser({ h1 = false } = {}) {
       const n = { ...s, ...patch }
       const [a, b] = C.lengthRange(n.diameter)
       n.length = Math.min(b, Math.max(a, n.length))
-      const mat = C.materials.find((m) => m.key === n.material)
-      if (!mat.finishes.includes(n.finish)) n.finish = mat.finishes[0]
+      n.finish = resolveFinish(n.material, n.finish) // first allowed finish if the current one is not offered
       return n
     })
 
@@ -180,7 +188,7 @@ export default function Customiser({ h1 = false } = {}) {
                   <Suspense fallback={null}>
                     <div className={`absolute inset-0 transition-opacity duration-700 ${ready ? 'opacity-100' : 'opacity-0'}`}>
                       <CustomiserScene
-                        opts={{ ...o, pitch: d.pitch }}
+                        opts={{ ...o, finish: d.finish, pitch: d.pitch }}
                         detail={profile.detail}
                         dpr={profile.dpr}
                         reduced={profile.reduced}
@@ -300,24 +308,21 @@ export default function Customiser({ h1 = false } = {}) {
 
             <Group label={c.finish} value={d.finishLabel}>
               <div className="flex flex-wrap gap-2">
-                {Object.keys(C.finishCodes).map((f) => {
-                  const allowed = d.material.finishes.includes(f)
-                  return (
-                    <button
-                      key={f}
-                      type="button"
-                      aria-pressed={o.finish === f}
-                      aria-label={finishes[f].label}
-                      title={allowed ? finishes[f].label : `${finishes[f].label}: not offered for ${d.material.label}`}
-                      disabled={!allowed}
-                      onClick={() => set({ finish: f })}
-                      className={`size-9 rounded-full border-2 transition-transform disabled:cursor-not-allowed disabled:opacity-25 ${
-                        o.finish === f ? 'scale-110 border-ink' : 'border-paper shadow-[0_0_0_1px_var(--color-steel-300)]'
-                      }`}
-                      style={{ background: `radial-gradient(circle at 34% 28%, #fff 0%, ${finishes[f].color} 34%, color-mix(in oklab, ${finishes[f].color} 62%, #000) 100%)` }}
-                    />
-                  )
-                })}
+                {/* only the finishes offered for this material (src/data/materialFinishes.js) */}
+                {d.finishes.map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    aria-pressed={d.finish === f}
+                    aria-label={customFinishes[f].label}
+                    title={customFinishes[f].label}
+                    onClick={() => set({ finish: f })}
+                    className={`size-9 rounded-full border-2 transition-transform ${
+                      d.finish === f ? 'scale-110 border-ink' : 'border-paper shadow-[0_0_0_1px_var(--color-steel-300)]'
+                    }`}
+                    style={{ background: `radial-gradient(circle at 34% 28%, #fff 0%, ${finishes[f].color} 34%, color-mix(in oklab, ${finishes[f].color} 62%, #000) 100%)` }}
+                  />
+                ))}
               </div>
             </Group>
 

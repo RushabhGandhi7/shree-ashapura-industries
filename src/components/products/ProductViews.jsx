@@ -21,12 +21,13 @@ import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
+import { useReleaseGL } from '../../lib/glGate.js'
 
 // one render request flag, shared by the DOM side and the canvas
 const loop = { dirty: true, onScreen: true }
 const requestRender = () => (loop.dirty = true)
 
-function CardScene({ c, quality, reduced }) {
+function CardScene({ c, quality, reduced, visible }) {
   const inner = useRef(null)
   const st = useRef({ angle: 0, vel: 0 })
   const cam = useRef(null)
@@ -49,6 +50,7 @@ function CardScene({ c, quality, reduced }) {
     s.angle += s.vel * Math.min(dt, 0.05)
     inner.current.rotation.y = s.angle
     if (spinning || s.vel !== 0) requestRender()
+    if (visible) spinStore.markReady(c.slug) // drawn this frame: the card can drop its poster
   })
 
   return (
@@ -107,6 +109,8 @@ const MAX_BUFFER = 4096 // keep the drawing buffer inside WebGL's usual size lim
 
 export default function ProductViews({ slots, container, touch, quality, reduced }) {
   const lenis = useLenis()
+  const onCreated = useReleaseGL()
+  useEffect(() => () => spinStore.resetReady(), []) // canvas gone: posters back
   const [dpr, setDpr] = useState(1)
   const [onScreen, setOnScreen] = useState({})
 
@@ -164,7 +168,7 @@ export default function ProductViews({ slots, container, touch, quality, reduced
         slots[c.slug]
           ? createPortal(
               <View className="pointer-events-none absolute inset-0" visible={onScreen[c.slug] !== false}>
-                <CardScene c={c} quality={quality} reduced={reduced} />
+                <CardScene c={c} quality={quality} reduced={reduced} visible={onScreen[c.slug] !== false} />
               </View>,
               slots[c.slug],
               c.slug,
@@ -173,6 +177,7 @@ export default function ProductViews({ slots, container, touch, quality, reduced
       )}
       <Canvas
         frameloop="never"
+        onCreated={onCreated}
         dpr={dpr}
         eventSource={container.current}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}

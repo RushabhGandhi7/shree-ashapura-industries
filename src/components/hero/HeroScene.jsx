@@ -2,6 +2,7 @@
 // frames are requested by the scroll timeline and by pointer tilt via heroStore.
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { useReleaseGL } from '../../lib/glGate.js'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bolt, TappedPlate } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
@@ -195,8 +196,10 @@ function Lights({ lowEnd }) {
 
 export default function HeroScene({ dpr, detail, tilt, lowEnd }) {
   heroStore.detail = detail
+  const onCreated = useReleaseGL()
   return (
     <Canvas
+      onCreated={onCreated}
       frameloop="demand"
       dpr={dpr}
       camera={{ fov: 30, near: 0.1, far: 80, position: [6, 5, 10] }}

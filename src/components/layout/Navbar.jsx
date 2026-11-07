@@ -63,7 +63,7 @@ export default function Navbar() {
           hidden && !open ? '-translate-y-full' : 'translate-y-0'
         } ${scrolled ? 'bg-paper/85 shadow-[0_1px_0_var(--color-steel-300)] backdrop-blur-md' : 'bg-transparent'}`}
       >
-        <div className="container-x flex h-[var(--nav-h)] items-center justify-between gap-6">
+        <div className="container-x flex h-[var(--nav-h)] items-center justify-between gap-2 sm:gap-6">
           <Link to="/" className="-ml-1 p-1">
             <Logo />
             <span className="sr-only">, home</span>

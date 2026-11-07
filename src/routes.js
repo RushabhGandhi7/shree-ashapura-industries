@@ -57,7 +57,7 @@ export function structuredData(p) {
     foundingDate: String(company.founded),
     url: `${SITE}/`,
     image: `${SITE}/products/og-products.jpg`,
-    logo: `${SITE}/apple-touch-icon.png`,
+    logo: `${SITE}/brand/sa-logo.png`,
     telephone: '+91-70215-80583',
     email: company.emails[0],
     address: {

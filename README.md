@@ -109,9 +109,8 @@ The available types and heads are listed in `variants` in the same file (screws,
 ### Customer logos
 `customers` in `src/data/products.js` renders as text wordmarks. Add `logo: '/brand/customers/<file>.svg'` to a customer to show its logo instead. Set `SHOW_CUSTOMERS = false` to hide the strip.
 
-### Swap the logo
-The logo is a placeholder SVG in `src/components/ui/Logo.jsx`, with the favicon in `public/favicon.svg` and the touch icon in `public/apple-touch-icon.png`.
-Replace the `<svg>` in `Logo.jsx` with the client's mark (keep `aria-hidden` on it; the visible wordmark text stays for accessibility), then replace both icon files.
+### Logo
+The client's mark is `public/brand/sa-logo.svg` (and `.png`). Its path is copied into `src/components/ui/logoMark.js`, which the `Logo` lockup (`src/components/ui/Logo.jsx`) and the icon generator use; the mark renders in ink with the dot in the brand red. After changing the mark, run `node scripts/brand-icons.mjs` to rebuild `public/favicon.svg`, `favicon-48.png` and `apple-touch-icon.png`, and `npm run render:products` to refresh the Open Graph collage header.
 
 ### Add real photos and the unit video
 Drop photos into `public/gallery/real/` (JPG / WebP / PNG, about 1600 px on the long edge) and optionally a `captions.json` with alt text and captions; add `unit-video.mp4` (and `unit-video-poster.jpg`) for the walkthrough slot. `scripts/gallery-manifest.js` reads the folder at build time (and live in dev) with their real sizes, so the gallery switches over by itself. Photos under 1000 px are shown smaller rather than stretched. Full instructions: `public/gallery/real/README.txt`. Until photos exist, the gallery shows the product renders plus blueprint drawings of the machine areas (`public/gallery/illustrations/`). Never use images from the printed catalogue.

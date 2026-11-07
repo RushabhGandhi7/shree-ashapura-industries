@@ -4,6 +4,25 @@
 @import '@fontsource/ibm-plex-mono/500.css';
 @import 'tailwindcss';
 
+/* Metric-matched fallbacks: while the web fonts load (slow connections), text is set in a
+   local font scaled to the same width, so the swap does not reflow the page (CLS) or
+   repaint the LCP text. Ratios measured against Archivo at weight 750 / stretch 118% and
+   Instrument Sans at 400. */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Roboto Bold'), local('Roboto-Bold'), local('Arial'), local('Roboto');
+  font-weight: 100 900;
+  size-adjust: 120.6%;
+  ascent-override: 72.8%;
+  descent-override: 17.4%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Instrument Sans Fallback';
+  src: local('Arial'), local('ArialMT'), local('Roboto');
+  size-adjust: 100.5%;
+}
+
 /* ───────────────────────── Design tokens ───────────────────────── */
 @theme {
   /* Colour: warm paper, steel greys, logo red, charcoal ink. No blues. */
@@ -23,8 +42,8 @@
   --color-current: currentColor;
 
   /* Type */
-  --font-display: 'Archivo Variable', 'Archivo', ui-sans-serif, sans-serif;
-  --font-sans: 'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, sans-serif;
+  --font-display: 'Archivo Variable', 'Archivo', 'Archivo Fallback', ui-sans-serif, sans-serif;
+  --font-sans: 'Instrument Sans Variable', 'Instrument Sans', 'Instrument Sans Fallback', ui-sans-serif, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --text-display-xl: clamp(2.75rem, 1.6rem + 5.9vw, 7rem);
@@ -296,4 +315,9 @@ html.has-hex-cursor * {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* Inner pages: the first section sits under the breadcrumb, so it needs less top padding. */
+nav[aria-label='Breadcrumb'] + section.section-y {
+  padding-top: clamp(2rem, 5vw, 3.5rem);
 }

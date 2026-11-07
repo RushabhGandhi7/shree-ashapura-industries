@@ -70,7 +70,8 @@ const Group = ({ label, value, children }) => (
   </fieldset>
 )
 
-export default function Customiser() {
+export default function Customiser({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
   const section = useRef(null)
   const stage = useRef(null)
   const [o, setO] = useState(C.defaults)
@@ -125,9 +126,9 @@ export default function Customiser() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="customise-title" className="text-h2">
+            <H id="customise-title" className="text-h2">
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </h2>
+            </H>
           </div>
           <p className="max-w-[46ch] text-steel-700 md:col-span-5">{t.lead}</p>
         </div>
@@ -142,6 +143,16 @@ export default function Customiser() {
               role="img"
             >
               <div className="bp-grid bp-grid-fade absolute inset-0" aria-hidden />
+              {/* poster until the 3D part is ready (also the first paint of the prerendered page) */}
+              <img
+                src="/hero-poster.svg"
+                alt=""
+                width="600"
+                height="720"
+                fetchPriority="high"
+                decoding="async"
+                className={`pointer-events-none absolute inset-0 m-auto h-[82%] w-auto transition-opacity duration-500 ${ready ? 'opacity-0' : 'opacity-100'}`}
+              />
               {mount3D && (
                 <Boundary>
                   <Suspense fallback={null}>

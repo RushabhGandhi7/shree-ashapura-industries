@@ -146,7 +146,8 @@ function UnitVideo() {
   )
 }
 
-export default function Gallery() {
+export default function Gallery({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
   const [open, setOpen] = useState(null)
   const close = useCallback(() => setOpen(null), [])
   const step = useCallback((d) => setOpen((i) => (i + d + gallery.length) % gallery.length), [])
@@ -160,9 +161,9 @@ export default function Gallery() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="gallery-title" className="text-h2">
+            <H id="gallery-title" className="text-h2">
               {t.title}
-            </h2>
+            </H>
           </div>
           <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
         </div>

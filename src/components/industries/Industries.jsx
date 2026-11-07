@@ -116,7 +116,8 @@ function IndustryGlyph({ k }) {
   )
 }
 
-export default function Industries() {
+export default function Industries({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
   const root = useRef(null)
   const nums = useRef([])
 
@@ -159,9 +160,9 @@ export default function Industries() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="industries-title" className="text-h2 max-w-[16ch]">
+            <H id="industries-title" className="text-h2 max-w-[16ch]">
               {t.title}
-            </h2>
+            </H>
           </div>
           <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
         </div>

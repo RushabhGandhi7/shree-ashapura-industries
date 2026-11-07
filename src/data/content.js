@@ -46,20 +46,20 @@ const en = {
   nav: {
     label: 'Primary',
     links: [
-      { id: 'products', label: 'Products' },
-      { id: 'process', label: 'Process' },
-      { id: 'capability', label: 'Capability' },
-      { id: 'quality', label: 'Quality' },
-      { id: 'industries', label: 'Industries' },
-      { id: 'gallery', label: 'Gallery' },
-      { id: 'contact', label: 'Contact' },
+      { to: '/products', label: 'Products' },
+      { to: '/custom', label: 'Custom' },
+      { to: '/manufacturing', label: 'Manufacturing' },
+      { to: '/quality', label: 'Quality' },
+      { to: '/about', label: 'About' },
+      { to: '/gallery', label: 'Gallery' },
+      { to: '/contact', label: 'Contact' },
     ],
     call: 'Call',
     whatsapp: 'WhatsApp',
     callWhatsapp: 'Call / WhatsApp',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
-    homeLabel: 'Shree Ashapura Industries, back to top',
+    homeLabel: 'Shree Ashapura Industries, home',
   },
   loader: {
     spec: 'THREAD M12 × 1.75',
@@ -86,7 +86,7 @@ const en = {
     },
   },
   products: {
-    label: '03 / What we make',
+    label: 'What we make',
     title: 'Eight product lines, made to order.',
     lead: 'From chipboard screws and washers to castors, brass inserts and complete furniture fitting kits.',
     open: 'View range',
@@ -110,7 +110,7 @@ const en = {
     },
   },
   exploded: {
-    label: '04 / Exploded view',
+    label: 'Exploded view',
     title: ['Every part,', 'to drawing.'],
     lead: 'Bolt, washer and nut, taken apart. Every dimension is checked against the drawing with calibrated gauges.',
     scrollCue: 'Scroll to take it apart',
@@ -122,7 +122,7 @@ const en = {
     dims: { dia: 'Ø8', len: 'L 25', thread: 'M8 × 1.25', washer: 'Ø16', nut: 'AF 13', nutH: 'm 6.8' },
   },
   customise: {
-    label: '05 / Customise',
+    label: 'Customise',
     title: ['Specify it.', 'We make it.'],
     lead: 'Pick a head, size, length, material and finish. The part on the stage updates as you go, and the title block below becomes your enquiry.',
     controls: { head: 'Head', size: 'Thread size', pitch: 'Pitch', coarse: 'Coarse', fine: 'Fine', length: 'Length', material: 'Material', finish: 'Finish' },
@@ -143,7 +143,7 @@ const en = {
       ].join('\n'),
   },
   process: {
-    label: '06 / Manufacturing',
+    label: 'Manufacturing',
     title: 'From wire coil to dispatch.',
     lead: 'Six stations, one part. Follow a screw through units 24 & 25.',
     // Machine counts and ranges: units 24 & 25 only (client override).
@@ -176,7 +176,7 @@ const en = {
     track: 'Part journey',
   },
   capability: {
-    label: '07 / Capability',
+    label: 'Capability',
     title: ['Capacity on', 'the shop floor.'],
     lead: 'Machine ranges in units 24 & 25, on one scale. Wire and part diameters in millimetres.',
     scale: 'Ø mm',
@@ -192,7 +192,7 @@ const en = {
     },
   },
   quality: {
-    label: '08 / Quality & certifications',
+    label: 'Quality & certifications',
     title: ['Checked at', 'every step.'],
     mission: 'Our mission: high-quality parts for manufacturing industries.',
     instrumentsTitle: 'Inspection instruments',
@@ -254,7 +254,7 @@ const en = {
     },
   },
   industries: {
-    label: '09 / Industries & why us',
+    label: 'Industries & why us',
     title: 'Trusted since 1990.',
     lead: 'Fasteners and components for furniture, appliance, electrical, lock and cable makers.', // CONFIRM industries list
     // 'years' / 'categories' / 'industries' are computed in Industries.jsx
@@ -286,7 +286,7 @@ const en = {
     customersMore: 'and other customers',
   },
   gallery: {
-    label: '10 / Gallery',
+    label: 'Gallery',
     title: 'Parts, machines and the works.',
     lead: 'Our parts, rendered from their drawings, and the machine areas of units 24 & 25. Workshop photos and a unit video are on the way.',
     open: 'Open image',
@@ -329,7 +329,7 @@ const en = {
         .join('\n'),
   },
   contact: {
-    label: '11 / Contact',
+    label: 'Contact',
     title: ['Send us your', 'requirement.'],
     lead: 'Tell us the part, size and quantity, or send your drawing. We reply on WhatsApp or by email.',
     form: {
@@ -373,12 +373,87 @@ const en = {
     addressTitle: 'Works',
     contactTitle: 'Contact',
     linksTitle: 'Site',
+    productsTitle: 'Products',
     mobile: 'Mobile / WhatsApp',
     landline: 'Landline',
     email: 'Email',
     rights: 'All rights reserved.',
     backToTop: 'Back to top',
     drawingNo: 'DWG NO. SA-001 · REV A',
+  },
+  pages: {
+    home: { title: 'Fastener Manufacturer in Mumbai | Screws, Turned Parts & Furniture Fittings', description: 'Shree Ashapura Industries, Mumbai, since 1990: fasteners, screws, washers, precision turned parts, brass inserts, castors and furniture fittings, made to your drawing.' },
+    products: { title: 'Products: Fasteners, Washers, Brackets, Castors & Furniture Fittings', description: 'Eight product lines from Shree Ashapura Industries, Mumbai: screws and fasteners, washers, plastic components, brackets and press parts, brass parts, studs and turned parts, castors, furniture fittings and cams.', crumb: 'Products' },
+    category: {
+      title: (c) => `${c.name}: ${c.items.slice(0, 3).join(', ')}`,
+      description: (c) => `${c.name} from Shree Ashapura Industries, Mumbai: ${c.items.join(', ')}. Made to your drawing; request a quote on WhatsApp.`.slice(0, 300),
+    },
+    custom: { title: 'Custom Fasteners & Parts Made to Your Drawing', description: 'Configure a custom bolt or screw, or send your drawing or sample. Shree Ashapura Industries develops special-purpose parts to your requirement, drawn in AutoCAD 2D & 3D.', crumb: 'Custom orders' },
+    manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting and BT, thread rolling, heat treatment and plating via approved partners, inspection and packing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' },
+    quality: { title: 'Quality & Certifications: ISO 9001:2015, PPAP, Inspection', description: 'ISO 9001:2015 quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.', crumb: 'Quality' },
+    about: { title: 'About Us: Fastener Makers Since 1990', description: 'Shree Ashapura Industries has made fasteners and machine components for the lock and furniture industry since 1990. Meet the team, our industries and customers.', crumb: 'About' },
+    gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, and the cold-heading, thread-rolling and slotting areas of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },
+    contact: { title: 'Contact: Call, WhatsApp or Visit Us in Dahisar (East), Mumbai', description: 'Send your requirement on WhatsApp or email, call +91 70215 80583, or visit Gala No. 24 & 25, Agarwal Co-op. Industrial Estate, S.V. Road, Dahisar (East), Mumbai 400068.', crumb: 'Contact' },
+    notFound: { title: 'Page not found', description: 'This page does not exist. Browse our products or contact Shree Ashapura Industries.', crumb: 'Not found' },
+    home_crumb: 'Home',
+    titleSuffix: ' | Shree Ashapura Industries',
+  },
+  teasers: {
+    products: { label: 'What we make', title: 'Eight product lines.', lead: 'From chipboard screws and washers to castors, brass inserts and complete furniture fitting kits.', cta: 'All products' },
+    capability: { cta: 'See manufacturing' },
+    quality: { label: 'Quality', title: ['Checked at', 'every step.'], cta: 'Quality & certifications' },
+    final: { cta: 'Contact us' },
+  },
+  category: {
+    back: 'All products',
+    items: 'Products in this line',
+    materials: 'Materials',
+    notes: 'Notes',
+    quote: 'Request a quote on WhatsApp',
+    quoteMsg: (name) => `Hello Shree Ashapura Industries, I would like a quote for ${name}. Part / size / quantity: `,
+    call: 'Call',
+    custom: 'Need something not listed? We make parts to your drawing.',
+    customCta: 'Custom orders',
+    related: 'Related product lines',
+    view: 'View range',
+    imageAlt: (name) => `${name}: rendered example parts`,
+  },
+  howCustom: {
+    label: 'How custom orders work',
+    title: 'From your drawing to production.',
+    steps: [
+      { k: '01', title: 'Send a drawing or sample', text: 'Share your drawing, a sample part or the requirement on WhatsApp or email.' },
+      { k: '02', title: 'We review', text: 'We study the part, the material and the quantity, and come back with questions or a quote.' },
+      { k: '03', title: 'Sample approval', text: 'Samples are made for your approval before the run.' },
+      { k: '04', title: 'Production', text: 'The approved part goes into production, with first-piece approval and in-process checks.' },
+    ],
+    cta: 'Send your drawing',
+    message: 'Hello Shree Ashapura Industries, I would like a custom part made to my drawing. Part / size / quantity: ',
+  },
+  about: {
+    label: 'About us',
+    title: ['Your trust,', 'our mission.'],
+    story: [
+      'Shree Ashapura Industries was established in 1990 to provide fasteners and machine components to the lock and furniture industry.',
+      'Today we manufacture and supply screws and fasteners, washers, plastic components, brackets and press parts, brass parts, studs and precision turned parts, castors and furniture fittings, from units 24 & 25 in Dahisar (East), Mumbai.',
+      'We also develop and produce special-purpose products to customer requirement and design, drawn in AutoCAD 2D & 3D.',
+    ],
+    facts: [
+      { k: 'Established', v: '1990' },
+      { k: 'Quality system', v: 'ISO 9001:2015' }, // CONFIRM certificate details
+      { k: 'Lean', v: 'Lean Cluster Mumbai' },
+      { k: 'Design', v: 'AutoCAD 2D & 3D' },
+    ],
+    leader: { name: 'Bharat Jain', role: 'Chief Executive Officer', quote: 'Our mission: high-quality parts for manufacturing industries.' },
+  },
+  notFound: {
+    code: 'ERR 404',
+    title: ['Part not', 'found.'],
+    lead: 'This page is not on our drawing. Try one of these instead.',
+    category: (slug) => `There is no product line called "${slug}".`,
+    didYouMean: 'Did you mean',
+    links: 'Main pages',
+    home: 'Back to home',
   },
   whatsappMessages: {
     general: 'Hello Shree Ashapura Industries, I would like to enquire about your products.',

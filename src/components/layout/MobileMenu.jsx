@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { NavLink } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import { content, company } from '../../data/content.js'
 import { telHref, whatsappHref } from '../../lib/contact.js'
@@ -11,7 +12,7 @@ import { PhoneIcon, WhatsAppIcon } from '../ui/Icons.jsx'
 const t = content.nav
 const ease = [0.16, 1, 0.3, 1]
 
-export default function MobileMenu({ open, onClose, onNavigate, returnFocusRef }) {
+export default function MobileMenu({ open, onClose, returnFocusRef }) {
   const lenis = useLenis()
   const reduced = useReducedMotion()
   const panel = useRef(null)
@@ -83,22 +84,24 @@ export default function MobileMenu({ open, onClose, onNavigate, returnFocusRef }
             <ul className="border-t border-steel-300">
               {t.links.map((l, i) => (
                 <motion.li
-                  key={l.id}
+                  key={l.to}
                   className="border-b border-steel-300"
                   initial={{ opacity: 0, y: 24 * d }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 * d, delay: (0.15 + i * 0.05) * d, ease }}
                 >
-                  <a
-                    href={`#${l.id}`}
-                    onClick={(e) => onNavigate(e, l.id)}
-                    className="flex items-baseline justify-between gap-4 py-4 font-display text-[clamp(2rem,9vw,3rem)] leading-none font-[760] tracking-[-0.02em] [font-stretch:118%] active:text-red"
+                  <NavLink
+                    to={l.to}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `flex items-baseline justify-between gap-4 py-3 font-display text-[clamp(1.6rem,7vw,2.6rem)] leading-none font-[760] tracking-[-0.02em] [font-stretch:118%] active:text-red ${isActive ? 'text-red' : ''}`
+                    }
                   >
                     {l.label}
                     <span className="label-mono text-steel-500" aria-hidden>
                       0{i + 1}
                     </span>
-                  </a>
+                  </NavLink>
                 </motion.li>
               ))}
             </ul>

@@ -242,7 +242,13 @@ export default function Hero() {
             className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 md:left-[42%] ${ready ? 'opacity-0' : 'opacity-100'}`}
             aria-hidden={ready || undefined}
           >
-            <HeroPoster seated={profile.reduced} className="h-[88%] w-auto max-w-full md:h-[78%]" />
+            {/* Prerendered HTML ships the poster as an <img>: it is the largest element at first
+                paint, so it stays the LCP when React later renders the (inline SVG) poster. */}
+            {window.__prerender ? (
+              <img src="/hero-poster.svg" alt="" width="600" height="720" fetchPriority="high" decoding="async" className="h-[88%] w-auto max-w-full md:h-[78%]" />
+            ) : (
+              <HeroPoster seated={profile.reduced} className="h-[88%] w-auto max-w-full md:h-[78%]" />
+            )}
           </div>
           {mount3D && (
             <SceneBoundary>

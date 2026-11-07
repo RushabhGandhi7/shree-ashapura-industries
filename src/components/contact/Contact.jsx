@@ -38,7 +38,9 @@ function Field({ id, label, optional, error, hint, children }) {
 const inputCls =
   'block w-full rounded-xs border border-steel-300 bg-paper px-3 py-2.5 text-body text-ink placeholder:text-steel-500 transition-colors focus:border-ink focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red aria-[invalid=true]:border-red'
 
-export default function Contact() {
+export default function Contact({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
+  const Hs = h1 ? 'h2' : 'h3'
   const uid = useId().replace(/:/g, '')
   const id = (k) => `${uid}-${k}`
   const [v, setV] = useState({ name: '', company: '', phone: '', requirement: '', quantity: '' })
@@ -89,9 +91,9 @@ export default function Contact() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           {/* form */}
           <div className="lg:col-span-7">
-            <h2 id="contact-title" className="text-h2">
+            <H id="contact-title" className="text-h2">
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </h2>
+            </H>
             <p className="mt-5 max-w-[46ch] text-steel-700">{t.lead}</p>
 
             <form noValidate onSubmit={submit} className="mt-10 grid gap-5 rounded-xs border border-steel-300 bg-paper p-5 sm:grid-cols-2 sm:p-8">
@@ -138,7 +140,7 @@ export default function Contact() {
           <aside className="flex flex-col gap-6 lg:col-span-5">
             <div className="grid gap-6 rounded-xs border border-steel-300 bg-paper p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-1">
               <div>
-                <h3 className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.addressTitle}</h3>
+                <Hs className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.addressTitle}</Hs>
                 <address className="text-small leading-relaxed not-italic">
                   <strong className="font-semibold">{company.name}</strong>
                   {company.address.lines.map((l) => (
@@ -154,7 +156,7 @@ export default function Contact() {
               <div>
                 {t.hours && (
                   <>
-                    <h3 className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.hoursTitle}</h3>
+                    <Hs className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.hoursTitle}</Hs>
                     <dl className="mb-5 space-y-1 text-small">
                       {t.hours.map(([d, h]) => (
                         <div key={d} className="flex justify-between gap-4">
@@ -165,7 +167,7 @@ export default function Contact() {
                     </dl>
                   </>
                 )}
-                <h3 className="label-mono mb-2 font-medium [font-stretch:100%] text-steel-500">{t.callTitle}</h3>
+                <Hs className="label-mono mb-2 font-medium [font-stretch:100%] text-steel-500">{t.callTitle}</Hs>
                 <p className="text-small">
                   <a href={telHref()} className="inline-block py-1 font-medium hover:text-red">
                     {company.phone.display}
@@ -175,7 +177,7 @@ export default function Contact() {
                     {company.landline.display}
                   </a>
                 </p>
-                <h3 className="label-mono mt-5 mb-2 font-medium [font-stretch:100%] text-steel-500">{t.emailTitle}</h3>
+                <Hs className="label-mono mt-5 mb-2 font-medium [font-stretch:100%] text-steel-500">{t.emailTitle}</Hs>
                 <p className="text-small">
                   {company.emails.map((e) => (
                     <a key={e} href={mailtoHref({ to: e })} className="block py-1 font-medium [overflow-wrap:anywhere] hover:text-red">

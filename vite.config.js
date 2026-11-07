@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import staticShell from './scripts/static-shell.js'
 import galleryManifest from './scripts/gallery-manifest.js'
 
 // Preload the Latin subsets of the two fonts the hero needs for first paint (the LCP
@@ -25,7 +24,7 @@ function preloadFonts() {
 // No manual chunking: three / R3F / drei are only reachable through lazy imports
 // (hero, cards, exploded, customiser, lab), so they split into async chunks.
 export default defineConfig({
-  plugins: [react(), tailwindcss(), preloadFonts(), staticShell(), galleryManifest()],
+  plugins: [react(), tailwindcss(), preloadFonts(), galleryManifest()],
   build: {
     chunkSizeWarningLimit: 1100,
   },

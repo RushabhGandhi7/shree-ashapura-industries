@@ -1,4 +1,4 @@
-// Build-time static first paint.
+// Build-time static first paint (used by scripts/prerender.mjs since Phase 8A).
 //
 // The site is client-rendered, so without this nothing paints until the main JS has
 // downloaded and run (≈ 3.5 s on a throttled phone). This plugin writes a static copy of
@@ -54,13 +54,13 @@ function shellHTML(content, company) {
     </div>`
 }
 
-export default function staticShell() {
-  return {
-    name: 'static-shell',
-    apply: 'build',
-    async transformIndexHtml(html) {
-      const mod = await import(pathToFileURL(path.resolve('src/data/content.js')).href + `?t=${Date.now()}`)
-      return html.replace('<div id="root"></div>', `<div id="root">${shellHTML(mod.content, mod.company)}</div>`)
-    },
-  }
+/** Static frame of the intro loader, inserted into the prerendered Home (first visits only; CSS shows it while html.is-loading). */
+export async function loaderFrameHTML() {
+  const mod = await import(pathToFileURL(path.resolve('src/data/content.js')).href + `?t=${Date.now()}`)
+  const l = mod.content.loader
+  return `<div class="sa-shell-loader fixed inset-0 z-[90] bg-paper"><div class="bp-grid absolute inset-0"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 px-5"><div class="relative mx-auto flex w-full max-w-[44rem] justify-between"><p class="label-mono text-steel-700">${esc(l.status)}</p><p class="label-mono text-red">${esc(l.spec)}</p></div></div>
+      </div>`
 }
+
+export { shellHTML }

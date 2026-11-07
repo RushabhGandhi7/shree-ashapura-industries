@@ -10,8 +10,11 @@ const t = content.quote
 const OTHER = 'other'
 
 /** "Request a custom quote": pick a product line (preselected from a drawer), add details, send on WhatsApp. */
-export default function QuoteCTA() {
-  const selected = useSyncExternalStore(quoteStore.subscribe, quoteStore.get)
+export default function QuoteCTA({ initial } = {}) {
+  const stored = useSyncExternalStore(quoteStore.subscribe, quoteStore.get)
+  const [touched, setTouched] = useState(false)
+  // On a category page the band starts on that category until the visitor picks another.
+  const selected = !touched && initial ? initial : stored
   const [details, setDetails] = useState('')
   const id = useId()
   const current = selected ?? OTHER
@@ -38,7 +41,7 @@ export default function QuoteCTA() {
                   key={slug}
                   type="button"
                   aria-pressed={current === slug}
-                  onClick={() => quoteStore.set(slug === OTHER ? null : slug)}
+                  onClick={() => (setTouched(true), quoteStore.set(slug === OTHER ? null : slug))}
                   className={`rounded-xs border px-3 py-2 text-small transition-colors duration-200 ${
                     current === slug ? 'border-ink bg-ink text-paper' : 'border-steel-300 bg-paper text-ink hover:border-ink'
                   }`}

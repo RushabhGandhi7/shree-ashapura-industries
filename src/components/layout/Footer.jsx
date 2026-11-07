@@ -1,4 +1,6 @@
+import { Link } from 'react-router'
 import { content, company } from '../../data/content.js'
+import { categories } from '../../data/products.js'
 import { telHref, whatsappHref, mailtoHref } from '../../lib/contact.js'
 import { useLenis, scrollToTarget } from '../../lib/smoothScroll.jsx'
 import Logo from '../ui/Logo.jsx'
@@ -11,9 +13,9 @@ export default function Footer() {
   const lenis = useLenis()
   const year = new Date().getFullYear()
 
-  const go = (e, id) => {
+  const toTop = (e) => {
     e.preventDefault()
-    scrollToTarget(lenis, id)
+    scrollToTarget(lenis, 0)
   }
 
   return (
@@ -78,17 +80,36 @@ export default function Footer() {
             </dl>
           </div>
 
-          <nav aria-label="Footer" className="lg:col-span-2">
-            <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.linksTitle}</h2>
-            <ul className="space-y-2 text-small">
-              {content.nav.links.map((l) => (
-                <li key={l.id}>
-                  <a href={`#${l.id}`} onClick={(e) => go(e, l.id)} className="font-medium hover:text-red">
-                    {l.label}
-                  </a>
+          <nav aria-label="Footer" className="grid gap-10 sm:col-span-2 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-12">
+            <div className="lg:col-span-3">
+              <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.linksTitle}</h2>
+              <ul className="space-y-2 text-small">
+                <li>
+                  <Link to="/" className="font-medium hover:text-red">
+                    {content.pages.home_crumb}
+                  </Link>
                 </li>
-              ))}
-            </ul>
+                {content.nav.links.map((l) => (
+                  <li key={l.to}>
+                    <Link to={l.to} className="font-medium hover:text-red">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="lg:col-span-9">
+              <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.productsTitle}</h2>
+              <ul className="grid gap-x-6 gap-y-2 text-small sm:grid-cols-2">
+                {categories.map((c) => (
+                  <li key={c.slug}>
+                    <Link to={`/products/${c.slug}`} className="font-medium hover:text-red">
+                      {c.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </nav>
         </div>
 
@@ -108,7 +129,7 @@ export default function Footer() {
             © {year} {company.name}. {t.rights}
           </p>
           <p className="label-mono text-steel-500">{t.drawingNo}</p>
-          <a href="#top" onClick={(e) => go(e, 'top')} className="inline-flex items-center gap-2 font-medium text-ink hover:text-red">
+          <a href="#main" onClick={toTop} className="inline-flex items-center gap-2 font-medium text-ink hover:text-red">
             {t.backToTop} <ArrowUp />
           </a>
         </div>

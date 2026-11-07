@@ -7,30 +7,67 @@ React + Vite, Tailwind CSS v4, GSAP + ScrollTrigger, Lenis, React Three Fiber + 
 
 ```bash
 npm install
-npm run dev       # http://localhost:5173
-npm run build     # production build in dist/
-npm run preview   # serve the build locally
+npm run dev        # http://localhost:5173 (client-rendered, no prerender)
+npm run build      # vite build -> sitemap/robots -> prerender every route into dist/
+npm run preview    # serve dist/ like Vercel (cleanUrls, 404.html, Brotli) on http://localhost:4173
+npm run build:spa  # vite build only (no prerender)
 ```
 
 `/lab` is an internal page that shows every 3D part with controls (not linked, `noindex`). Deep links work, for example `/lab?type=nut&head=wing&finish=brass`.
 
+## Pages
+
+| Route | Page | Sections |
+|---|---|---|
+| `/` | Home | Hero (intro loader on a first visit only) · 8-category teaser · exploded view · capability teaser · quality teaser · customers marquee · quote CTA |
+| `/products` | Products | 8 category cards (one shared 3D canvas) · custom banner · quote CTA |
+| `/products/:slug` | Category (8 pages, from `products.js`) | 3D stage of the category's parts · items · materials · notes · WhatsApp quote (prefilled) · related lines · quote CTA. Unknown slug → 404 with "Did you mean …" |
+| `/custom` | Custom orders | Configurator · how custom orders work · quote CTA |
+| `/manufacturing` | Manufacturing | Process (horizontal scroll) · capability ranges (units 24 & 25) |
+| `/quality` | Quality | ISO 9001:2015 · in-process checks · instruments · PPAP checklist · Lean · policy |
+| `/about` | About | Story since 1990 · CEO · industries · why us · customers |
+| `/gallery` | Gallery | Renders · machine drawings · real-photo slots · unit video |
+| `/contact` | Contact | Enquiry form (WhatsApp / email) · map · address · quote CTA |
+| anything else | 404 | Styled "part not found" with links |
+
+### How it is put together
+
+```
+src/main.jsx              createRoot + RouterProvider (removes prerendered head tags first)
+src/router.jsx            route tree; every page is a lazy chunk
+src/routes.js             route list + per-page title / description / image / breadcrumbs, JSON-LD builders
+                          (also read by scripts/sitemap.mjs and scripts/prerender.mjs)
+src/layout/               RootLayout (navbar, footer, cursor, smooth scroll), PageTransition,
+                          RouteLifecycle (scroll reset, ScrollTrigger.refresh, dev leak check), Seo
+src/pages/                one file per route, composed from the sections in src/components/
+scripts/prerender.mjs     renders every route in a headless browser, writes dist/<route>.html
+scripts/sitemap.mjs       dist/sitemap.xml + robots.txt from src/routes.js
+scripts/serve-dist.mjs    local server that behaves like Vercel (used by prerender and `npm run preview`)
+```
+
+- **Adding a page:** add the route in `src/router.jsx`, its SEO entry in `src/routes.js` (copy in `content.pages`), and a file in `src/pages/`. The sitemap and prerender pick it up from `routes.js`.
+- **Adding a product line:** add it to `categories` in `src/data/products.js`; its page, sitemap entry, footer link and JSON-LD follow automatically. Run `npm run render:products` for its image.
+- **SEO:** each page renders `<Seo>` (React 19 hoists the tags into `<head>`): title, description, canonical, Open Graph, Twitter, and JSON-LD (LocalBusiness everywhere, BreadcrumbList on inner pages, ItemList on `/products`, Product items on category pages).
+- **Prerender:** `scripts/prerender.mjs` loads each route of the built site with reduced motion and WebGL off (no canvas or pinned layout is captured; the 3D stays client-only), keeps the head tags and page markup, and writes static HTML, so crawlers and WhatsApp / LinkedIn previews see the real page. React then renders over it on load.
+- **Route changes:** pages fade out and in (Framer Motion `LazyMotion`, opacity only). The window jumps to the top between pages, every section's GSAP context is reverted on unmount (pins, triggers), `ScrollTrigger.refresh()` runs once the new page has laid out, and R3F releases each WebGL context when its canvas unmounts.
+- **Leak check (dev):** `RouteLifecycle` records ScrollTriggers, pin spacers and live WebGL contexts per route on the first visit and warns `[route-leak]` in the console if a later visit differs. Inspect `window.__routeBaseline`.
+
 ## Deploy (Vercel)
 
-`vercel.json` already sets the framework (Vite), build command (`npm run build`), output (`dist`), the SPA rewrite, long-cache headers for hashed assets, a week's cache for `/products/` and `/gallery/`, and basic security headers. Vercel serves real files before applying the rewrite, so `/sitemap.xml`, `/robots.txt` and `/llms.txt` are served as files. Vercel compresses responses automatically.
+`vercel.json` sets the framework (Vite), build (`npm run build`, which includes the prerender), output (`dist`), `cleanUrls` (so `/products` serves `products.html`), no trailing slashes, long-cache headers for hashed assets, a week's cache for `/products/` and `/gallery/`, and basic security headers. There is no SPA catch-all: unknown URLs get `404.html` with a real 404 status, and the app shows the styled 404 (with "Did you mean …" for mistyped product lines).
 
-1. **Check the build locally:** `npm ci && npm run build`, then `npm run preview` and open http://localhost:4173.
-2. **Set the real domain** before the first production deploy: search the project for `shreeashapura.in` and replace it in `index.html` (canonical, Open Graph, Twitter, JSON-LD), `public/robots.txt` and `public/sitemap.xml`. Update `<lastmod>` in the sitemap.
-3. **Create the project**, either:
-   - Vercel dashboard → *Add New… → Project* → import the Git repository → keep the detected settings → *Deploy*; or
-   - CLI: `npx vercel` (links the folder and makes a preview deploy), then `npx vercel --prod`.
-4. **Add the domain:** *Project → Settings → Domains* → add the domain, then set the DNS records Vercel shows at your registrar. HTTPS is issued automatically.
-5. **After deploy, check:**
-   - the [Rich Results Test](https://search.google.com/test/rich-results) on the live URL (LocalBusiness data)
-   - the link preview (WhatsApp / LinkedIn) shows `products/og-products.jpg`
-   - Lighthouse (mobile) in Chrome DevTools
-   - `/lab` is reachable but `noindex`
+1. **Check the build locally:** `npm ci && npm run build && npm run preview`, open http://localhost:4173 and click through a few pages.
+2. **Set the real domain:** replace `SITE` in `src/routes.js` (canonical, Open Graph, JSON-LD, sitemap, robots all read it).
+3. **Create the project:** Vercel dashboard → *Add New… → Project* → import the repo → keep the detected settings → *Deploy*; or `npx vercel` then `npx vercel --prod`.
+4. **Prerender on Vercel:** the build image has no Playwright browser, so on Vercel (`VERCEL=1`) `scripts/prerender.mjs` launches `@sparticuz/chromium` through `playwright-core`. This path has not been tested on Vercel yet: check the build log for the `prerendered /…` lines on the first deploy. If launching fails the build fails (no silent SEO loss); the fallback is to build locally and upload the result: `npx vercel build --prod && npx vercel deploy --prebuilt --prod`.
+5. **Add the domain:** *Project → Settings → Domains*, then set the DNS records Vercel shows. HTTPS is automatic.
+6. **After deploy, check:**
+   - view-source of a few pages shows their own `<title>` and content
+   - the [Rich Results Test](https://search.google.com/test/rich-results)
+   - a WhatsApp / LinkedIn link preview
+   - Lighthouse (mobile)
    - submit `sitemap.xml` in Google Search Console
-6. **Real photos later:** add files to `public/gallery/real/` (see the README there), commit and push; Vercel rebuilds and the gallery switches to them.
+7. **Real photos later:** add files to `public/gallery/real/` (see the README there), commit and push; Vercel rebuilds and the gallery switches to them.
 
 ## Client content
 
@@ -53,7 +90,7 @@ Anything the client still has to confirm carries a `// CONFIRM` comment in `src/
 | Gallery | `src/data/gallery.js`; real photos / unit video go in `public/gallery/real/` (picked up automatically) |
 | 3D part dimensions (ISO-style tables) | `src/three/specs.js` |
 | Colours, fonts, spacing tokens | `@theme` in `src/styles/index.css` |
-| SEO, Open Graph, LocalBusiness data | `index.html` |
+| SEO per page (titles, descriptions, JSON-LD) | `src/routes.js` + `content.pages` in `src/data/content.js` |
 
 Anything marked `// PLACEHOLDER` is sample content to replace (the logo, drifting-parts layout and the site URL).
 
@@ -91,9 +128,9 @@ Phones get `detail="low"` and a lighter material. All 3D canvases are lazy-loade
 ## Performance notes
 
 - Main bundle is about 154 kB gzipped. Three.js (275 kB) and Framer Motion (47 kB) load lazily.
-- `scripts/static-shell.js` writes a static copy of the hero into `index.html` at build time, so the page paints before the JavaScript runs. If you change the hero's layout classes in `Hero.jsx`, mirror them there. The copy itself is read from `content.js` automatically.
-- Sections below the fold mount progressively after the hero (`src/App.jsx`).
-- Measured on a throttled phone profile (Slow 4G, 4× CPU): FCP 1.5 s, LCP 1.6 s, TBT ≈ 230 ms, CLS 0. Lighthouse mobile: Accessibility 100, Best Practices 100, SEO 100.
+- Every route is prerendered, so the page paints before the JavaScript runs. On Home and Custom the bolt poster (`/hero-poster.svg`) is the largest element at first paint and is preloaded, so it stays the LCP; metric-matched fallback fonts (`src/styles/index.css`) stop the web-font swap from shifting the layout.
+- Each page is its own chunk; three.js loads only on Home, Products, the category pages and Custom.
+- Measured on a throttled phone profile (Slow 4G, 4× CPU), Phase 8A: LCP 2.3 s on Home, 2.4 s on Products, 2.2 s on Custom; CLS 0 to 0.02. Lighthouse mobile on those pages: Accessibility 100, Best Practices 100, SEO 100.
 
 ## Accessibility
 

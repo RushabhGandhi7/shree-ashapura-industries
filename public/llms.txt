@@ -2,6 +2,10 @@
 
 > Your trust, our mission. Established 1990. Manufacturer and supplier of fasteners and machine components for the lock and furniture industry, plus precision turned parts, press parts and plastic moulded parts. Special-purpose products developed to customer requirement and design. Dahisar (East), Mumbai, India.
 
+## Pages
+
+- / (home), /products, /products/<line>, /custom, /manufacturing, /quality, /about, /gallery, /contact
+
 ## Contact
 
 - Address: Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump, Dahisar (East), Mumbai 400068
@@ -11,14 +15,14 @@
 
 ## Products
 
-- [Screws & Fasteners](/products/screws-fasteners.webp): CSK Phillips and PHHD chipboard, Allen flat and button head, combi head, Phillips combi washer, male-female, rivets, pan head slotted, hex head, hex nuts, wood, self-tapping, machine, hex flange, locking and umbrella screws, high-tensile items
-- [Washers](/products/washers.webp): plain, spring, circlip, star, cap
-- [Plastic Components](/products/plastic-components.webp): levellers, leg tube caps, male-female parts (PP, LD, ABS, HD-Nylon, EPDM; colour as required)
-- [Brackets & Press Parts](/products/brackets-press-parts.webp): L, door, T, square and hook brackets
-- [Brass Parts](/products/brass-parts.webp): pins, knurled inserts (size as required)
-- [Studs, Pins & Turned Parts](/products/studs-pins-turned.webp): studs, cotter pins, machine parts, precision turned parts
-- [Castors](/products/castors.webp): plate castors with wheel, threaded-stem castors
-- [Furniture Fittings & Cams](/products/furniture-fittings.webp): cams, cam locks, threaded inserts, ferrules / bushes, locks, furniture fitting kits
+- [Screws & Fasteners](/products/screws-fasteners): CSK Phillips and PHHD chipboard, Allen flat and button head, combi head, Phillips combi washer, male-female, rivets, pan head slotted, hex head, hex nuts, wood, self-tapping, machine, hex flange, locking and umbrella screws, high-tensile items
+- [Washers](/products/washers): plain, spring, circlip, star, cap
+- [Plastic Components](/products/plastic-components): levellers, leg tube caps, male-female parts (PP, LD, ABS, HD-Nylon, EPDM; colour as required)
+- [Brackets & Press Parts](/products/brackets-press-parts): L, door, T, square and hook brackets
+- [Brass Parts](/products/brass-parts): pins, knurled inserts (size as required)
+- [Studs, Pins & Turned Parts](/products/studs-pins-turned): studs, cotter pins, machine parts, precision turned parts
+- [Castors](/products/castors): plate castors with wheel, threaded-stem castors
+- [Furniture Fittings & Cams](/products/furniture-fittings): cams, cam locks, threaded inserts, ferrules / bushes, locks, furniture fitting kits
 - Custom products made to your drawing (AutoCAD 2D & 3D)
 
 ## Manufacturing (units 24 & 25)

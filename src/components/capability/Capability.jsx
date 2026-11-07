@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Link } from 'react-router'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { content, machines } from '../../data/content.js'
@@ -26,7 +27,8 @@ function MachineCount({ n }) {
 }
 
 /** Capability: machine ranges for units 24 & 25 on one mm scale, plus the made-to-drawing call-out. */
-export default function Capability() {
+export default function Capability({ h1 = false, teaser = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
   const root = useRef(null)
 
   useGSAP(
@@ -60,16 +62,16 @@ export default function Capability() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="capability-title" className="text-h2 max-w-[16ch]">
+            <H id="capability-title" className="text-h2 max-w-[16ch]">
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </h2>
+            </H>
           </div>
           <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
         </div>
 
         <div className="mt-12 grid gap-10 md:mt-16 lg:grid-cols-12">
           {/* range chart */}
-          <div className="flex min-w-0 flex-col border border-steel-300 bg-paper p-5 sm:p-8 lg:col-span-8">
+          <div className={`flex min-w-0 flex-col border border-steel-300 bg-paper p-5 sm:p-8 ${teaser ? 'lg:col-span-12' : 'lg:col-span-8'}`}>
             <ul className="flex flex-1 flex-col justify-between gap-9">
               {machines.map((m) => (
                 <li key={m.key} data-row>
@@ -108,8 +110,13 @@ export default function Capability() {
             </div>
           </div>
 
+          {teaser && (
+            <Link to="/manufacturing" className="label-mono inline-flex items-center gap-2 text-ink hover:text-red lg:col-span-12">
+              {content.teasers.capability.cta} <span aria-hidden>→</span>
+            </Link>
+          )}
           {/* made to your drawing */}
-          <aside className="relative flex flex-col overflow-hidden border border-ink bg-paper p-6 sm:p-8 lg:col-span-4">
+          {!teaser && <aside className="relative flex flex-col overflow-hidden border border-ink bg-paper p-6 sm:p-8 lg:col-span-4">
             <svg viewBox="0 0 200 120" className="mb-6 w-full max-w-[16rem]" aria-hidden>
               <rect x="2" y="2" width="196" height="116" fill="none" stroke="var(--color-ink)" strokeWidth="1.2" />
               <rect x="8" y="8" width="184" height="104" fill="none" stroke="var(--color-steel-300)" />
@@ -144,7 +151,7 @@ export default function Capability() {
             >
               <span className="relative z-[2]">{t.drawing.cta} →</span>
             </a>
-          </aside>
+          </aside>}
         </div>
       </div>
     </section>

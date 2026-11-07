@@ -1,12 +1,10 @@
 import { Component, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router'
 import { content } from '../../data/content.js'
 import { whatsappHref } from '../../lib/contact.js'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { dprCap, hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
-// Drawer (and Framer Motion) load on first open, prefetched when idle.
-const loadDrawer = () => import('./ProductDrawer.jsx')
-const ProductDrawer = lazy(loadDrawer)
 
 // One shared canvas for all eight cards, loaded lazily when the section gets close.
 const ProductViews = lazy(() => import('./ProductViews.jsx'))
@@ -25,7 +23,7 @@ class Boundary extends Component {
   }
 }
 
-function Card({ c, onOpen, setSlot, touch, still }) {
+function Card({ c, setSlot, touch, still, Hc = 'h3', eager = false }) {
   const ref = useRef(null)
 
   // Touch devices: one turn when the card scrolls into view.
@@ -43,18 +41,14 @@ function Card({ c, onOpen, setSlot, touch, still }) {
 
   return (
     <li>
-      <button
+      <Link
         ref={ref}
-        type="button"
-        onClick={() => {
-          if (touch) spinStore.kick(c.slug, 1400)
-          onOpen(c.slug)
-        }}
+        to={`/products/${c.slug}`}
+        onClick={() => touch && spinStore.kick(c.slug, 1400)}
         onPointerEnter={(e) => e.pointerType === 'mouse' && spinStore.set(c.slug, true)}
         onPointerLeave={() => spinStore.set(c.slug, false)}
         onFocus={() => spinStore.set(c.slug, true)}
         onBlur={() => spinStore.set(c.slug, false)}
-        aria-haspopup="dialog"
         className="shine group flex h-full w-full flex-col bg-paper text-left transition-colors duration-300 hover:bg-white focus-visible:z-10"
       >
         {/* 3D slot: the shared canvas renders this card's View here */}
@@ -67,7 +61,7 @@ function Card({ c, onOpen, setSlot, touch, still }) {
             {c.code}
           </span>
           {/* no WebGL (or the 3D chunk failed): the pre-rendered image of the same parts */}
-          {still && <img src={c.image} alt="" width="1200" height="900" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain" />}
+          {still && <img src={c.image} alt="" width="1200" height="900" loading={eager ? 'eager' : 'lazy'} fetchPriority={eager ? 'high' : undefined} decoding="async" className="absolute inset-0 h-full w-full object-contain" />}
           <div ref={(el) => setSlot(c.slug, el)} className="absolute inset-0" aria-hidden />
           <span className="label-mono absolute right-3 bottom-3 rounded-xs border border-steel-300 bg-paper/85 px-1.5 py-0.5 text-[10px] text-steel-700">
             {c.callout}
@@ -76,7 +70,7 @@ function Card({ c, onOpen, setSlot, touch, still }) {
 
         <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">
           <span className="font-mono text-small font-medium text-red">{c.code}</span>
-          <h3 className="text-[1.15rem] leading-tight sm:text-h3">{c.name}</h3>
+          <Hc className="text-[1.15rem] leading-tight sm:text-h3">{c.name}</Hc>
           <p className="text-small leading-relaxed text-steel-700">{c.blurb}</p>
           <span className="label-mono mt-auto inline-flex items-center gap-2 pt-2 text-ink group-hover:text-red">
             {t.open}
@@ -85,27 +79,19 @@ function Card({ c, onOpen, setSlot, touch, still }) {
             </span>
           </span>
         </div>
-      </button>
+      </Link>
     </li>
   )
 }
 
-export default function Products() {
+export default function Products({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
   const section = useRef(null)
   const grid = useRef(null)
   const slotsRef = useRef({})
   const [slots, setSlots] = useState(null)
   const [mount3D, setMount3D] = useState(false)
-  const [openSlug, setOpenSlug] = useState(null)
   const [glFailed, setGlFailed] = useState(false)
-  const [drawerLoaded, setDrawerLoaded] = useState(false)
-  useEffect(() => {
-    if (openSlug) setDrawerLoaded(true)
-  }, [openSlug])
-  useEffect(() => {
-    const idle = window.requestIdleCallback ?? ((f) => setTimeout(f, 2500))
-    idle(() => loadDrawer())
-  }, [])
 
   const profile = useMemo(
     () => ({
@@ -143,8 +129,6 @@ export default function Products() {
     return () => io.disconnect()
   }, [profile.webgl])
 
-  const active = categories.find((c) => c.slug === openSlug) ?? null
-
   return (
     <section id="products" ref={section} aria-labelledby="products-title" className="relative section-y bg-paper">
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-60" aria-hidden />
@@ -155,9 +139,9 @@ export default function Products() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="products-title" className="text-h2 max-w-[16ch]">
+            <H id="products-title" className="text-h2 max-w-[16ch]">
               {t.title}
-            </h2>
+            </H>
           </div>
           <div className="md:col-span-5">
             <p className="max-w-[44ch] text-steel-700">{t.lead}</p>
@@ -167,8 +151,8 @@ export default function Products() {
 
         <div ref={grid} className="relative mt-12 md:mt-16">
           <ul className="grid grid-cols-1 gap-px border border-steel-300 bg-steel-300 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((c) => (
-              <Card key={c.slug} c={c} onOpen={setOpenSlug} setSlot={setSlot} touch={profile.touch} still={!profile.webgl || glFailed} />
+            {categories.map((c, i) => (
+              <Card key={c.slug} eager={i < 2} Hc={h1 ? 'h2' : 'h3'} c={c} setSlot={setSlot} touch={profile.touch} still={!profile.webgl || glFailed} />
             ))}
           </ul>
           {mount3D && slots && (
@@ -203,11 +187,6 @@ export default function Products() {
         </div>
       </div>
 
-      {drawerLoaded && (
-        <Suspense fallback={null}>
-          <ProductDrawer category={active} onClose={() => setOpenSlug(null)} />
-        </Suspense>
-      )}
     </section>
   )
 }

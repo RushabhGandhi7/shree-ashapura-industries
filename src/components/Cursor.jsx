@@ -81,7 +81,7 @@ function HexCursor() {
   }, [])
 
   return (
-    <div ref={outer} className="group pointer-events-none fixed top-0 left-0 z-[100]" data-hover="false" aria-hidden>
+    <div ref={outer} className="group pointer-events-none fixed top-0 left-0 z-[100]" data-hover="false" data-transient aria-hidden>
       <svg ref={nut} width="32" height="32" viewBox="0 0 32 32" className="block overflow-visible">
         <polygon
           points={HEX}

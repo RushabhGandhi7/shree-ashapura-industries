@@ -8,14 +8,14 @@ import InstrumentIcon from './InstrumentIcon.jsx'
 const t = content.quality
 const N_TICKS = 5 // first piece + 4 two-hour checks on the timeline
 
-const Heading = ({ children, id }) => (
-  <h3 id={id} className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">
+const Heading = ({ children, id, as: Tag = 'h3' }) => (
+  <Tag id={id} className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">
     {children}
-  </h3>
+  </Tag>
 )
 
 /** ISO 9001:2015 seal (certificate details // CONFIRM in content.js). */
-function IsoSeal() {
+export function IsoSeal() {
   const teeth = Array.from({ length: 24 }, (_, i) => i)
   return (
     <svg viewBox="0 0 120 120" className="size-28 shrink-0 sm:size-32" role="img" aria-label={`${t.isoBadge.title} ${t.isoBadge.text}`}>
@@ -37,7 +37,9 @@ function IsoSeal() {
 }
 
 /** Quality & certifications: ISO, policy, in-process timeline, instruments, PPAP checklist, Lean. */
-export default function Quality() {
+export default function Quality({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
+  const Hs = h1 ? 'h2' : 'h3'
   const root = useRef(null)
   const line = useRef(null)
   const count = useRef(null)
@@ -100,9 +102,9 @@ export default function Quality() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="quality-title" className="text-h2 max-w-[16ch]">
+            <H id="quality-title" className="text-h2 max-w-[16ch]">
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </h2>
+            </H>
           </div>
           <div className="flex items-center gap-5 md:col-span-5">
             <IsoSeal />
@@ -141,7 +143,7 @@ export default function Quality() {
 
         {/* instruments */}
         <section aria-labelledby="q-instruments" className="mt-14">
-          <Heading id="q-instruments">{t.instrumentsTitle}</Heading>
+          <Heading as={Hs} id="q-instruments">{t.instrumentsTitle}</Heading>
           <ul className="grid grid-cols-2 gap-px border border-steel-300 bg-steel-300 sm:grid-cols-3 lg:grid-cols-7">
             {t.instruments.map((it) => (
               <li key={it.name} className="flex flex-col gap-3 bg-paper p-4 max-sm:last:col-span-2 sm:p-5 sm:max-lg:last:col-span-3">
@@ -158,9 +160,9 @@ export default function Quality() {
           {/* PPAP checklist, ticks with scroll */}
           <section aria-labelledby="q-ppap" className="min-w-0 lg:col-span-7">
             <div className="mb-4 flex items-baseline justify-between gap-4">
-              <h3 id="q-ppap" className="label-mono font-medium [font-stretch:100%] text-steel-500">
+              <Hs id="q-ppap" className="label-mono font-medium [font-stretch:100%] text-steel-500">
                 {t.ppap.title}
-              </h3>
+              </Hs>
               <span ref={count} className="font-mono text-small text-red" aria-hidden>
                 {t.ppapProgress(0, total)}
               </span>
@@ -191,7 +193,7 @@ export default function Quality() {
 
           <div className="min-w-0 space-y-10 lg:col-span-5">
             <section aria-labelledby="q-lean">
-              <Heading id="q-lean">{t.lean.title}</Heading>
+              <Heading as={Hs} id="q-lean">{t.lean.title}</Heading>
               <p className="font-display text-[1.2rem] font-[760] [font-stretch:115%]">{t.lean.text}</p>
               <ul className="mt-4 flex flex-wrap gap-1.5">
                 {t.lean.items.map((it) => (

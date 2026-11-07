@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router'
 import { content, company } from '../../data/content.js'
 import { telHref, whatsappHref } from '../../lib/contact.js'
-import { useLenis, scrollToTarget } from '../../lib/smoothScroll.jsx'
 import Logo from '../ui/Logo.jsx'
 import Button from '../ui/Button.jsx'
 import { PhoneIcon, WhatsAppIcon } from '../ui/Icons.jsx'
@@ -14,7 +14,7 @@ const MobileMenu = lazy(loadMenu)
 const t = content.nav
 
 export default function Navbar() {
-  const lenis = useLenis()
+  const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
@@ -43,12 +43,11 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const go = (e, id) => {
-    e.preventDefault()
+  // New page: close the menu and show the bar again.
+  useEffect(() => {
     setOpen(false)
-    scrollToTarget(lenis, id)
-    history.replaceState(null, '', id === 'top' ? location.pathname : `#${id}`)
-  }
+    setHidden(false)
+  }, [pathname])
 
   return (
     <>
@@ -65,29 +64,30 @@ export default function Navbar() {
         } ${scrolled ? 'bg-paper/85 shadow-[0_1px_0_var(--color-steel-300)] backdrop-blur-md' : 'bg-transparent'}`}
       >
         <div className="container-x flex h-[var(--nav-h)] items-center justify-between gap-6">
-          <a href="#top" onClick={(e) => go(e, 'top')} className="-ml-1 p-1">
+          <Link to="/" className="-ml-1 p-1">
             <Logo />
-            <span className="sr-only">, back to top</span>
-          </a>
+            <span className="sr-only">, home</span>
+          </Link>
 
           <nav aria-label={t.label} className="hidden xl:block">
             <ul className="flex items-center gap-1">
               {t.links.map((l, i) => (
-                <li key={l.id}>
-                  <a
-                    href={`#${l.id}`}
-                    onClick={(e) => go(e, l.id)}
-                    className="group relative inline-flex items-baseline gap-1.5 px-3 py-2 text-small font-medium text-ink transition-colors hover:text-red"
+                <li key={l.to}>
+                  <NavLink
+                    to={l.to}
+                    className={({ isActive }) =>
+                      `group relative inline-flex items-baseline gap-1.5 px-3 py-2 text-small font-medium transition-colors hover:text-red ${isActive ? 'is-active text-red' : 'text-ink'}`
+                    }
                   >
                     <span className="label-mono text-[0.6rem] text-steel-500 group-hover:text-red" aria-hidden>
                       0{i + 1}
                     </span>
                     {l.label}
                     <span
-                      className="absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 bg-red transition-transform duration-300 ease-[var(--ease-out)] group-hover:scale-x-100"
+                      className="absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 bg-red transition-transform duration-300 ease-[var(--ease-out)] group-hover:scale-x-100 group-[.is-active]:scale-x-100"
                       aria-hidden
                     />
-                  </a>
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -140,7 +140,7 @@ export default function Navbar() {
 
       {menuLoaded && (
         <Suspense fallback={null}>
-          <MobileMenu open={open} onClose={() => setOpen(false)} onNavigate={go} returnFocusRef={menuBtn} />
+          <MobileMenu open={open} onClose={() => setOpen(false)} returnFocusRef={menuBtn} />
         </Suspense>
       )}
     </>

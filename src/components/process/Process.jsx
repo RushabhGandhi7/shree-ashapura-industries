@@ -35,7 +35,8 @@ function JourneyIcon({ iconRef }) {
   )
 }
 
-export default function Process() {
+export default function Process({ h1 = false } = {}) {
+  const H = h1 ? 'h1' : 'h2'
   const section = useRef(null)
   const stage = useRef(null)
   const track = useRef(null)
@@ -178,9 +179,9 @@ export default function Process() {
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
             </p>
-            <h2 id="process-title" className="text-h2 max-w-[14ch]">
+            <H id="process-title" className="text-h2 max-w-[14ch]">
               {t.title}
-            </h2>
+            </H>
             <p className="mt-5 max-w-[36ch] text-steel-700">{t.lead}</p>
             {horizontal && (
               <p className="label-mono mt-8 hidden items-center gap-3 text-steel-500 md:flex" aria-hidden>

@@ -1,15 +1,16 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { content, yearsInBusiness } from '../../data/content.js'
-import { SHOW_CUSTOMERS } from '../../data/products.js'
+import { SHOW_CUSTOMERS, content, yearsInBusiness } from '../../data/content.js'
+import { categories } from '../../data/products.js'
 import Customers from './Customers.jsx'
 import { prefersReducedMotion } from '../../lib/device.js'
 import { gearPath } from '../ui/gear.js'
 import DimensionLine from '../ui/DimensionLine.jsx'
 
 const t = content.industries
-const counters = t.counters.map((c) => ({ ...c, value: c.value === 'years' ? yearsInBusiness() : c.value }))
+const computed = { years: yearsInBusiness(), categories: categories.length, industries: t.list.length }
+const counters = t.counters.map((c) => ({ ...c, value: computed[c.value] ?? c.value }))
 const fmt = (v, d = 0) => v.toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d })
 
 // Micro-animations run on hover, keyboard focus, or once in view on touch (data-in).

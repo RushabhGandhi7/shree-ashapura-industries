@@ -194,8 +194,7 @@ export const categories = [
   },
 ].map((c) => ({ ...c, image: `/products/${c.slug}.webp` }))
 
-/** Customers named in the catalogue (approved for the site). Add `logo: '/brand/customers/<file>.svg'` when files arrive. */
-export const SHOW_CUSTOMERS = true
+/** Customers named in the catalogue (approved for the site; shown when SHOW_CUSTOMERS in content.js). Add `logo: '/brand/customers/<file>.svg'` when files arrive. */
 export const customers = [
   { name: 'Godrej Interio', logo: null },
   { name: 'IFB', logo: null },

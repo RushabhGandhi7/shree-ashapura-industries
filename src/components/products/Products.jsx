@@ -17,12 +17,15 @@ class Boundary extends Component {
   static getDerivedStateFromError() {
     return { failed: true }
   }
+  componentDidCatch() {
+    this.props.onFail?.()
+  }
   render() {
     return this.state.failed ? null : this.props.children
   }
 }
 
-function Card({ c, onOpen, setSlot, touch }) {
+function Card({ c, onOpen, setSlot, touch, still }) {
   const ref = useRef(null)
 
   // Touch devices: one turn when the card scrolls into view.
@@ -63,6 +66,8 @@ function Card({ c, onOpen, setSlot, touch }) {
           >
             {c.code}
           </span>
+          {/* no WebGL (or the 3D chunk failed): the pre-rendered image of the same parts */}
+          {still && <img src={c.image} alt="" width="1200" height="900" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain" />}
           <div ref={(el) => setSlot(c.slug, el)} className="absolute inset-0" aria-hidden />
           <span className="label-mono absolute right-3 bottom-3 rounded-xs border border-steel-300 bg-paper/85 px-1.5 py-0.5 text-[10px] text-steel-700">
             {c.callout}
@@ -92,6 +97,7 @@ export default function Products() {
   const [slots, setSlots] = useState(null)
   const [mount3D, setMount3D] = useState(false)
   const [openSlug, setOpenSlug] = useState(null)
+  const [glFailed, setGlFailed] = useState(false)
   const [drawerLoaded, setDrawerLoaded] = useState(false)
   useEffect(() => {
     if (openSlug) setDrawerLoaded(true)
@@ -162,11 +168,11 @@ export default function Products() {
         <div ref={grid} className="relative mt-12 md:mt-16">
           <ul className="grid grid-cols-1 gap-px border border-steel-300 bg-steel-300 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((c) => (
-              <Card key={c.slug} c={c} onOpen={setOpenSlug} setSlot={setSlot} touch={profile.touch} />
+              <Card key={c.slug} c={c} onOpen={setOpenSlug} setSlot={setSlot} touch={profile.touch} still={!profile.webgl || glFailed} />
             ))}
           </ul>
           {mount3D && slots && (
-            <Boundary>
+            <Boundary onFail={() => setGlFailed(true)}>
               <Suspense fallback={null}>
                 <ProductViews slots={slots} container={grid} dpr={profile.dpr} quality={profile.quality} reduced={profile.reduced} />
               </Suspense>

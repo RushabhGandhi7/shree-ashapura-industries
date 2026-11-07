@@ -16,13 +16,21 @@ npm run preview   # serve the build locally
 
 ## Deploy (Vercel)
 
-Import the repo in Vercel and keep the defaults: framework Vite, build `npm run build`, output `dist`.
-`vercel.json` adds the SPA rewrite and long-cache headers for hashed assets. Vercel compresses files automatically.
+`vercel.json` already sets the framework (Vite), build command (`npm run build`), output (`dist`), the SPA rewrite, long-cache headers for hashed assets, a week's cache for `/products/` and `/gallery/`, and basic security headers. Vercel serves real files before applying the rewrite, so `/sitemap.xml`, `/robots.txt` and `/llms.txt` are served as files. Vercel compresses responses automatically.
 
-**Before launch, set the real domain.** Search the project for `shreeashapura.in` and replace it in:
-- `index.html` (canonical URL, Open Graph, JSON-LD)
-- `public/robots.txt`
-- `public/sitemap.xml`
+1. **Check the build locally:** `npm ci && npm run build`, then `npm run preview` and open http://localhost:4173.
+2. **Set the real domain** before the first production deploy: search the project for `shreeashapura.in` and replace it in `index.html` (canonical, Open Graph, Twitter, JSON-LD), `public/robots.txt` and `public/sitemap.xml`. Update `<lastmod>` in the sitemap.
+3. **Create the project**, either:
+   - Vercel dashboard → *Add New… → Project* → import the Git repository → keep the detected settings → *Deploy*; or
+   - CLI: `npx vercel` (links the folder and makes a preview deploy), then `npx vercel --prod`.
+4. **Add the domain:** *Project → Settings → Domains* → add the domain, then set the DNS records Vercel shows at your registrar. HTTPS is issued automatically.
+5. **After deploy, check:**
+   - the [Rich Results Test](https://search.google.com/test/rich-results) on the live URL (LocalBusiness data)
+   - the link preview (WhatsApp / LinkedIn) shows `products/og-products.jpg`
+   - Lighthouse (mobile) in Chrome DevTools
+   - `/lab` is reachable but `noindex`
+   - submit `sitemap.xml` in Google Search Console
+6. **Real photos later:** add files to `public/gallery/real/` (see the README there), commit and push; Vercel rebuilds and the gallery switches to them.
 
 ## Client content
 
@@ -42,12 +50,12 @@ Anything the client still has to confirm carries a `// CONFIRM` comment in `src/
 | Company details (address, phones, emails, founding year) | `company` in `src/data/content.js` |
 | Product categories (items, materials, notes, 3D parts), customers | `src/data/products.js` |
 | Customiser options (heads, sizes, materials → allowed finishes) | `customiser` in `src/data/products.js` |
-| Gallery list | `src/data/gallery.js` (images in `public/gallery/`) |
+| Gallery | `src/data/gallery.js`; real photos / unit video go in `public/gallery/real/` (picked up automatically) |
 | 3D part dimensions (ISO-style tables) | `src/three/specs.js` |
 | Colours, fonts, spacing tokens | `@theme` in `src/styles/index.css` |
 | SEO, Open Graph, LocalBusiness data | `index.html` |
 
-Anything marked `// PLACEHOLDER` is sample content to replace (now only the gallery photos).
+Anything marked `// PLACEHOLDER` is sample content to replace (the logo, drifting-parts layout and the site URL).
 
 ### Swap the copy (or add Hindi / Gujarati)
 Edit `src/data/content.js`. Components read only from `content`. To add a language, copy the `en` object to `hi` or `gu`, translate it, and point `content` at the locale you want (`export const content = locales.hi`), or add a switcher.
@@ -68,15 +76,11 @@ The available types and heads are listed in `variants` in the same file (screws,
 The logo is a placeholder SVG in `src/components/ui/Logo.jsx`, with the favicon in `public/favicon.svg` and the touch icon in `public/apple-touch-icon.png`.
 Replace the `<svg>` in `Logo.jsx` with the client's mark (keep `aria-hidden` on it; the visible wordmark text stays for accessibility), then replace both icon files.
 
-### Swap the photos
-1. Put the photos in `public/gallery/`. JPG or WebP, about 1600 px on the long edge, compressed to roughly 200–400 KB each.
-2. Edit `src/data/gallery.js`. For each photo give `src`, its real `width` and `height` in pixels (this stops layout jumps), `alt` text describing the photo, and a short `caption`.
-3. Delete the `placeholder-*.svg` files.
-
-The gallery is a masonry grid with a lightbox (arrow keys, swipe, Esc).
+### Add real photos and the unit video
+Drop photos into `public/gallery/real/` (JPG / WebP / PNG, about 1600 px on the long edge) and optionally a `captions.json` with alt text and captions; add `unit-video.mp4` (and `unit-video-poster.jpg`) for the walkthrough slot. `scripts/gallery-manifest.js` reads the folder at build time (and live in dev) with their real sizes, so the gallery switches over by itself. Photos under 1000 px are shown smaller rather than stretched. Full instructions: `public/gallery/real/README.txt`. Until photos exist, the gallery shows the product renders plus blueprint drawings of the machine areas (`public/gallery/illustrations/`). Never use images from the printed catalogue.
 
 ### Social share image
-`public/og-image.jpg` (1200×630) is a screenshot of the hero. Replace it with any 1200×630 JPG if you like.
+`public/products/og-products.jpg` (1200×630) is a collage of the product renders, rebuilt by `npm run render:products`. Swap the `og:image` / `twitter:image` URLs in `index.html` to use another image.
 
 ## How the 3D works
 

@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SITE URL PLACEHOLDER: replace the domain with the live one. -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.shreeashapura.in/</loc>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/screws-fasteners.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/washers.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/plastic-components.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/brackets-press-parts.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/brass-parts.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/studs-pins-turned.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/castors.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.shreeashapura.in/products/furniture-fittings.webp</image:loc>
+    </image:image>
   </url>
 </urlset>

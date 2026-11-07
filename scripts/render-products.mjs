@@ -67,11 +67,20 @@ try {
   const tw = 300
   const th = 225
   const tiles = await Promise.all(files.map((f) => sharp(f).resize(tw, th).toBuffer()))
-  const info = await sharp({ create: { width: 1200, height: 630, channels: 3, background: '#F6F4EF' } })
-    .composite(tiles.map((input, i) => ({ input, left: (i % 4) * tw, top: 90 + Math.floor(i / 4) * th })))
-    .webp({ quality: 82 })
-    .toFile(path.join(OUT, 'og-products.webp'))
-  console.log(`og-products.webp  ${(info.size / 1024).toFixed(0)} kB`)
+  const head = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90">
+    <rect x="40" y="38" width="16" height="16" fill="#C8102E" transform="rotate(45 48 46)"/>
+    <text x="72" y="56" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="800" fill="#1E1F21">SHREE ASHAPURA INDUSTRIES</text>
+    <text x="1160" y="56" text-anchor="end" font-family="Menlo, monospace" font-size="18" letter-spacing="2" fill="#55575A">FASTENERS · TURNED PARTS · FURNITURE FITTINGS · MUMBAI</text>
+  </svg>`)
+  const collage = sharp({ create: { width: 1200, height: 630, channels: 3, background: '#F6F4EF' } }).composite([
+    { input: head, left: 0, top: 0 },
+    ...tiles.map((input, i) => ({ input, left: (i % 4) * tw, top: 90 + Math.floor(i / 4) * th })),
+  ])
+  const buf = await collage.png().toBuffer()
+  const info = await sharp(buf).webp({ quality: 82 }).toFile(path.join(OUT, 'og-products.webp'))
+  // JPG too: some link-preview scrapers do not accept WebP for og:image
+  const jpg = await sharp(buf).jpeg({ quality: 84, mozjpeg: true }).toFile(path.join(OUT, 'og-products.jpg'))
+  console.log(`og-products.webp  ${(info.size / 1024).toFixed(0)} kB · og-products.jpg  ${(jpg.size / 1024).toFixed(0)} kB`)
 } finally {
   await browser.close()
   server.stop()

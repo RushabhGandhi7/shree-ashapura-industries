@@ -70,7 +70,7 @@ export default function Navbar() {
             <span className="sr-only">, back to top</span>
           </a>
 
-          <nav aria-label={t.label} className="hidden lg:block">
+          <nav aria-label={t.label} className="hidden xl:block">
             <ul className="flex items-center gap-1">
               {t.links.map((l, i) => (
                 <li key={l.id}>
@@ -126,7 +126,7 @@ export default function Navbar() {
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={t.openMenu}
-              className="relative -mr-2 grid size-11 place-items-center rounded-xs lg:hidden"
+              className="relative -mr-2 grid size-11 place-items-center rounded-xs xl:hidden"
             >
               <span className="flex w-6 flex-col items-end gap-[5px]" aria-hidden>
                 <span className="h-[1.5px] w-6 bg-ink" />

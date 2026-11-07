@@ -11,7 +11,9 @@ import Products from './components/products/Products.jsx'
 import Exploded from './components/exploded/Exploded.jsx'
 import Customiser from './components/customise/Customiser.jsx'
 import Process from './components/process/Process.jsx'
+import Capability from './components/capability/Capability.jsx'
 import Quality from './components/quality/Quality.jsx'
+import QuoteCTA from './components/quote/QuoteCTA.jsx'
 import Industries from './components/industries/Industries.jsx'
 import Gallery from './components/gallery/Gallery.jsx'
 import Contact from './components/contact/Contact.jsx'
@@ -40,12 +42,13 @@ const GROUPS = [
       <GearDivider />
     </>
   ),
+  () => <Capability />,
   () => <Quality />,
   () => <Industries />,
   () => (
     <>
       <Gallery />
-      <GearDivider />
+      <QuoteCTA />
     </>
   ),
   () => <Contact />,

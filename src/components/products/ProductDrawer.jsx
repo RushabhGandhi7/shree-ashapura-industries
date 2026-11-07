@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { content, company } from '../../data/content.js'
 import { telHref, whatsappHref } from '../../lib/contact.js'
-import { useLenis } from '../../lib/smoothScroll.jsx'
+import { scrollToTarget, useLenis } from '../../lib/smoothScroll.jsx'
+import { quoteStore } from '../../lib/quoteStore.js'
 import { useMediaQuery, useReducedMotion } from '../../hooks/useReducedMotion.js'
 import Button from '../ui/Button.jsx'
 import MonoLabel from '../ui/MonoLabel.jsx'
@@ -168,6 +169,17 @@ export default function ProductDrawer({ category, onClose }) {
               <Button href={telHref()} variant="outline" icon={<PhoneIcon />} magnetic={false} aria-label={`Call ${company.phone.display}`}>
                 {company.phone.display}
               </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  quoteStore.set(category.slug)
+                  onClose()
+                  setTimeout(() => scrollToTarget(lenis, 'quote'), 80)
+                }}
+                className="label-mono py-2 text-left text-ink underline decoration-red underline-offset-4 hover:text-red sm:col-span-2"
+              >
+                {content.quote.fromDrawer} →
+              </button>
             </footer>
           </motion.div>
         </div>

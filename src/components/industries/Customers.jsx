@@ -1,29 +1,51 @@
 import { customers } from '../../data/products.js'
 
+const Mark = ({ c }) =>
+  c.logo ? (
+    <img src={c.logo} alt="" loading="lazy" className="h-9 w-auto max-w-[10rem] object-contain opacity-80 grayscale" />
+  ) : (
+    <span className="font-display text-[clamp(1.15rem,0.95rem+0.8vw,1.6rem)] leading-none font-[760] tracking-[-0.01em] whitespace-nowrap text-steel-700 [font-stretch:115%]">
+      {c.name}
+    </span>
+  )
+
 /**
- * Customer wordmarks. Styled text until logo files arrive: give a customer a `logo`
- * (e.g. '/brand/customers/godrej.svg') in src/data/products.js and it renders instead.
+ * "Trusted by": customer wordmarks in a slow marquee (pauses on hover / focus; static
+ * under reduced motion). Text until logo files arrive: give a customer a `logo`
+ * (e.g. '/brand/customers/godrej.svg') in src/data/products.js.
  */
 export default function Customers({ title, more }) {
+  const row = (hidden) => (
+    <ul className="flex shrink-0 items-center gap-14 pr-14 md:gap-20 md:pr-20" aria-hidden={hidden || undefined}>
+      {customers.map((c) => (
+        <li key={c.name} className="flex items-center gap-14 md:gap-20">
+          <Mark c={c} />
+          <span className="size-1.5 rounded-full bg-red/70" aria-hidden />
+        </li>
+      ))}
+    </ul>
+  )
   return (
     <div className="mt-16 md:mt-20">
       <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
         <span className="h-px w-8 bg-red" aria-hidden />
         {title}
       </p>
-      <ul className="grid grid-cols-2 gap-px border border-steel-300 bg-steel-300 sm:grid-cols-4">
+      {/* screen readers get the plain list */}
+      <ul className="sr-only">
         {customers.map((c) => (
-          <li key={c.name} className="flex min-h-24 items-center justify-center bg-paper px-4 py-6 text-center">
-            {c.logo ? (
-              <img src={c.logo} alt={c.name} loading="lazy" className="max-h-10 w-auto max-w-full object-contain opacity-80 grayscale" />
-            ) : (
-              <span className="font-display text-[clamp(1rem,0.85rem+0.5vw,1.25rem)] leading-tight font-[760] tracking-[-0.01em] text-steel-700 [font-stretch:112%]">
-                {c.name}
-              </span>
-            )}
-          </li>
+          <li key={c.name}>{c.name}</li>
         ))}
       </ul>
+      <div
+        className="group relative overflow-hidden border-y border-steel-300 py-7 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]"
+        aria-hidden
+      >
+        <div className="flex w-max animate-[sa-marquee_48s_linear_infinite] group-hover:[animation-play-state:paused] motion-reduce:w-auto motion-reduce:animate-none motion-reduce:flex-wrap">
+          {row(false)}
+          <span className="contents motion-reduce:hidden">{row(true)}</span>
+        </div>
+      </div>
       <p className="label-mono mt-4 text-steel-500">+ {more}</p>
     </div>
   )

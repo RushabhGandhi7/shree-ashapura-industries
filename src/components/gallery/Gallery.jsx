@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { content } from '../../data/content.js'
-import { gallery } from '../../data/gallery.js'
+import { gallery, unitVideo } from '../../data/gallery.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
 
 const t = content.gallery
@@ -59,13 +59,18 @@ function Lightbox({ index, onClose, onStep }) {
         </button>
       </div>
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 md:px-20" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        {/* low-res photos sit on a blurred copy of themselves instead of being blown up */}
+        {item.small && (
+          <img src={item.src} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-2xl" />
+        )}
         <img
           key={item.src}
           src={item.src}
           alt={item.alt}
           width={item.width}
           height={item.height}
-          className="max-h-full max-w-full rounded-xs object-contain shadow-2xl motion-safe:animate-[sa-fade_.3s_ease-out]"
+          style={{ maxWidth: `min(100%, ${Math.round(item.width * 1.5)}px)`, maxHeight: `min(100%, ${Math.round(item.height * 1.5)}px)` }}
+          className="relative h-auto w-auto rounded-xs object-contain shadow-2xl motion-safe:animate-[sa-fade_.3s_ease-out]"
         />
         <button
           type="button"
@@ -84,8 +89,60 @@ function Lightbox({ index, onClose, onStep }) {
           →
         </button>
       </div>
-      <p className="container-x shrink-0 py-5 text-center font-mono text-small tracking-[0.1em] text-steel-300 uppercase">{item.caption}</p>
+      <p className="container-x shrink-0 py-5 text-center font-mono text-small tracking-[0.1em] text-steel-300 uppercase">
+        {item.caption}
+        {item.small && <span className="ml-3 text-steel-500">· {t.lowRes}</span>}
+      </p>
     </div>
+  )
+}
+
+/** Unit walkthrough slot: blueprint poster until public/gallery/real/unit-video.mp4 exists. */
+function UnitVideo() {
+  const v = t.video
+  const [play, setPlay] = useState(false)
+  return (
+    <figure className="relative mt-3 overflow-hidden rounded-xs border border-steel-300 bg-paper md:mt-4">
+      <div className="relative aspect-video md:aspect-[21/9]">
+        {unitVideo && play ? (
+          <video className="absolute inset-0 h-full w-full bg-ink object-contain" controls autoPlay playsInline preload="none" poster={unitVideo.poster ?? undefined}>
+            <source src={unitVideo.src} type={unitVideo.type} />
+          </video>
+        ) : (
+          <>
+            {unitVideo?.poster ? (
+              <img src={unitVideo.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="bp-grid absolute inset-0" aria-hidden />
+            )}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+              {unitVideo ? (
+                <button
+                  type="button"
+                  onClick={() => setPlay(true)}
+                  aria-label={v.play}
+                  className="grid size-20 place-items-center rounded-full bg-red text-paper shadow-[0_12px_32px_-12px_rgb(200_16_46/0.7)] transition-transform hover:scale-105"
+                >
+                  <svg viewBox="0 0 24 24" className="ml-1 size-8" fill="currentColor" aria-hidden>
+                    <path d="M7 4.5v15l12-7.5z" />
+                  </svg>
+                </button>
+              ) : (
+                <span className="grid size-20 place-items-center rounded-full border-2 border-dashed border-steel-500 text-steel-500" aria-hidden>
+                  <svg viewBox="0 0 24 24" className="ml-1 size-8" fill="currentColor">
+                    <path d="M7 4.5v15l12-7.5z" />
+                  </svg>
+                </span>
+              )}
+              <div>
+                <p className="font-display text-[1.3rem] font-[760] [font-stretch:115%]">{v.title}</p>
+                <p className="label-mono mt-1 text-steel-500">{unitVideo ? v.text : v.soon}</p>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </figure>
   )
 }
 
@@ -117,7 +174,7 @@ export default function Gallery() {
               <button
                 type="button"
                 onClick={() => setOpen(i)}
-                className="group relative block w-full overflow-hidden rounded-xs border border-steel-300 bg-paper"
+                className={`group relative block w-full overflow-hidden rounded-xs border border-steel-300 bg-paper ${g.small ? 'bp-grid p-6' : ''}`}
               >
                 <img
                   src={g.src}
@@ -126,12 +183,14 @@ export default function Gallery() {
                   height={g.height}
                   loading="lazy"
                   decoding="async"
-                  className="block h-auto w-full transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.045] motion-reduce:transition-none"
+                  style={g.small ? { maxWidth: g.width } : undefined}
+                  className="mx-auto block h-auto w-full transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.045] motion-reduce:transition-none"
                 />
                 <span className="sr-only">{t.open}: </span>
-                <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-ink/70 to-transparent px-3 pt-8 pb-2.5 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 max-md:opacity-100">
-                  <span className="label-mono text-paper">{g.caption}</span>
-                  <span className="label-mono text-paper/80" aria-hidden>
+                {/* caption strip: always readable, no dark overlay on light renders */}
+                <span className={`relative flex items-center justify-between gap-3 border-t border-steel-300 bg-paper px-3 py-2 text-left ${g.small ? '-mx-6 -mb-6 mt-6' : ''}`}>
+                  <span className="label-mono line-clamp-2 text-[10px] text-steel-700 group-hover:text-red">{g.caption}</span>
+                  <span className="label-mono text-[10px] text-steel-500" aria-hidden>
                     {String(i + 1).padStart(2, '0')}
                   </span>
                 </span>
@@ -139,6 +198,8 @@ export default function Gallery() {
             </li>
           ))}
         </ul>
+
+        <UnitVideo />
       </div>
       {open !== null && <Lightbox index={open} onClose={close} onStep={step} />}
     </section>

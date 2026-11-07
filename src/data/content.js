@@ -21,6 +21,23 @@ export const company = {
   email: 'ashapura56@gmail.com', // primary (mailto from the enquiry form)
 }
 
+/** Show the "Trusted by" customer marquee (customer list: `customers` in products.js). */
+export const SHOW_CUSTOMERS = true
+
+/**
+ * Machines in units 24 & 25 only (client override). Read by the Capability section and
+ * the Manufacturing stations, so the numbers live in one place.
+ */
+export const machines = [
+  { key: 'heading', name: 'Cold heading', count: 5, min: 1.6, max: 7.5, unit: 'mm' }, // CONFIRM
+  { key: 'rolling', name: 'Thread rolling', count: 8, min: 3, max: 50, unit: 'mm' }, // CONFIRM
+  { key: 'slotting', name: 'Slotting & BT', count: 4, min: 4, max: 55, unit: 'mm' }, // CONFIRM
+]
+const mSpec = (key) => {
+  const m = machines.find((x) => x.key === key)
+  return `${m.count} machines · ${m.min} – ${m.max} ${m.unit}`
+}
+
 /** Whole years in business, computed so it never goes stale. */
 export const yearsInBusiness = () => new Date().getFullYear() - company.founded
 
@@ -31,6 +48,7 @@ const en = {
     links: [
       { id: 'products', label: 'Products' },
       { id: 'process', label: 'Process' },
+      { id: 'capability', label: 'Capability' },
       { id: 'quality', label: 'Quality' },
       { id: 'industries', label: 'Industries' },
       { id: 'gallery', label: 'Gallery' },
@@ -137,9 +155,9 @@ const en = {
         spec: 'Raw-material test reports',
         text: "Wire is checked against the supplier's chemical test report and third-party lab reports before it reaches the machines.",
       },
-      { key: 'heading', name: 'Cold heading', short: 'Heading', spec: '5 machines · 1.6 – 7.5 mm', text: 'Wire is cut and struck cold between dies to form the head. The first piece is approved before the run starts.' }, // CONFIRM
-      { key: 'slotting', name: 'Slotting & BT', short: 'Slotting', spec: '4 machines · 4 – 55 mm', text: 'Slotting and BT machines finish the head before the thread is formed.' }, // CONFIRM
-      { key: 'rolling', name: 'Thread rolling', short: 'Rolling', spec: '8 machines · 3 – 50 mm', text: 'Dies roll the thread into the blank, checked with calibrated thread ring gauges.' }, // CONFIRM
+      { key: 'heading', name: 'Cold heading', short: 'Heading', spec: mSpec('heading'), text: 'Wire is cut and struck cold between dies to form the head. The first piece is approved before the run starts.' }, // CONFIRM
+      { key: 'slotting', name: 'Slotting & BT', short: 'Slotting', spec: mSpec('slotting'), text: 'Slotting and BT machines finish the head before the thread is formed.' }, // CONFIRM
+      { key: 'rolling', name: 'Thread rolling', short: 'Rolling', spec: mSpec('rolling'), text: 'Dies roll the thread into the blank, checked with calibrated thread ring gauges.' }, // CONFIRM
       {
         key: 'heatPlating',
         name: 'Heat treatment & plating',
@@ -157,23 +175,39 @@ const en = {
     ],
     track: 'Part journey',
   },
+  capability: {
+    label: '07 / Capability',
+    title: ['Capacity on', 'the shop floor.'],
+    lead: 'Machine ranges in units 24 & 25, on one scale. Wire and part diameters in millimetres.',
+    scale: 'Ø mm',
+    machinesLabel: (n) => `${n} machines`,
+    rangeLabel: (m) => `Ø${m.min} – Ø${m.max} ${m.unit}`,
+    drawing: {
+      eyebrow: 'Made to your drawing',
+      title: 'Send a drawing or a sample. We develop the part.',
+      text: 'Special-purpose parts are developed to your requirement and design. Drawings are made in AutoCAD 2D & 3D.',
+      cta: 'Send your drawing',
+      message: 'Hello Shree Ashapura Industries, I would like a part made to my drawing. Part / size / quantity: ',
+      tags: ['AutoCAD 2D', 'AutoCAD 3D', 'Sample to part'],
+    },
+  },
   quality: {
-    label: '07 / Quality',
+    label: '08 / Quality & certifications',
     title: ['Checked at', 'every step.'],
+    mission: 'Our mission: high-quality parts for manufacturing industries.',
+    instrumentsTitle: 'Inspection instruments',
+    instruments: [
+      { icon: 'vernier', name: 'Vernier calipers', note: 'Calibrated' },
+      { icon: 'micrometer', name: 'Micrometers', note: 'Calibrated' },
+      { icon: 'ring', name: 'Thread ring gauges', note: 'External threads' },
+      { icon: 'plug', name: 'Thread plug gauges', note: 'Internal threads' },
+      { icon: 'hardness', name: 'Hardness tester', note: 'HRC' },
+      { icon: 'jig', name: 'Jigs & fixtures', note: 'In-house, critical dimensions' },
+      { icon: 'report', name: 'Test reports', note: 'Raw material, plating, TC' },
+    ],
+    ppapProgress: (n, total) => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`,
     lead: 'Shree Ashapura Industries was established in 1990 to provide fasteners and machine components to the lock and furniture industry. We work to an ISO 9001:2015 quality system.', // CONFIRM ISO certificate details
     isoBadge: { title: 'ISO 9001:2015', text: 'Quality management system' }, // CONFIRM
-    inspection: {
-      title: 'Inspection & testing',
-      items: [
-        'Calibrated vernier calipers and micrometers',
-        'Calibrated thread ring gauges (external) and plug gauges (internal)',
-        'Hardness testing (HRC)',
-        'In-house jigs, fixtures and tools for critical dimensions',
-        "Raw-material test reports: supplier's chemical report plus a third-party lab",
-        'Plating supplier and third-party lab reports',
-        'Hardening / plating TC reports',
-      ],
-    },
     inProcess: {
       title: 'In-process checks',
       steps: [
@@ -220,13 +254,14 @@ const en = {
     },
   },
   industries: {
-    label: '08 / Industries & why us',
+    label: '09 / Industries & why us',
     title: 'Trusted since 1990.',
     lead: 'Fasteners and components for furniture, appliance, electrical, lock and cable makers.', // CONFIRM industries list
+    // 'years' / 'categories' / 'industries' are computed in Industries.jsx
     counters: [
       { value: 'years', suffix: '+', label: 'Years in business', note: 'Since 1990' },
-      { value: 5, label: 'Cold-heading machines', note: '1.6 – 7.5 mm' }, // CONFIRM
-      { value: 8, label: 'Thread-rolling machines', note: '3 – 50 mm' }, // CONFIRM
+      { value: 'categories', label: 'Product lines', note: 'Plus parts to drawing' },
+      { value: 'industries', label: 'Industries supplied', note: 'Furniture to cables' },
     ],
     iso: { title: 'ISO 9001:2015', note: 'Quality system' }, // CONFIRM
     whyTitle: 'Why Ashapura',
@@ -247,21 +282,54 @@ const en = {
       { key: 'locks', name: 'Locks & Hardware' },
       { key: 'networking', name: 'Networking & Cables' },
     ],
-    customersTitle: 'Some of our customers',
+    customersTitle: 'Trusted by',
     customersMore: 'and other customers',
   },
   gallery: {
-    label: '09 / Gallery',
-    title: 'Inside the workshop.', // PLACEHOLDER
-    lead: 'A look at the parts, the machines and the people. Real photos coming soon.', // PLACEHOLDER
+    label: '10 / Gallery',
+    title: 'Parts, machines and the works.',
+    lead: 'Our parts, rendered from their drawings, and the machine areas of units 24 & 25. Workshop photos and a unit video are on the way.',
     open: 'Open image',
     close: 'Close',
     prev: 'Previous image',
     next: 'Next image',
+    lowRes: 'Low resolution',
     count: (i, n) => `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`,
+    renderAlt: (name, items) => `Rendered ${name}: ${items}`,
+    renderCaption: (name) => name,
+    illustrations: [
+      { file: 'header', alt: 'Line drawing of a cold-heading machine: wire feed, cut-off, dies and punch', caption: 'Cold-heading area' },
+      { file: 'thread-roller', alt: 'Line drawing of a flat-die thread rolling machine with a blank between the dies', caption: 'Thread-rolling area' },
+      { file: 'slotter', alt: 'Line drawing of a slotting machine: slitting saw above a screw head in its fixture', caption: 'Slotting & BT area' },
+    ],
+    video: {
+      title: 'Unit walkthrough',
+      soon: 'Video coming soon',
+      text: 'A short walk through units 24 & 25.',
+      play: 'Play the unit video',
+    },
+  },
+  quote: {
+    title: ['Request a', 'custom quote.'],
+    lead: 'Pick a product line, add the size and quantity, and send it on WhatsApp. Drawings welcome.',
+    categoryLabel: 'Product line',
+    other: 'Something else',
+    detailsLabel: 'Size, quantity or drawing reference',
+    detailsHint: 'e.g. M6 × 20, 10,000 pcs',
+    optional: 'optional',
+    cta: 'Request on WhatsApp',
+    fromDrawer: 'Request a custom quote',
+    message: ({ category, details }) =>
+      [
+        'Hello Shree Ashapura Industries, I would like a custom quote.',
+        `Product line: ${category}`,
+        details && `Details: ${details}`,
+      ]
+        .filter(Boolean)
+        .join('\n'),
   },
   contact: {
-    label: '10 / Contact',
+    label: '11 / Contact',
     title: ['Send us your', 'requirement.'],
     lead: 'Tell us the part, size and quantity, or send your drawing. We reply on WhatsApp or by email.',
     form: {

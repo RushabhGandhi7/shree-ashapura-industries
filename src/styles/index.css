@@ -236,6 +236,15 @@ html.lenis body {
   animation: sa-drift var(--dur, 16s) ease-in-out var(--delay, 0s) infinite;
 }
 
+@keyframes sa-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes sa-fade {
   from {
     opacity: 0;

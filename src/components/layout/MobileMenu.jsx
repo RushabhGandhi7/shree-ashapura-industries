@@ -58,7 +58,7 @@ export default function MobileMenu({ open, onClose, onNavigate, returnFocusRef }
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className="bp-grid fixed inset-0 z-[60] flex flex-col lg:hidden"
+          className="bp-grid fixed inset-0 z-[60] flex flex-col xl:hidden"
           initial={{ clipPath: 'inset(0 0 100% 0)' }}
           animate={{ clipPath: 'inset(0 0 0% 0)' }}
           exit={{ clipPath: 'inset(0 0 100% 0)' }}

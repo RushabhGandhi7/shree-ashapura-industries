@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { content } from '../data/content.js'
 import { useLenis } from '../lib/smoothScroll.jsx'
+import { LogoMark } from './ui/Logo.jsx'
 
 const t = content.loader
 const SEEN_KEY = 'sa-intro-seen'
@@ -162,7 +163,10 @@ export default function Loader({ onDone }) {
       gsap.set(q('.ld-cut'), { attr: { width: 0 } })
       gsap.set(q('.ld-tool'), { x: 0 })
 
-      tl.from(q('.ld-axis'), { scaleX: 0, transformOrigin: '50% 50%', duration: 0.5, ease: 'expo.out' })
+      // the client's logo: shapes fade up, then the red dot drops in
+      tl.from(q('.ld-logo path'), { autoAlpha: 0, y: 14, duration: 0.6, ease: 'expo.out' })
+        .from(q('.ld-logo circle'), { scale: 0, transformOrigin: '50% 50%', duration: 0.45, ease: 'back.out(2.2)' }, '-=0.3')
+        .from(q('.ld-axis'), { scaleX: 0, transformOrigin: '50% 50%', duration: 0.5, ease: 'expo.out' }, '-=0.2')
         .from(q('.ld-body'), { scaleX: 0, transformOrigin: '0% 50%', duration: 0.6, ease: 'expo.out' }, '-=0.25')
         .from(q('.ld-dim'), { autoAlpha: 0, duration: 0.3 }, '-=0.3')
         .from(q('.ld-tool'), { y: -30, autoAlpha: 0, duration: 0.35, ease: 'back.out(2)' }, '-=0.2')
@@ -209,6 +213,10 @@ export default function Loader({ onDone }) {
         <div className="bp-grid absolute inset-x-0 top-0 h-[100svh]" aria-hidden />
         <div className="absolute inset-x-0 top-0 h-[100svh]">
           <Stage idPrefix="ldt" />
+          {/* client logo (light background, own clear space), above the rod; leaves with the top half */}
+          <div className="ld-logo absolute inset-x-0 top-[calc(50%-12rem)] flex justify-center [--logo-h:3rem] md:top-[calc(50%-14rem)] md:[--logo-h:4rem]">
+            <LogoMark title="Shree Ashapura Industries" />
+          </div>
         </div>
       </div>
       {/* Bottom half: same drawing offset up, so the seam runs through the rod's centre */}

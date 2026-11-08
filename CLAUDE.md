@@ -13,7 +13,7 @@ Shree Ashapura Industries, manufacturers of: all kinds of fasteners (screws, nut
   - WhatsApp link: `https://wa.me/917021580583` (no leading 0)
 - **Landline:** 022-2089 1665
 - **Email:** ashapura56@gmail.com, b_jaan@hotmail.com
-- **Logo:** red triangular "SA" mark. The client will supply the file later; until then use a clean SVG placeholder wordmark.
+- **Logo (master file):** `public/brand/sa-logo.svg` is the client's real logo (traced "SA": black shapes plus a pure red `#FF0000` dot). The client has **no original logo file**, so this SVG is the master; a backup copy lives in `client-assets/brand/`. **Never replace it with a redraw, and never recolour or reshape it** (the red dot stays `#FF0000`, not the site accent). `scripts/brand-icons.mjs` derives everything from it: `src/components/ui/logoMark.js` (inlined in the navbar, footer and loader), the favicons and the touch/manifest icons. Keep clear space around the mark equal to the dot's diameter, and use it on light backgrounds only.
 
 ## Concept: "Precision in motion"
 Feels like a machined object crossed with an engineering blueprint. Tight, exact, mechanical, premium. Motion must be purposeful and tied to manufacturing (threads, rotation, assembly, exploded views, dimension lines), never random decoration.

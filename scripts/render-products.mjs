@@ -69,9 +69,9 @@ try {
   const th = 225
   const tiles = await Promise.all(files.map((f) => sharp(f).resize(tw, th).toBuffer()))
   const head = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90">
-    <svg x="36" y="28" width="56" height="36" viewBox="${MARK.viewBox}"><path fill="#1E1F21" d="${MARK.d}"/><circle fill="#C8102E" cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}"/></svg>
-    <text x="104" y="56" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="800" fill="#1E1F21">SHREE ASHAPURA INDUSTRIES</text>
-    <text x="1160" y="56" text-anchor="end" font-family="Menlo, monospace" font-size="18" letter-spacing="2" fill="#55575A">FASTENERS · TURNED PARTS · FURNITURE FITTINGS · MUMBAI</text>
+    <svg x="36" y="27" width="60" height="38" viewBox="${MARK.viewBox}"><path fill="${MARK.ink}" d="${MARK.d}"/><circle fill="${MARK.dot.fill}" cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}"/></svg>
+    <text x="112" y="56" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#1E1F21">SHREE ASHAPURA INDUSTRIES</text>
+    <text x="1160" y="56" text-anchor="end" font-family="Menlo, monospace" font-size="15" letter-spacing="1.5" fill="#55575A">FASTENERS · TURNED PARTS · FURNITURE FITTINGS · MUMBAI</text>
   </svg>`)
   const collage = sharp({ create: { width: 1200, height: 630, channels: 3, background: '#F6F4EF' } }).composite([
     { input: head, left: 0, top: 0 },

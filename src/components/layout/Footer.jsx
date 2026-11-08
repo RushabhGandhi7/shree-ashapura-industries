@@ -25,7 +25,7 @@ export default function Footer() {
       <div className="container-x relative pt-20 pb-10 md:pt-28">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12">
           <div className="sm:col-span-2 lg:col-span-5">
-            <Logo />
+            <Logo size="footer" />
             <p className="mt-6 max-w-[38ch] text-steel-700">{t.blurb}</p>
           </div>
 

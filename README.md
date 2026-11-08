@@ -92,7 +92,7 @@ Anything the client still has to confirm carries a `// CONFIRM` comment in `src/
 | Colours, fonts, spacing tokens | `@theme` in `src/styles/index.css` |
 | SEO per page (titles, descriptions, JSON-LD) | `src/routes.js` + `content.pages` in `src/data/content.js` |
 
-Anything marked `// PLACEHOLDER` is sample content to replace (the logo, drifting-parts layout and the site URL).
+Anything marked `// PLACEHOLDER` is sample content to replace (today only the drifting-parts layout in `src/components/DriftingParts.jsx`). Open items are listed under "Open items" in `CLAUDE.md`.
 
 ### Swap the copy (or add Hindi / Gujarati)
 Edit `src/data/content.js`. Components read only from `content`. To add a language, copy the `en` object to `hi` or `gu`, translate it, and point `content` at the locale you want (`export const content = locales.hi`), or add a switcher.
@@ -118,7 +118,7 @@ Rules: clear space around the mark equal to the red dot's diameter (built into `
 Drop photos into `public/gallery/real/` (JPG / WebP / PNG, about 1600 px on the long edge) and optionally a `captions.json` with alt text and captions; add `unit-video.mp4` (and `unit-video-poster.jpg`) for the walkthrough slot. `scripts/gallery-manifest.js` reads the folder at build time (and live in dev) with their real sizes, so the gallery switches over by itself. Photos under 1000 px are shown smaller rather than stretched. Full instructions: `public/gallery/real/README.txt`. Until photos exist, the gallery shows the product renders plus blueprint drawings of the machine areas (`public/gallery/illustrations/`). Never use images from the printed catalogue.
 
 ### Social share image
-`public/products/og-products.jpg` (1200×630) is a collage of the product renders, rebuilt by `npm run render:products`. Swap the `og:image` / `twitter:image` URLs in `index.html` to use another image.
+`public/products/og-products.jpg` (1200×630) is a collage of the product renders, rebuilt by `npm run render:products`. Each page's `image` in `src/routes.js` sets its `og:image` / `twitter:image` (category pages use their own render); change it there to use another image.
 
 ## How the 3D works
 

@@ -58,7 +58,7 @@ export function structuredData(p) {
     url: `${SITE}/`,
     image: `${SITE}/products/og-products.jpg`,
     logo: `${SITE}/brand/sa-logo.png`,
-    telephone: '+91-70215-80583',
+    telephone: company.phone.e164,
     email: company.emails[0],
     address: {
       '@type': 'PostalAddress',
@@ -69,8 +69,8 @@ export function structuredData(p) {
       addressCountry: 'IN',
     },
     contactPoint: [
-      { '@type': 'ContactPoint', telephone: '+91-70215-80583', email: company.emails[0], contactType: 'sales', availableLanguage: ['en', 'hi', 'gu'] },
-      { '@type': 'ContactPoint', telephone: '+91-22-2089-1665', email: company.emails[1], contactType: 'customer service' },
+      { '@type': 'ContactPoint', telephone: company.phone.e164, email: company.emails[0], contactType: 'sales', availableLanguage: ['en', 'hi', 'gu'] },
+      { '@type': 'ContactPoint', telephone: company.landline.e164, email: company.emails[1], contactType: 'customer service' },
     ],
     areaServed: 'IN',
   }

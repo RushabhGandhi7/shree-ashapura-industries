@@ -233,7 +233,7 @@ function heatColor(t) {
 }
 /* 05 — heat treatment then plating (via approved partners): glow, quench, finish */
 const FINISH = ['#D9DCDE', '#DCC47E']
-export const HeatPlating = forwardRef(function HeatPlating({ label }, ref) {
+export const HeatPlating = forwardRef(function HeatPlating({ label, tag }, ref) {
   const parts = useRef([])
   const glow = useRef(null)
   const steam = useRef(null)
@@ -301,7 +301,7 @@ export const HeatPlating = forwardRef(function HeatPlating({ label }, ref) {
             </text>
           </g>
           <text x="40" y="40" className="font-mono" fontSize="10" letterSpacing="1.5" fill={STEEL}>
-            APPROVED PARTNERS
+            {tag}
           </text>
         </>
       )}

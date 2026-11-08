@@ -180,7 +180,8 @@ const en = {
         name: 'Heat treatment & plating',
         short: 'Heat & plate',
         spec: 'Via approved partners', // CONFIRM
-        text: 'Hardening and plating are done by approved partners, backed by hardening / plating TC reports and third-party lab reports.',
+        tag: 'APPROVED PARTNERS', // CONFIRM (drawn in the vignette)
+        text: 'Hardening and plating are done by approved partners, backed by hardening / plating TC reports and third-party lab reports.', // CONFIRM
       },
       {
         key: 'inspection',
@@ -406,7 +407,7 @@ const en = {
       description: (c) => `${c.name} from Shree Ashapura Industries, Mumbai: ${c.items.join(', ')}. Made to your drawing; request a quote on WhatsApp.`.slice(0, 300),
     },
     custom: { title: 'Custom Fasteners & Parts Made to Your Drawing', description: 'Configure a custom bolt or screw, or send your drawing or sample. Shree Ashapura Industries develops special-purpose parts to your requirement, drawn in AutoCAD 2D & 3D.', crumb: 'Custom orders' },
-    manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting and BT, thread rolling, heat treatment and plating via approved partners, inspection and packing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' },
+    manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting and BT, thread rolling, heat treatment and plating via approved partners, inspection and packing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' }, // CONFIRM approved partners
     quality: { title: 'Quality & Certifications: ISO 9001:2015, PPAP, Inspection', description: 'ISO 9001:2015 quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.', crumb: 'Quality' },
     about: { title: 'About Us: Fastener Makers Since 1990', description: 'Shree Ashapura Industries has made fasteners and machine components for the lock and furniture industry since 1990. Meet the team, our industries and customers.', crumb: 'About' },
     gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, and the cold-heading, thread-rolling and slotting areas of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },

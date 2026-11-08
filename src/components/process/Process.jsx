@@ -210,7 +210,7 @@ export default function Process({ h1 = false } = {}) {
                   <div data-vignette className="relative aspect-[3/2] overflow-hidden rounded-xs border border-steel-300 bg-paper">
                     <div className="bp-grid absolute inset-0 opacity-50" aria-hidden />
                     <div className="relative h-full w-full p-2">
-                      <V ref={(el) => (vig.current[i] = el)} label={`${s.name}: ${s.text}`} />
+                      <V ref={(el) => (vig.current[i] = el)} label={`${s.name}: ${s.text}`} tag={s.tag} />
                     </div>
                   </div>
                   <p className="label-mono mt-4 text-steel-500">{s.spec}</p>

@@ -19,9 +19,9 @@ Shree Ashapura Industries, manufacturers of: all kinds of fasteners (screws, nut
 Feels like a machined object crossed with an engineering blueprint. Tight, exact, mechanical, premium. Motion must be purposeful and tied to manufacturing (threads, rotation, assembly, exploded views, dimension lines), never random decoration.
 
 ## Design rules (strict)
-- **Light theme only.** Base: warm white / cream (around `#F6F4EF`) with steel greys. Accent: logo red (approx `#C8102E`). Ink: near-black charcoal.
+- **Light theme only.** Base: warm white / cream (`--color-paper #F6F4EF`) with steel greys. Accent: red (`--color-red #C8102E`; the logo's own dot stays `#FF0000`). Ink: near-black charcoal (`--color-ink #1C1D1F`). Tokens: `@theme` in `src/styles/index.css`.
 - **NO dark blue anywhere.** No dark-mode hero. No navy, no midnight-blue gradients.
-- **Typography:** one distinctive display face plus one clean text face (Google Fonts, self-hosted via fontsource). Avoid Inter / Roboto / Arial defaults. Consider a technical mono for dimension labels.
+- **Typography:** Archivo (display), Instrument Sans (text), IBM Plex Mono (dimension labels), self-hosted via fontsource. Avoid Inter / Roboto / Arial.
 - **Blueprint motifs:** fine grid lines, dimension arrows, callout labels like "M8 x 1.25", "Ø12", "L 40".
 - Premium and uncluttered; generous whitespace; strong hierarchy.
 
@@ -35,8 +35,13 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - Deploy target: Vercel
 
 ## Content rules
-- English only, but put **all copy in `src/data/content.js`** so a Hindi/Gujarati layer can be added later.
-- Products are placeholders. Put all products, categories, materials and sizes in **`src/data/products.js`** so they can be swapped easily. Mark placeholder text with a `// PLACEHOLDER` comment.
+- English only, but put **all copy in `src/data/content.js`** so a Hindi/Gujarati layer can be added later. No hardcoded user-facing strings in components.
+- **All products**, categories, materials, sizes, finishes and customers live in **`src/data/products.js`** (real client lists since Phase 7A). Mark sample text `// PLACEHOLDER` and unconfirmed client facts `// CONFIRM`.
+- **No catalogue photos on the site**, ever (`client-assets/catalogue.pdf` is a shape reference only). Product images are our own renders: `public/products/*.webp` from `npm run render:products` (`scripts/render-products.mjs`, Playwright on `/lab?render=<slug>`).
+- **Site URL** is one constant, `SITE_URL` in `src/config.js`, from `VITE_SITE_URL`, default `https://shreeashapuraindustries.vercel.app`. There is no custom domain yet; `shreeashapura.in` is **not** the client's domain, never use it.
+- **Capability numbers** (units 24 & 25 only): 5 cold-heading machines (1.6 to 7.5 mm), 8 thread-rolling machines (3 to 50 mm), 4 slotting/BT machines (4 to 55 mm). Single source: `machines` in `content.js`. Never mention units 31, 35, Sarita, drilling, grinding or length machines.
+- **Heat treatment and plating:** "via approved partners" `// CONFIRM`. Finishes allowed for high tensile and brass `// CONFIRM` (`src/data/materialFinishes.js`).
+- **Customers** are shown as styled text wordmarks (`customers` in `products.js`, `SHOW_CUSTOMERS = true`), each with a `logo` field (null for now) for real files later.
 - 3D fastener models are generated **procedurally in code** (no external model files for now) and driven by parameters (type, head, diameter, length, pitch, finish) so they can be re-skinned later.
 
 ## Performance and quality
@@ -48,10 +53,10 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - Use **Context7** to check current docs for GSAP, R3F and drei before using their APIs.
 - Use **Playwright** to screenshot desktop (1440) and mobile (390) after each section, and fix visual issues without being asked.
 
-## Page sections, in order
+## Page sections (original concept; now split across routes, see Current status)
 1. **Intro loader** — thread being cut along a rod.
 2. **Hero** — scroll-driven 3D bolt threading into a plate.
-3. **What we make** — 7 category cards with 3D spin on hover.
+3. **What we make** — 8 category cards with 3D spin on hover.
 4. **Exploded view** — bolt / washer / nut separate on scroll with drawn dimension lines.
 5. **Customisation showcase** — visual only: switch head, thread, finish; 3D morphs live; "Request a custom order" button opens WhatsApp with a prefilled message.
 6. **Manufacturing process** — horizontal scroll: wire coil, heading, thread rolling, heat treatment, plating, inspection.
@@ -70,3 +75,67 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - `detail: 'low'` on phones / low-end devices (fewer segments plus a standard material). Geometry is memoised in `buildPart`, and materials are shared per (finish, role, quality).
 - Finishes live in `src/data/products.js` (`finishes`). Dimension tables live in `src/three/specs.js`.
 - Inspect parts at `/lab` (deep links: `/lab?type=nut&head=wing&finish=brass&normals=1`).
+
+## Current status (2026-11-08, after Phase 9B)
+Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
+
+### Completed phases
+- **1 Foundation**: Vite + React 19 (JavaScript), Tailwind v4 `@theme`, fonts, Lenis + GSAP, layout, cursor, magnetic buttons, gear dividers, drifting parts.
+- **2 Hero**: pinned scroll scene, bolt threads into a tapped plate (`components/hero/`), torque readout, dimension overlay, SVG poster for LCP / no-WebGL.
+- **3 3D library + `/lab`**: procedural parts in `src/three/` (real helical threads, hex heads, recesses), `Fastener` API, `/lab` inspector (internal, `noindex`).
+- **4 Categories + exploded view**: category cards with hover spin; bolt / washer / nut exploded on scroll with drawn dimension lines.
+- **5 Configurator + manufacturing**: `/custom` customiser (head, size, pitch, length, material, finish; WhatsApp enquiry from the title block); horizontal-scroll process with SVG vignettes.
+- **6–7B Content**: loader, quality (ISO, in-process, instruments, PPAP, Lean, policy), capability ranges, about, industries + counters, customers marquee, gallery, contact, quote CTA, real client content (7A), SEO + JSON-LD (7B).
+- **8A Multi-page routing + prerender**: React Router 7 lazy routes, per-route SEO in `src/routes.js`, `scripts/prerender.mjs` writes static HTML for 17 pages, sitemap/robots, Vercel config.
+- **8B Configurator top view**: live SVG top view (`customise/TopView.jsx`) sharing proportions with the 3D heads via `three/headGeometry.js`.
+- **8C Safari scroll-drift fix**: `SyncCanvasRect` in `products/ProductViews.jsx` writes the live canvas rect each frame so drei Views stop drifting; `scripts/check-view-drift.mjs` measures it. Same commit: `SITE_URL` from `VITE_SITE_URL`.
+- **9A**: live 3D product cards on Home (`ProductsTeaser` reuses the shared-canvas grid), finishes by material (`data/materialFinishes.js`: swatches, spec, DWG code and WhatsApp text all read it), footer wordmark removed.
+- **9B Logo**: client master `public/brand/sa-logo.svg` inlined via generated `ui/logoMark.js` in navbar, mobile menu, footer and loader; favicons / touch / manifest icons from `scripts/brand-icons.mjs`.
+
+### Routes
+`/` Home · `/products` · `/products/:slug` (8 lines from `categories`) · `/custom` · `/manufacturing` · `/quality` · `/about` · `/gallery` · `/contact` · `*` styled 404 (with "Did you mean") · `/lab` outside the layout. Tree: `src/router.jsx`; SEO + JSON-LD: `src/routes.js`.
+
+### Key folders
+- `src/pages/` one file per route · `src/layout/` RootLayout, PageTransition (Framer `LazyMotion`, opacity), RouteLifecycle, Seo
+- `src/components/<section>/` sections · `src/components/ui/` Logo, Button, DimensionLine, GearDivider, MonoLabel, Section
+- `src/three/` part builders (`parts.js`, `parts-extra.js`, `lib/`), `materials.js`, `specs.js`, `headGeometry.js`, `categoryFit.js`, `StudioEnvironment.jsx`
+- `src/lib/` `smoothScroll.jsx`, `glGate.js`, `device.js` (quality profile), `contact.js` (tel / wa.me / mailto builders), small stores (`heroStore`, `explodedStore`, `spinStore`, `quoteStore`)
+- `src/data/` `content.js`, `products.js`, `materialFinishes.js`, `gallery.js` · `scripts/` prerender, sitemap, serve-dist, render-products, brand-icons, gallery-manifest, check-view-drift
+
+### Scroll and 3D architecture
+- **One rAF loop**: a single Lenis instance (`autoRaf: false`) is driven by `gsap.ticker`; Lenis `scroll` calls `ScrollTrigger.update`. Reduced motion: no Lenis, native scroll, no pins, static 3D.
+- **Shared canvas**: the product grid (Products page and Home teaser) is ONE `<Canvas>` with eight drei `<View>`s portalled into card slots; it renders on the GSAP tick only when dirty and on screen.
+- **WebGL gate** (`lib/glGate.js`): at most one live WebGL context per page. Sections register with `useGLGate`; the most-visible one owns it; handoff is two-phase (`useGLHold`), and `useReleaseGL` force-loses the context on unmount so two never overlap (Safari / phone context limits). `window.__glContexts` / `__glMax` count them.
+- **Route change**: window jumps to top, each section's `useGSAP` context reverts its pins/triggers on unmount, `RouteLifecycle` calls `ScrollTrigger.refresh()` after two frames and again after fonts load, and sets `window.__pageReady` for the prerenderer.
+- **Leak check (dev)**: `RouteLifecycle` stores triggers / pin spacers / GL contexts per route on first visit (`window.__routeBaseline`) and warns `[route-leak]` on mismatch.
+- Phones get `detail="low"`, capped DPR, lazy 3D chunks (three only loads on Home, Products, Category, Custom).
+
+### Commands
+`npm run dev` (5173) · `npm run build` (vite build → sitemap → prerender) · `npm run preview` (Vercel-like server on 4173) · `npm run build:spa` · `npm run render:products` · `node scripts/brand-icons.mjs` · `node scripts/check-view-drift.mjs <outDir> [tag] [baseUrl] [route]`.
+
+### Health check (2026-11-08)
+- `npm run build`: passes, 17 pages prerendered, sitemap 16 URLs.
+- ScrollTrigger baseline (every route visited twice by in-app links, desktop Chromium): triggers and pin spacers identical on revisit for all routes; peak WebGL contexts 1. One expected warning: `/` on a cold load records `gl: 0` because the hero canvas mounts ~1–2.5 s after load, after the 2.5 s snapshot; later visits show 1. Timing, not a leak.
+
+### Half-finished or risky
+- Prerender on Vercel (`@sparticuz/chromium` via `playwright-core`) has **never been tested on a real Vercel build**; fallback is `vercel build` locally + `deploy --prebuilt`.
+- Dev leak check races the hero chunk on a cold load of `/` (above); could snapshot after `__glContexts` settles.
+- `.claude/launch.json` "preview" runs `vite preview`, not `npm run preview` (no cleanUrls / 404.html behaviour).
+- Real workshop photos and the unit video are not supplied; the gallery shows renders and blueprint drawings until `public/gallery/real/` is filled.
+- Customer logos not supplied (wordmarks shown). Working hours hidden (`hours: null`).
+- `public/llms.txt` and the `<noscript>` text in `index.html` repeat contact, capability and partner facts by hand: update them when `content.js` changes.
+- Console noise: React Router "No HydrateFallback" warning and a three.js `THREE.Clock` deprecation (from R3F / drei).
+- Large lazy chunks: `StudioEnvironment` ~179 kB gzip, `headGeometry` ~104 kB gzip (three.js bundled there).
+
+### Open items: `// CONFIRM` (client to confirm)
+- [ ] ISO 9001:2015 certificate details (number, body, validity): `content.js` `company.iso`, `hero.eyebrow`, `quality.lead`, `quality.isoBadge`, `industries.iso`, `about.facts`; seal in `quality/Quality.jsx`
+- [ ] Machine counts and ranges (5 / 8 / 4 machines): `content.js` `machines` and the heading, slotting, rolling stations
+- [ ] Heat treatment and plating "via approved partners": `content.js` station `spec`, `tag`, `text` and `pages.manufacturing` (also in `public/llms.txt`)
+- [ ] Finishes for high tensile 8.8 / 10.9 and brass: `materialFinishes.js`
+- [ ] Customiser options (heads, sizes, grades, finishes are illustrative): `products.js` `customiser`, `content.js` `customise.note`
+- [ ] EPDM in plastic materials: `products.js` plastic-components
+- [ ] Industries list (derived from customers): `content.js` `industries.lead`, `industries.list`
+- [ ] Working hours (hidden until supplied): `content.js` `contact.hours`
+
+### Open items: `// PLACEHOLDER`
+- [ ] Drifting background parts layout: `components/DriftingParts.jsx` `LAYOUT`

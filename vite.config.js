@@ -58,11 +58,47 @@ function deferEntry() {
   }
 }
 
-// No manual chunking: three / R3F / drei are only reachable through lazy imports
-// (hero, cards, exploded, customiser, lab), so they split into async chunks.
+// Fails the build if any three / R3F / drei code is statically reachable from the entry
+// (it must only load through the lazy 3D scenes).
+function assertNo3DInEntry() {
+  const is3D = (id) => /node_modules\/(three|@react-three|three-stdlib)\//.test(id)
+  return {
+    name: 'assert-no-3d-in-entry',
+    apply: 'build',
+    generateBundle(_, bundle) {
+      const seen = new Set()
+      const walk = (file) => {
+        if (seen.has(file)) return
+        seen.add(file)
+        const c = bundle[file]
+        if (c?.type !== 'chunk') return
+        const bad = c.moduleIds.find(is3D)
+        if (bad) this.error(`3D code in the initial graph: ${file} contains ${bad}`)
+        c.imports.forEach(walk)
+      }
+      Object.values(bundle)
+        .filter((c) => c.type === 'chunk' && c.isEntry)
+        .forEach((c) => walk(c.fileName))
+    },
+  }
+}
+
+// Named vendor chunks (stable hashes across deploys). react and gsap are in the entry graph
+// anyway; three groups three + R3F + drei into one lazy chunk. Framer is left to automatic
+// splitting on purpose: one group would merge its lazy feature packs (domAnimation, domMax)
+// into the chunk the entry needs, adding ~34 KB gzip to every first load.
+const vendor = [
+  { name: 'react', test: /node_modules\/(react|react-dom|scheduler|react-router)\// },
+  { name: 'gsap', test: /node_modules\/(gsap|@gsap|lenis)\// },
+  { name: 'three', test: /node_modules\/(three|@react-three|three-stdlib|its-fine|zustand|suspend-react|use-sync-external-store|@monogrid|fflate|camera-controls|maath|troika-[^/]+|stats-gl|meshline|detect-gpu)\// },
+]
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), preloadFonts(), deferEntry(), galleryManifest()],
+  plugins: [react(), tailwindcss(), preloadFonts(), deferEntry(), galleryManifest(), assertNo3DInEntry()],
   build: {
     chunkSizeWarningLimit: 1100,
+    rolldownOptions: {
+      output: { codeSplitting: { groups: vendor } },
+    },
   },
 })

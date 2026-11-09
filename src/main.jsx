@@ -43,8 +43,24 @@ if (import.meta.env.DEV) {
   }
 }
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+// Render only once the first route's lazy chunk has resolved. createRoot() clears the
+// prerendered page on its first commit; rendering earlier would commit an empty route and
+// leave the screen blank until the chunk arrives (and repaint the LCP element late).
+function whenRouterReady() {
+  if (router.state.initialized) return Promise.resolve()
+  return new Promise((resolve) => {
+    const off = router.subscribe((s) => {
+      if (!s.initialized) return
+      off()
+      resolve()
+    })
+  })
+}
+
+whenRouterReady().then(() =>
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
+  ),
 )

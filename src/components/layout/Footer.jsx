@@ -2,21 +2,13 @@ import { Link } from 'react-router'
 import { content, company } from '../../data/content.js'
 import { categories } from '../../data/products.js'
 import { telHref, whatsappHref, mailtoHref } from '../../lib/contact.js'
-import { useLenis, scrollToTarget } from '../../lib/smoothScroll.jsx'
 import Logo from '../ui/Logo.jsx'
 import DimensionLine from '../ui/DimensionLine.jsx'
-import { ArrowUp } from '../ui/Icons.jsx'
 
 const t = content.footer
 
 export default function Footer() {
-  const lenis = useLenis()
   const year = new Date().getFullYear()
-
-  const toTop = (e) => {
-    e.preventDefault()
-    scrollToTarget(lenis, 0)
-  }
 
   return (
     <footer className="relative overflow-hidden border-t border-steel-300 bg-paper-2">
@@ -79,54 +71,51 @@ export default function Footer() {
               </div>
             </dl>
           </div>
-
-          <nav aria-label="Footer" className="grid gap-10 sm:col-span-2 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-12">
-            <div className="lg:col-span-3">
-              <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.linksTitle}</h2>
-              <ul className="space-y-2 text-small">
-                <li>
-                  <Link to="/" className="font-medium hover:text-red">
-                    {content.pages.home_crumb}
-                  </Link>
-                </li>
-                {content.nav.links.map((l) => (
-                  <li key={l.to}>
-                    <Link to={l.to} className="font-medium hover:text-red">
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="lg:col-span-9">
-              <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.productsTitle}</h2>
-              {/* even grid: 8 lines = 2 full rows of 4 on desktop, 4 rows of 2 below */}
-              <ul className="grid grid-cols-2 gap-x-8 gap-y-2 text-small lg:grid-cols-4">
-                {categories.map((c) => (
-                  <li key={c.slug}>
-                    <Link to={`/products/${c.slug}`} className="font-medium hover:text-red">
-                      {c.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </nav>
         </div>
 
-        {/* company name on a dimension line, title block style */}
-        <div className="mt-12 md:mt-16">
+        {/* company name on a dimension line: divides the company block from the link columns */}
+        <div className="my-12">
           <DimensionLine length="100%" label={company.name.toUpperCase()} tone="steel" />
         </div>
 
-        <div className="mt-6 flex flex-col gap-4 border-t border-steel-300 pt-6 text-small text-steel-700 sm:flex-row sm:items-center sm:justify-between">
+        <nav aria-label="Footer" className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="lg:col-span-3">
+            <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.linksTitle}</h2>
+            <ul className="space-y-2 text-small">
+              <li>
+                <Link to="/" className="font-medium hover:text-red">
+                  {content.pages.home_crumb}
+                </Link>
+              </li>
+              {content.nav.links.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="font-medium hover:text-red">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="lg:col-span-9">
+            <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.productsTitle}</h2>
+            {/* even grid: 8 lines = 2 full rows of 4 on desktop, 4 rows of 2 below */}
+            <ul className="grid grid-cols-2 gap-x-8 gap-y-2 text-small lg:grid-cols-4">
+              {categories.map((c) => (
+                <li key={c.slug}>
+                  <Link to={`/products/${c.slug}`} className="font-medium hover:text-red">
+                    {c.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+
+        {/* bottom bar: copyright only */}
+        <div className="mt-12 border-t border-steel-300 pt-6 text-small text-steel-700">
           <p>
             © {year} {company.name}. {t.rights}
           </p>
-          <p className="label-mono text-steel-500">{t.drawingNo}</p>
-          <a href="#main" onClick={toTop} className="inline-flex items-center gap-2 font-medium text-ink hover:text-red">
-            {t.backToTop} <ArrowUp />
-          </a>
         </div>
       </div>
     </footer>

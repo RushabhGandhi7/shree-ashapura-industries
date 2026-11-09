@@ -403,8 +403,6 @@ const en = {
     landline: 'Landline',
     email: 'Email',
     rights: 'All rights reserved.',
-    backToTop: 'Back to top',
-    drawingNo: 'DWG NO. SA-001 · REV A',
   },
   pages: {
     home: { title: 'Fastener Manufacturer in Mumbai | Screws, Turned Parts & Furniture Fittings', description: 'Shree Ashapura Industries, Mumbai, since 1990: fasteners, screws, washers, precision turned parts, brass inserts, castors and furniture fittings, made to your drawing.' },

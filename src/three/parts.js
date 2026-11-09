@@ -688,7 +688,12 @@ export function normalise(params) {
   return p
 }
 
+// Geometry cache, shared by every canvas (parts are rebuilt only for new parameters).
+// LRU-capped: the configurator can request many size / length / head combinations. An
+// evicted geometry is disposed (frees its GPU buffers); if a mounted mesh still uses it,
+// three simply re-uploads it on the next frame.
 const cache = new Map()
+const CACHE_MAX = 64
 
 /**
  * Build (or fetch from cache) the geometry for a part.
@@ -697,7 +702,12 @@ const cache = new Map()
 export function buildPart(params) {
   const p = normalise(params)
   const key = JSON.stringify(p)
-  if (cache.has(key)) return cache.get(key)
+  const hit = cache.get(key)
+  if (hit) {
+    cache.delete(key) // move to the most-recent end
+    cache.set(key, hit)
+    return hit
+  }
   const t0 = performance.now()
   const B = makeBuilders()
   const res = BUILDERS[p.type](B, p) || {}
@@ -717,5 +727,10 @@ export function buildPart(params) {
   const tris = Object.values(geos).reduce((s, g) => s + (g.index ? g.index.count : g.attributes.position.count) / 3, 0)
   const out = { geos, tris, ms: performance.now() - t0 }
   cache.set(key, out)
+  if (cache.size > CACHE_MAX) {
+    const [oldKey, old] = cache.entries().next().value
+    cache.delete(oldKey)
+    Object.values(old.geos).forEach((g) => g.dispose())
+  }
   return out
 }

@@ -76,7 +76,7 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - Finishes live in `src/data/products.js` (`finishes`). Dimension tables live in `src/three/specs.js`.
 - Inspect parts at `/lab` (deep links: `/lab?type=nut&head=wing&finish=brass&normals=1`).
 
-## Current status (2026-11-09, after Phase 10)
+## Current status (2026-11-09, after Phase 10D performance)
 Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 
 ### Completed phases
@@ -93,6 +93,7 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - **9C Dead space**: footer, quote, about and category paddings trimmed; /quality Lean and /about CEO quote go full width under their grids; /contact map fills the column; gallery fallback is a regular grid (renders 4 per row, drawings 3 per row) plus a compact "video coming soon" strip. Rule: no gap over 160 px between sections at 1440.
 - **10C Footer divider**: company-name dimension line between the footer company block and the link columns (48 px above / below); bottom bar is the copyright line only.
 - **10 Blueprint navbar + spacing system**: nav is always visible (no auto-hide), shrinks 72 → 54 px past 80 px (logo scales, sub-line folds, blur + 1 px steel border); `--nav-h` stays 72 px for layout. Caliper indicator (`layout/NavLinksCaliper.jsx`, lazy, xl only, Framer `layoutId` + `domMax`) springs under the hovered / active link with its measured width. Scroll progress dimension line (`layout/NavProgress.jsx`, `useScrollProgress`: Lenis `scroll` event, window listener only when Lenis is absent). Mobile menu is a slide-down panel with 01–07 labels and Call / WhatsApp at the bottom. Spacing scale in `@theme` (`--spacing-section-sm/md/lg` 48 / 64 / 96, `--spacing-head` 48); `section-y` uses it, and every section boundary is one gap: same tone → the next section drops its top padding; tint change → half in each band; last section + footer → half each (CSS in `index.css` after `@utility section-y`). QuoteCTA, AboutStory, category items and the Home customers strip are `section-y` too, so the rules see them. `ui/SectionHead.jsx` = label + title + baseline-aligned aside, always 48 px above content. `lib/reveal.js` `revealOnce()` = one-shot reveal that snaps to the end state if unreachable / reduced motion (Capability, DimensionLine). Exploded pin stops at p 0.8 with a pin shortened to match (no idle tail). Gallery real-photo mode uses the same grid, the last card spans the rest of its row. Footer product links: even 2 / 4-column grid.
+- **10D Performance**: no blank flash (`main.jsx` renders only after the first lazy route resolves); entry JS starts after `load` + first-contentful-paint (`deferEntry` in `vite.config.js`, 3 s cap, no modulepreload) so the prerendered page and its LCP paint first; static loader frame matches the loader's first frame; 3D takes the WebGL gate only after load + idle (posters until then); `StudioEnvironment` built with three directly (drei's HDR/EXR loaders gone, renders pixel-identical); customiser + category stage render from `gsap.ticker` via `three/TickerLoop.jsx`; DPR cap [1, 1.5] (low-end 1), antialias off on touch / low-end (`glAntialias()`); geometry cache LRU 64; PageTransition uses WAAPI (Framer only in the mobile menu / caliper); vendor chunks `react`, `gsap`, `three` and a build assert that no 3D code is in the entry graph. Mobile Lighthouse (median before → single runs after the first-paint fixes): / 84 → 95-96, /products 83 → 93, /custom 77 → 91-93; LCP 3.9-4.4 s → 2.3-2.6 s.
 - **9B Logo**: client master `public/brand/sa-logo.svg` inlined via generated `ui/logoMark.js` in navbar, mobile menu, footer and loader; favicons / touch / manifest icons from `scripts/brand-icons.mjs`.
 
 ### Routes
@@ -107,8 +108,8 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 
 ### Scroll and 3D architecture
 - **One rAF loop**: a single Lenis instance (`autoRaf: false`) is driven by `gsap.ticker`; Lenis `scroll` calls `ScrollTrigger.update`. Reduced motion: no Lenis, native scroll, no pins, static 3D.
-- **Shared canvas**: the product grid (Products page and Home teaser) is ONE `<Canvas>` with eight drei `<View>`s portalled into card slots; it renders on the GSAP tick only when dirty and on screen.
-- **WebGL gate** (`lib/glGate.js`): at most one live WebGL context per page. Sections register with `useGLGate`; the most-visible one owns it; handoff is two-phase (`useGLHold`), and `useReleaseGL` force-loses the context on unmount so two never overlap (Safari / phone context limits). `window.__glContexts` / `__glMax` count them.
+- **Shared canvas**: the product grid (Products page and Home teaser) is ONE `<Canvas>` with eight drei `<View>`s portalled into card slots; it renders on the GSAP tick only when dirty and on screen. Always-animated canvases (customiser, category stage) use `TickerLoop` (gsap.ticker, paused when the tab is hidden); hero / exploded are `frameloop="demand"`.
+- **WebGL gate** (`lib/glGate.js`): at most one live WebGL context per page. Sections register with `useGLGate`; the most-visible one owns it; handoff is two-phase (`useGLHold`), and `useReleaseGL` force-loses the context on unmount so two never overlap (Safari / phone context limits). `window.__glContexts` / `__glMax` count them. No section gets the gate before load + first idle.
 - **Route change**: window jumps to top, each section's `useGSAP` context reverts its pins/triggers on unmount, `RouteLifecycle` calls `ScrollTrigger.refresh()` after two frames and again after fonts load, and sets `window.__pageReady` for the prerenderer.
 - **Navbar**: fixed, outside `<main>` and PageTransition (keep transforms off its ancestors). Condensed state and the progress line both come from `useScrollProgress` (Lenis); never add window scroll listeners for scroll UI while Lenis exists.
 - **Spacing**: vertical rhythm only from the `@theme` scale (`section-y`, `mb-head`, `p*-section-*`); new section headers use `SectionHead`; new scroll reveals use `revealOnce`.
@@ -129,10 +130,11 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - Real workshop photos and the unit video are not supplied; the gallery shows renders and blueprint drawings until `public/gallery/real/` is filled.
 - Customer logos not supplied (wordmarks shown). Working hours hidden (`hours: null`).
 - `public/llms.txt` and the `<noscript>` text in `index.html` repeat contact, capability and partner facts by hand: update them when `content.js` changes.
-- Console noise: React Router "No HydrateFallback" warning and a three.js `THREE.Clock` deprecation (from R3F / drei).
+- Console noise: a three.js `THREE.Clock` deprecation (from R3F).
+- First load: the app JS starts only after `load` + first paint (3 s cap); on a slow phone the page is interactive a little later than before, while painting sooner. The hero 3D replaces its poster ~2 s after load.
 - Home exploded view: the pinned stage is full height with its copy vertically centred, so about 220 to 300 px of empty grid sits above the copy while it is pinned (the parts spread into that height as they separate). Left as designed.
 - `Process.jsx` intro panel keeps its own header layout (it lives inside the pinned horizontal track), not `SectionHead`.
-- Large lazy chunks: `StudioEnvironment` ~179 kB gzip, `headGeometry` ~104 kB gzip (three.js bundled there).
+- Large lazy chunk: `three` (three + R3F + drei) ~255 kB gzip, loaded only on 3D routes after idle.
 
 ### Open items: `// CONFIRM` (client to confirm)
 - [ ] ISO 9001:2015 certificate details (number, body, validity): `content.js` `company.iso`, `hero.eyebrow`, `quality.lead`, `quality.isoBadge`, `industries.iso`, `about.facts`; seal in `quality/Quality.jsx`

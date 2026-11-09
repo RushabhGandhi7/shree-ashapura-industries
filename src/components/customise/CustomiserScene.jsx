@@ -10,8 +10,10 @@ import gsap from 'gsap'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bolt, buildPart } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
+import TickerLoop from '../../three/TickerLoop.jsx'
 import { createTweenMaterial, finishParams, setTweenTargets } from '../../three/materials.js'
 import { blobShadowTexture } from '../../three/lib/shadow.js'
+import { glAntialias } from '../../lib/device.js'
 import { useReleaseGL } from '../../lib/glGate.js'
 
 const FOV = 26
@@ -212,11 +214,12 @@ export default function CustomiserScene({ opts, detail, dpr, reduced, active, dr
     <Canvas
       onCreated={onCreated}
       // 'demand' when off-screen (not 'never'): the first frame renders at mount, a screen
-      // early, so shaders compile before the stage scrolls into view.
-      frameloop={active && !reduced ? 'always' : 'demand'}
+      // early, so shaders compile before the stage scrolls into view. On screen, the idle
+      // spin renders every gsap tick (TickerLoop), not from R3F's own rAF loop.
+      frameloop={active && !reduced ? 'never' : 'demand'}
       dpr={dpr}
       camera={{ fov: FOV, near: 0.05, far: 100, position: [3, 1, 8] }}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      gl={{ antialias: glAntialias(), alpha: true, powerPreference: 'high-performance' }}
       style={{ position: 'absolute', inset: 0 }}
       aria-hidden
     >
@@ -224,6 +227,7 @@ export default function CustomiserScene({ opts, detail, dpr, reduced, active, dr
       <ambientLight intensity={0.3} />
       <directionalLight position={[4, 8, 6]} intensity={1.1} />
       <Stage opts={opts} detail={detail} reduced={reduced} dragTarget={dragTarget} store={store} onReady={onReady} />
+      <TickerLoop running={active && !reduced} />
     </Canvas>
   )
 }

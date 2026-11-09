@@ -21,8 +21,11 @@ export const isLowEnd = () => {
 
 export const isSmallScreen = () => !!mq('(max-width: 767px)')
 
-/** Cap devicePixelRatio for WebGL canvases: 1.5 on phones, 1.25 on low-end hardware. */
-export const dprCap = () => (isLowEnd() ? [1, 1.25] : isSmallScreen() || isTouch() ? [1, 1.5] : [1, 1.75])
+/** Cap devicePixelRatio for WebGL canvases: at most 1.5, and 1 on low-end hardware. */
+export const dprCap = () => (isLowEnd() ? [1, 1] : [1, 1.5])
+
+/** MSAA for WebGL canvases: off on phones / tablets and low-end hardware (fill-rate bound). */
+export const glAntialias = () => hasFinePointer() && !isLowEnd()
 
 // Probed once per page load: each probe creates a real WebGL context, and Safari warns
 // (then drops the oldest context) when too many have been created.

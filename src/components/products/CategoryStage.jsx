@@ -5,7 +5,9 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { PerspectiveCamera } from '@react-three/drei'
 import { Fastener } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
+import TickerLoop from '../../three/TickerLoop.jsx'
 import { CARD_FOV, fitDistance, measure } from '../../three/categoryFit.js'
+import { glAntialias } from '../../lib/device.js'
 import { useReleaseGL } from '../../lib/glGate.js'
 
 function Scene({ category, detail, onReady }) {
@@ -49,8 +51,10 @@ export default function CategoryStage({ category, detail, dpr, onReady }) {
   }, [])
   return (
     <div ref={box} className="absolute inset-0">
-      <Canvas onCreated={onCreated} frameloop={visible ? 'always' : 'never'} dpr={dpr} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }} aria-hidden>
+      <Canvas onCreated={onCreated} frameloop="never" dpr={dpr} gl={{ antialias: glAntialias(), alpha: true, powerPreference: 'high-performance' }} aria-hidden>
         <Scene category={category} detail={detail} onReady={onReady} />
+        {/* idle spin while on screen, rendered from gsap.ticker */}
+        <TickerLoop running={visible} />
       </Canvas>
     </div>
   )

@@ -21,6 +21,7 @@ import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
+import { glAntialias } from '../../lib/device.js'
 import { useReleaseGL } from '../../lib/glGate.js'
 
 // one render request flag, shared by the DOM side and the canvas
@@ -180,7 +181,7 @@ export default function ProductViews({ slots, container, touch, quality, reduced
         onCreated={onCreated}
         dpr={dpr}
         eventSource={container.current}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        gl={{ antialias: glAntialias(), alpha: true, powerPreference: 'high-performance' }}
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
         aria-hidden
       >

@@ -80,6 +80,7 @@ const en = {
     whatsappCta: 'WhatsApp us',
     tolerance: 'EST. 1990',
     scrollCue: 'Scroll to thread it in',
+    sceneLabel: 'Interactive 3D model: a hex bolt threading into a tapped steel plate as you scroll.',
     posterAlt: 'Steel bolt above a tapped steel plate',
     dims: { dia: 'Ø12', len: 'L 30', thread: 'M12 × 1.75', pitch: 'P 1.75', af: 'AF 18' },
     readout: {
@@ -120,6 +121,7 @@ const en = {
     title: ['Every part,', 'to drawing.'],
     lead: 'Bolt, washer and nut, taken apart. Every dimension is checked against the drawing with calibrated gauges.',
     scrollCue: 'Scroll to take it apart',
+    sceneLabel: 'Interactive 3D exploded view of a hex bolt, plain washer and hex nut, with their dimensions.',
     parts: [
       { name: 'Hex bolt', std: 'M8 × 1.25' },
       { name: 'Plain washer', std: 'Ø16' },

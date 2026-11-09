@@ -9,6 +9,7 @@ import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { blobShadowTexture } from '../../three/lib/shadow.js'
 import { heroBolt } from '../../data/products.js'
 import { glAntialias } from '../../lib/device.js'
+import { content } from '../../data/content.js'
 import { heroStore, boltStateAt, dimsAt, BOLT } from '../../lib/heroStore.js'
 
 const DEG = Math.PI / 180
@@ -221,7 +222,8 @@ export default function HeroScene({ dpr, detail, tilt, lowEnd }) {
       camera={{ fov: 30, near: 0.1, far: 80, position: [6, 5, 10] }}
       gl={{ antialias: glAntialias(), alpha: true, powerPreference: 'high-performance', stencil: false }}
       style={{ position: 'absolute', inset: 0 }}
-      aria-hidden
+      role="img"
+      aria-label={content.hero.sceneLabel}
     >
       <Lights lowEnd={lowEnd} />
       <Rig tilt={tilt} />

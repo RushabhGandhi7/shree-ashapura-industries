@@ -23,7 +23,7 @@ export default function NotFound({ slug }) {
   return (
     <>
       <Seo page={notFoundPage} />
-      <section aria-labelledby="nf-title" className="relative min-h-[80svh] pt-[calc(var(--nav-h)+3rem)] pb-20">
+      <section aria-labelledby="nf-title" className="relative min-h-[80svh] pt-[calc(var(--chrome-h-max)+2rem)] pb-20">
         <div className="bp-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden />
         <div className="container-x relative grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">

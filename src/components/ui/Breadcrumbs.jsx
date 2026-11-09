@@ -5,7 +5,7 @@ import { content } from '../../data/content.js'
 export default function Breadcrumbs({ crumbs }) {
   const all = [{ name: content.pages.home_crumb, path: '/' }, ...crumbs]
   return (
-    <nav aria-label="Breadcrumb" className="container-x relative z-10 pt-[calc(var(--nav-h)+1.25rem)]">
+    <nav aria-label="Breadcrumb" className="container-x relative z-10 pt-[calc(var(--header-h-max)+1.25rem)]">
       <ol className="label-mono flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-steel-500">
         {all.map((c, i) => (
           <li key={c.path} className="flex items-center gap-2">

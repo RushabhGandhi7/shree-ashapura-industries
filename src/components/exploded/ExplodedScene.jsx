@@ -6,6 +6,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bolt, Nut, Washer } from '../../three/Fastener.jsx'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { glAntialias } from '../../lib/device.js'
+import { content } from '../../data/content.js'
 import { EXPLODED, explodedAt, explodedStore } from '../../lib/explodedStore.js'
 
 const FOV = 24
@@ -125,7 +126,8 @@ export default function ExplodedScene({ dpr, detail, onReady }) {
       camera={{ fov: FOV, near: 0.1, far: 80, position: [4, 1, 9] }}
       gl={{ antialias: glAntialias(), alpha: true, powerPreference: 'high-performance' }}
       style={{ position: 'absolute', inset: 0 }}
-      aria-hidden
+      role="img"
+      aria-label={content.exploded.sceneLabel}
     >
       {/* no red kicker: the stainless washer's flat face mirrored it as red streaks */}
       <StudioEnvironment resolution={detail === 'low' ? 64 : 128} kicker={false} />

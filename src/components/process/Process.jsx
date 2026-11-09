@@ -155,14 +155,16 @@ export default function Process({ h1 = false } = {}) {
   )
 
   // Desktop horizontal-layout classes, written out literally so Tailwind can see them.
+  // The pinned stage starts below the fixed header + ruler (--chrome-h); columns centre with
+  // `safe` alignment, so a column taller than the stage grows down instead of up under it.
   // Reduced motion keeps the stacked layout everywhere (no pin).
   const cx = horizontal
     ? {
-        stage: 'md:h-[100svh] md:pt-[var(--nav-h)]',
+        stage: 'md:h-[100svh] md:pt-[var(--chrome-h)]',
         track: 'md:flex md:h-full md:w-max md:items-stretch md:py-0',
-        intro: 'md:w-[min(38vw,560px)] md:shrink-0 md:flex md:flex-col md:justify-center md:pr-12 md:max-w-none',
+        intro: 'md:w-[min(38vw,560px)] md:shrink-0 md:flex md:flex-col md:justify-center-safe md:pr-12 md:max-w-none',
         list: 'md:mt-0 md:flex md:gap-0 md:px-0 md:max-w-none',
-        item: 'md:w-[min(44vw,620px)] md:shrink-0 md:justify-center md:border-l md:border-steel-300 md:px-10 md:pb-24',
+        item: 'md:w-[min(44vw,620px)] md:shrink-0 md:justify-center-safe md:border-l md:border-steel-300 md:px-10 md:pb-24',
         spacer: 'md:block md:w-[18vw] md:shrink-0',
       }
     : { stage: '', track: '', intro: '', list: 'md:grid-cols-2 lg:grid-cols-3', item: '', spacer: '' }

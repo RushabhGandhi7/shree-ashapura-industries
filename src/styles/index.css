@@ -194,6 +194,21 @@ html.lenis body {
 .section-y.bg-paper-2 + .section-y.bg-paper-2 {
   padding-top: 0;
 }
+/* At a change of tint the same single gap is split, half inside each band, so every
+   section boundary on the site is one --section-y (96 / 64 / 48). */
+.section-y.bg-paper:has(+ .section-y.bg-paper-2),
+.section-y.bg-paper-2:has(+ .section-y.bg-paper) {
+  padding-bottom: calc(var(--section-y) / 2);
+}
+.section-y.bg-paper + .section-y.bg-paper-2,
+.section-y.bg-paper-2 + .section-y.bg-paper {
+  padding-top: calc(var(--section-y) / 2);
+}
+/* The last section of a page and the footer split the gap the same way
+   (the footer's top padding is the other half). */
+main > div > .section-y:last-of-type {
+  padding-bottom: calc(var(--section-y) / 2);
+}
 
 /* Blueprint grid: 8px minor, 40px major. Pure CSS. */
 @utility bp-grid {

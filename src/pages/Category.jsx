@@ -118,7 +118,7 @@ export default function Category() {
         </div>
       </section>
 
-      <section aria-labelledby="items-title" className="relative pb-section-sm md:pb-section-md lg:pb-section-lg">
+      <section aria-labelledby="items-title" className="relative section-y bg-paper pt-0!">
         <div className="container-x grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <h2 id="items-title" className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">

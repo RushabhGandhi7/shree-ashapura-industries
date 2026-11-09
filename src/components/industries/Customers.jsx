@@ -14,7 +14,7 @@ const Mark = ({ c }) =>
  * under reduced motion). Text until logo files arrive: give a customer a `logo`
  * (e.g. '/brand/customers/godrej.svg') in src/data/products.js.
  */
-export default function Customers({ title, more }) {
+export default function Customers({ className = 'mt-head', title, more }) {
   const row = (hidden) => (
     <ul className="flex shrink-0 items-center gap-14 pr-14 md:gap-20 md:pr-20" aria-hidden={hidden || undefined}>
       {customers.map((c) => (
@@ -26,7 +26,7 @@ export default function Customers({ title, more }) {
     </ul>
   )
   return (
-    <div className="mt-16 md:mt-20">
+    <div className={className}>
       <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
         <span className="h-px w-8 bg-red" aria-hidden />
         {title}

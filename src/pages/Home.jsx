@@ -21,9 +21,11 @@ export default function Home() {
       <Capability teaser />
       <QualityTeaser />
       {SHOW_CUSTOMERS && (
-        <div className="container-x pb-16">
-          <Customers title={content.industries.customersTitle} more={content.industries.customersMore} />
-        </div>
+        <section aria-label={content.industries.customersTitle} className="relative section-y bg-paper">
+          <div className="container-x">
+            <Customers className="" title={content.industries.customersTitle} more={content.industries.customersMore} />
+          </div>
+        </section>
       )}
       <QuoteCTA />
     </>

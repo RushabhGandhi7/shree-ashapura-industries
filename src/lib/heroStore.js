@@ -17,6 +17,7 @@ export const BOLT = {
 export const heroStore = {
   p: 0, // scroll progress 0..1
   pointer: { x: 0, y: 0 }, // target tilt, -1..1
+  frame: null, // { x0, y0, x1, y1, avoid } canvas-px box the subject is fitted into (Hero.jsx)
   invalidate: null, // set by the canvas (frameloop="demand")
   anchors: null, // projected screen points, set by the canvas each frame
   onFrame: null, // overlay updater, called after anchors change

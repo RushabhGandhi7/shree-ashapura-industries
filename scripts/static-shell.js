@@ -32,23 +32,24 @@ function shellHTML(content, company) {
       <div class="sa-shell-loader fixed inset-0 z-[90] bg-paper"><div class="bp-grid absolute inset-0"></div>
         <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 px-5"><div class="relative mx-auto flex w-full max-w-[44rem] justify-between"><p class="label-mono text-steel-700">${esc(l.status)}</p><p class="label-mono text-red">${esc(l.spec)}</p></div></div>
       </div>
-      <section class="sa-shell-hero relative"><div class="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--nav-h)] md:block">
+      <section class="sa-shell-hero relative"><div class="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--chrome-h-max)] lg:block lg:h-auto lg:min-h-[100svh]">
         <div class="bp-grid bp-grid-fade pointer-events-none absolute inset-0"></div>
-        <div class="container-x relative z-10 pt-6 md:flex md:h-full md:items-center md:pt-0"><div class="md:max-w-[min(38rem,46%)] md:pb-16">
+        <div class="container-x relative z-10 pt-[clamp(1rem,3svh,2.5rem)] lg:flex lg:min-h-[calc(100svh-var(--chrome-h-max))] lg:flex-col lg:pb-[clamp(1rem,4svh,3rem)]"><div class="lg:my-auto lg:max-w-[min(38rem,46%)]">
           <div><span class="label-mono inline-flex items-center gap-2 rounded-xs border bg-paper/80 px-2 py-1 text-steel-700 border-steel-300"><span class="size-1.5 rounded-full bg-red"></span>${esc(h.eyebrow)}</span></div>
-          <p class="display-wide mt-5 text-[clamp(2.6rem,1.2rem+5.6vw,6.9rem)] leading-[0.92] tracking-[-0.03em] md:mt-8 md:max-lg:text-[3.3rem]" role="heading" aria-level="1">
+          <p class="display-wide mt-5 text-[clamp(2.6rem,min(1.2rem+5.6vw,12svh),6.9rem)] leading-[0.92] tracking-[-0.03em] lg:mt-[clamp(1rem,3.5svh,2rem)]" role="heading" aria-level="1">
             <span class="block overflow-hidden pb-[0.06em]"><span class="block">${esc(h.title[0])}</span></span>
             <span class="block overflow-hidden pb-[0.06em]"><span class="block text-red">${esc(h.title[1])}</span></span>
           </p>
-          <div class="mt-5 hidden h-6 md:block"></div>
-          <p class="mt-4 max-w-[44ch] text-[0.95rem] leading-relaxed text-steel-700 max-md:[@media(max-height:780px)]:hidden md:mt-6 md:text-body-lg">${esc(h.lead)}</p>
-          <div class="mt-5 flex gap-2.5 md:mt-9 md:gap-3">
+          <div class="mt-[clamp(0.75rem,2.5svh,1.25rem)] hidden h-6 md:block"></div>
+          <p class="mt-4 max-w-[44ch] text-[0.95rem] leading-relaxed text-steel-700 max-md:[@media(max-height:780px)]:hidden md:mt-[clamp(0.75rem,2.5svh,1.5rem)] md:text-body-lg">${esc(h.lead)}</p>
+          <div class="mt-5 flex gap-2.5 md:mt-[clamp(1.25rem,4svh,2.25rem)] md:gap-3">
             <a href="${tel}" class="${BTN} ${PRIMARY}"><span class="relative z-[2] inline-flex items-center gap-2.5">${PHONE}${esc(h.callCta)}</span></a>
             <a href="${esc(wa)}" class="${BTN} ${OUTLINE}"><span class="relative z-[2] inline-flex items-center gap-2.5">${WA}${esc(h.whatsappCta)}</span></a>
           </div>
+          <div class="label-mono pointer-events-none mt-[clamp(1.25rem,4svh,2.5rem)] hidden items-center gap-3 text-steel-700 md:flex [@media(max-height:640px)]:hidden"><span class="relative block h-10 w-px overflow-hidden bg-steel-300"></span>${esc(h.scrollCue)}</div>
         </div></div>
-        <div class="relative min-h-0 flex-1 md:absolute md:inset-0"><div class="absolute inset-0 flex items-center justify-center md:left-[42%]">
-          <img src="/hero-poster.svg" alt="" width="600" height="720" fetchpriority="high" decoding="async" class="h-[88%] w-auto max-w-full md:h-[78%]">
+        <div class="relative min-h-0 flex-1 lg:absolute lg:inset-0"><div class="absolute inset-0 flex items-center justify-center lg:top-[var(--chrome-h-max)] lg:left-[44%]">
+          <img src="/hero-poster.svg" alt="" width="600" height="720" fetchpriority="high" decoding="async" class="h-[88%] w-auto max-w-full lg:h-[86%]">
         </div></div>
       </div></section>
     </div>`

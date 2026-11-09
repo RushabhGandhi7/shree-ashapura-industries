@@ -51,6 +51,9 @@ export default function Hero() {
   const copy = useRef(null)
   const cue = useRef(null)
   const readout = useRef(null)
+  const stage3d = useRef(null)
+  const frame = useRef(null)
+  const readoutBox = useRef(null)
   const [introDone, setIntroDone] = useState(false)
   const [ready, setReady] = useState(false)
 
@@ -83,6 +86,30 @@ export default function Hero() {
   useEffect(() => {
     if (!mount3D) setReady(false) // poster back while the canvas is away
   }, [mount3D])
+
+  // Framing box for the camera, in canvas pixels: the `frame` element (the space the subject
+  // may use) and the torque readout's box (the model is kept clear of it). Re-measured on
+  // any size change; HeroScene fits the bolt + plate into it every frame.
+  useEffect(() => {
+    const canvasBox = stage3d.current
+    const measure = () => {
+      const c = canvasBox.getBoundingClientRect()
+      const rel = (el) => {
+        if (!el) return null
+        const r = el.getBoundingClientRect()
+        return { x0: r.left - c.left, y0: r.top - c.top, x1: r.right - c.left, y1: r.bottom - c.top }
+      }
+      heroStore.frame = { ...rel(frame.current), avoid: rel(readoutBox.current) }
+      requestFrame()
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ;[canvasBox, frame.current, readoutBox.current].forEach((el) => el && ro.observe(el))
+    return () => {
+      ro.disconnect()
+      heroStore.frame = null
+    }
+  }, [])
 
   useEffect(() => {
     heroStore.onReady = () => setReady(true)
@@ -184,17 +211,30 @@ export default function Hero() {
 
   return (
     <section id="top" ref={section} aria-labelledby="hero-title" className="relative">
-      <div ref={stage} className="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--nav-h)] md:block">
+      {/* Phones / tablets (< lg): copy first, 3D below, in one 100svh pinned stage.
+          Desktop (lg+): copy left, 3D right; at least 100svh. The stage starts below the fixed
+          header + scroll ruler (--chrome-h-max: their height at scroll 0). */}
+      <div
+        ref={stage}
+        className="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--chrome-h-max)] lg:block lg:h-auto lg:min-h-[100svh]"
+      >
         <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0" aria-hidden />
         <DriftingParts count={profile.parts} scrollTrigger={profile.reduced ? null : partsTrigger} />
 
-        {/* Copy */}
-        <div ref={copy} className="container-x relative z-10 pt-6 md:flex md:h-full md:items-center md:pt-0">
-          <div className="md:max-w-[min(38rem,46%)] md:pb-16">
+        {/* Copy. On lg it is centred with auto margins in the space under the chrome: if it is
+            taller than that space it grows downwards (never up under the header). */}
+        <div
+          ref={copy}
+          className="container-x relative z-10 pt-[clamp(1rem,3svh,2.5rem)] lg:flex lg:min-h-[calc(100svh-var(--chrome-h-max))] lg:flex-col lg:pb-[clamp(1rem,4svh,3rem)]"
+        >
+          <div className="lg:my-auto lg:max-w-[min(38rem,46%)]">
             <div data-fade>
               <MonoLabel dot>{t.eyebrow}</MonoLabel>
             </div>
-            <h1 id="hero-title" className="display-wide mt-5 text-[clamp(2.6rem,1.2rem+5.6vw,6.9rem)] leading-[0.92] tracking-[-0.03em] md:mt-8 md:max-lg:text-[3.3rem]">
+            <h1
+              id="hero-title"
+              className="display-wide mt-5 text-[clamp(2.6rem,min(1.2rem+5.6vw,12svh),6.9rem)] leading-[0.92] tracking-[-0.03em] lg:mt-[clamp(1rem,3.5svh,2rem)]"
+            >
               <span className="block overflow-hidden pb-[0.06em]">
                 <span data-line className="block">
                   {t.title[0]}
@@ -206,16 +246,16 @@ export default function Hero() {
                 </span>
               </span>
             </h1>
-            <div data-fade className="mt-5 hidden md:block">
+            <div data-fade className="mt-[clamp(0.75rem,2.5svh,1.25rem)] hidden md:block">
               <DimensionLine length="min(100%, 30rem)" label={t.tolerance} trigger="mount" delay={0.4} />
             </div>
             <p
               data-fade
-              className="mt-4 max-w-[44ch] text-[0.95rem] leading-relaxed text-steel-700 max-md:[@media(max-height:780px)]:hidden md:mt-6 md:text-body-lg"
+              className="mt-4 max-w-[44ch] text-[0.95rem] leading-relaxed text-steel-700 max-md:[@media(max-height:780px)]:hidden md:mt-[clamp(0.75rem,2.5svh,1.5rem)] md:text-body-lg"
             >
               {t.lead}
             </p>
-            <div data-fade className="mt-5 flex gap-2.5 md:mt-9 md:gap-3">
+            <div data-fade className="mt-5 flex gap-2.5 md:mt-[clamp(1.25rem,4svh,2.25rem)] md:gap-3">
               <Button
                 href={telHref()}
                 size="sm"
@@ -235,6 +275,20 @@ export default function Hero() {
                 {t.whatsappCta}
               </Button>
             </div>
+            {/* Scroll cue: in the copy flow under the CTAs, so it can never cover them. Hidden on
+                phones, on short screens, and faded out once scrolling starts. */}
+            {!profile.reduced && (
+              <div
+                ref={cue}
+                className="label-mono pointer-events-none mt-[clamp(1.25rem,4svh,2.5rem)] hidden items-center gap-3 text-steel-700 md:flex [@media(max-height:640px)]:hidden"
+                aria-hidden
+              >
+                <span className="relative block h-10 w-px overflow-hidden bg-steel-300">
+                  <span className="absolute inset-x-0 top-0 h-1/2 animate-[sa-cue_1.8s_var(--ease-machine)_infinite] bg-red" />
+                </span>
+                {t.scrollCue}
+              </div>
+            )}
           </div>
         </div>
 
@@ -244,18 +298,26 @@ export default function Hero() {
           </div>
         )}
 
-        {/* 3D stage: poster -> lazy canvas, with projected dimensions and the readout */}
-        <div className="relative min-h-0 flex-1 md:absolute md:inset-0">
+        {/* 3D stage: poster -> lazy canvas, with projected dimensions and the readout.
+            `frame` is the box the subject is fitted into (HeroScene reads it, see heroStore.frame);
+            the readout sits in the stage's bottom-right corner with equal margins, and the
+            camera framing keeps the model clear of it. */}
+        <div ref={stage3d} className="relative min-h-0 flex-1 lg:absolute lg:inset-0">
           <div
-            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 md:left-[42%] ${ready ? 'opacity-0' : 'opacity-100'}`}
+            ref={frame}
+            className="pointer-events-none absolute inset-x-[var(--gutter)] top-3 bottom-3 lg:top-[calc(var(--chrome-h-max)+clamp(1rem,3svh,2.5rem))] lg:right-[var(--gutter)] lg:bottom-[var(--gutter)] lg:left-[44%]"
+            aria-hidden
+          />
+          <div
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 lg:top-[var(--chrome-h-max)] lg:left-[44%] ${ready ? 'opacity-0' : 'opacity-100'}`}
             aria-hidden={ready || undefined}
           >
             {/* Prerendered HTML ships the poster as an <img>: it is the largest element at first
                 paint, so it stays the LCP when React later renders the (inline SVG) poster. */}
             {window.__prerender ? (
-              <img src="/hero-poster.svg" alt="" width="600" height="720" fetchPriority="high" decoding="async" className="h-[88%] w-auto max-w-full md:h-[78%]" />
+              <img src="/hero-poster.svg" alt="" width="600" height="720" fetchPriority="high" decoding="async" className="h-[88%] w-auto max-w-full lg:h-[86%]" />
             ) : (
-              <HeroPoster seated={profile.reduced} className="h-[88%] w-auto max-w-full md:h-[78%]" />
+              <HeroPoster seated={profile.reduced} className="h-[88%] w-auto max-w-full lg:h-[86%]" />
             )}
           </div>
           {mount3D && (
@@ -268,22 +330,12 @@ export default function Hero() {
           <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
             <HeroDimensions compact={profile.small} />
           </div>
-          {!profile.small && <TorqueReadout ref={readout} className="absolute right-[var(--gutter)] bottom-8" />}
+          {!profile.small && (
+            <div ref={readoutBox} className="absolute right-[var(--gutter)] bottom-[var(--gutter)]">
+              <TorqueReadout ref={readout} />
+            </div>
+          )}
         </div>
-
-        {/* Scroll cue */}
-        {!profile.reduced && (
-          <div
-            ref={cue}
-            className="label-mono pointer-events-none absolute bottom-6 left-[var(--gutter)] z-10 hidden items-center gap-3 text-steel-700 md:flex"
-            aria-hidden
-          >
-            <span className="relative block h-10 w-px overflow-hidden bg-steel-300">
-              <span className="absolute inset-x-0 top-0 h-1/2 animate-[sa-cue_1.8s_var(--ease-machine)_infinite] bg-red" />
-            </span>
-            {t.scrollCue}
-          </div>
-        )}
       </div>
     </section>
   )

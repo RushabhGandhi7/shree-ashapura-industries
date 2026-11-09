@@ -79,19 +79,34 @@ function Rig({ tilt }) {
     const { az, el } = bs.camera
     const azr = (az + (tilt ? tiltNow.current.x * 2 : 0)) * DEG
     const elr = el * DEG
-    const wide = size.width >= 760
-    const shift = wide ? 0.21 : 0 // fraction of canvas width to move the subject right
-    const frac = wide ? 0.54 : 1 // share of canvas width the subject may occupy
+    // The subject's extent (bolt top to plate bottom, plate width) is fitted into a box in
+    // canvas pixels (heroStore.frame, measured by Hero.jsx from the layout: below the fixed
+    // header + ruler, right of the copy on desktop). If the torque readout's box would cut
+    // into it, the box is shrunk either above the readout or left of it, whichever keeps
+    // the model larger. The view offset then puts the subject's centre in the box's centre.
+    const W = size.width
+    const H = size.height
     const top = h + BOLT.K + 0.25
     const bottom = Math.min(h - BOLT.L, -BOLT.plateT) - 0.2
     const extH = (top - bottom) * Math.cos(elr) + PLATE.d * Math.sin(elr)
     const extW = PLATE.w * Math.abs(Math.cos(azr)) + PLATE.d * Math.abs(Math.sin(azr))
-    const aspect = size.width / size.height
-    const dist = Math.max(extH / (2 * TAN_HALF_FOV), extW / (2 * TAN_HALF_FOV * aspect * frac)) * 1.14
+    const aspect = W / H
+    const F = heroStore.frame
+    let box = F && F.x1 > F.x0 && F.y1 > F.y0 ? F : { x0: 0, y0: 0, x1: W, y1: H }
+    const distFor = (b) => Math.max(extH / (2 * TAN_HALF_FOV * ((b.y1 - b.y0) / H)), extW / (2 * TAN_HALF_FOV * aspect * ((b.x1 - b.x0) / W))) * 1.06
+    const A = F?.avoid
+    if (A && A.x0 < box.x1 && A.x1 > box.x0 && A.y0 < box.y1 && A.y1 > box.y0) {
+      const gap = 12
+      const above = { ...box, y1: Math.max(box.y0 + 1, A.y0 - gap) }
+      const left = { ...box, x1: Math.max(box.x0 + 1, A.x0 - gap) }
+      box = distFor(above) <= distFor(left) ? above : left
+    }
+    const dist = distFor(box)
     const targetY = (top + bottom) / 2
     camera.position.set(Math.sin(azr) * Math.cos(elr) * dist, targetY + Math.sin(elr) * dist, Math.cos(azr) * Math.cos(elr) * dist)
     camera.lookAt(0, targetY, 0)
-    camera.filmOffset = -shift * 2 * TAN_HALF_FOV * aspect * camera.getFilmWidth()
+    camera.filmOffset = 0
+    camera.setViewOffset(W, H, W / 2 - (box.x0 + box.x1) / 2, H / 2 - (box.y0 + box.y1) / 2, W, H)
     camera.updateProjectionMatrix()
     camera.updateMatrixWorld()
 

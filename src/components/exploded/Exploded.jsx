@@ -109,15 +109,16 @@ export default function Exploded() {
 
   return (
     <section id="exploded" ref={section} aria-labelledby="exploded-title" className="relative">
-      <div ref={stage} className="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--nav-h)] md:block">
+      <div ref={stage} className="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--chrome-h)] md:block">
         <div className="bp-grid pointer-events-none absolute inset-0 opacity-80" aria-hidden />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_50%,transparent_30%,var(--color-paper)_85%)] md:bg-[radial-gradient(ellipse_at_68%_50%,transparent_35%,var(--color-paper)_80%)]"
           aria-hidden
         />
 
-        <div className="container-x relative z-10 pt-6 md:flex md:h-full md:items-center md:pt-0">
-          <div className="md:max-w-[min(26rem,36%)]">
+        {/* centred with auto margins below the fixed chrome: if taller, it grows down, never up */}
+        <div className="container-x relative z-10 pt-6 md:flex md:h-full md:flex-col md:pt-0">
+          <div className="md:my-auto md:max-w-[min(26rem,36%)] md:py-6">
             <p className="label-mono mb-4 flex items-center gap-3 text-steel-700 md:mb-6">
               <span className="h-px w-8 bg-red" aria-hidden />
               {t.label}
@@ -144,7 +145,9 @@ export default function Exploded() {
           </div>
         </div>
 
-        <div className="relative min-h-0 flex-1 md:absolute md:inset-y-0 md:right-0 md:w-[62%]">
+        {/* 3D + annotations: below the header and ruler (the camera fits the whole assembly,
+            callouts included, inside this box) */}
+        <div className="relative min-h-0 flex-1 md:absolute md:top-[var(--chrome-h)] md:right-0 md:bottom-0 md:w-[62%]">
           {mount3D && (
             <Boundary>
               <Suspense fallback={null}>

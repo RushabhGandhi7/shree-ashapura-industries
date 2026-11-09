@@ -20,10 +20,10 @@ const PANELS = [
   { form: 'rect', intensity: 1.4, position: [0, 1.5, 8], scale: [14, 3, 1], color: '#f6f4ef' },
   { form: 'rect', intensity: 0.35, position: [0, -6, 0], scale: [14, 14, 1], color: '#e9e7e1' },
   { form: 'rect', intensity: 2.6, position: [-4, 4, -6], scale: [2, 8, 1] },
-  { form: 'ring', intensity: 0.9, position: [3.5, 2.5, -7], scale: 2.6, color: '#C8102E' },
+  { form: 'ring', intensity: 0.9, position: [3.5, 2.5, -7], scale: 2.6, color: '#C8102E', kicker: true },
 ]
 
-function buildStudio(warm) {
+function buildStudio(warm, kicker) {
   const studio = new THREE.Scene()
   // mid-grey cyclorama: neutral and light overall, but dark enough between the
   // softboxes that polished metal shows contrast instead of reading as white plastic
@@ -31,6 +31,7 @@ function buildStudio(warm) {
   cyc.scale.setScalar(60)
   studio.add(cyc)
   for (const p of PANELS) {
+    if (p.kicker && !kicker) continue
     const geo = p.form === 'ring' ? new THREE.RingGeometry(0.25, 0.5, 64) : new THREE.PlaneGeometry(1, 1)
     const mat = new THREE.MeshBasicMaterial({ toneMapped: false, side: THREE.DoubleSide })
     mat.color.set(p.color ?? 'white').multiplyScalar(p.intensity)
@@ -44,14 +45,18 @@ function buildStudio(warm) {
   return studio
 }
 
-export default function StudioEnvironment({ resolution = 256, intensity = 1, warm = false }) {
+/**
+ * kicker: the faint brand-red ring light. Flat polished faces (e.g. a stainless washer seen
+ * from just above) mirror it as thin red streaks; scenes with such faces turn it off.
+ */
+export default function StudioEnvironment({ resolution = 256, intensity = 1, warm = false, kicker = true }) {
   const gl = useThree((s) => s.gl)
   const scene = useThree((s) => s.scene)
 
   useLayoutEffect(() => {
     const fbo = new THREE.WebGLCubeRenderTarget(resolution)
     fbo.texture.type = THREE.HalfFloatType
-    const studio = buildStudio(warm)
+    const studio = buildStudio(warm, kicker)
     const cam = new THREE.CubeCamera(0.1, 1000, fbo)
     studio.add(cam)
 
@@ -73,7 +78,7 @@ export default function StudioEnvironment({ resolution = 256, intensity = 1, war
         o.material?.dispose()
       })
     }
-  }, [gl, scene, resolution, intensity, warm])
+  }, [gl, scene, resolution, intensity, warm, kicker])
 
   return null
 }

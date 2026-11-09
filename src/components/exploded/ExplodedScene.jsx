@@ -37,18 +37,28 @@ function Rig({ detail, onReady }) {
     nut.current.position.y = yN
     nut.current.rotation.y = alpha
 
-    // camera: fixed 3/4 view, dolly fitted to the assembly as it grows
+    // camera: fixed 3/4 view, dolly fitted to the assembly as it grows. The assembly (bolt
+    // head top to nut bottom, incl. the nut's AF dimension) fits between PAD_TOP and
+    // PAD_BOTTOM canvas pixels: 24 px margin plus room for the bolt callout rising above
+    // the head and the dimension under the nut. The view offset centres it in that band.
     const az = 30 * DEG
     const el = 9 * DEG
     const top = yB + K + 0.35
     const bottom = yN - 0.5
-    const aspect = size.width / size.height
+    const W = size.width
+    const H = size.height
+    const aspect = W / H
+    const padTop = 24 + 44
+    const padBottom = 24 + 12
+    const band = Math.max(1, H - padTop - padBottom)
     const h = top - bottom
-    const w = 2 * WR + (size.width < 560 ? 1.4 : 2.6) // room for callouts
-    const dist = Math.max(h / (2 * TAN), w / (2 * TAN * aspect)) * 1.08
+    const w = 2 * WR + (W < 560 ? 1.4 : 2.6) // room for callouts
+    const dist = Math.max(h / (2 * TAN * (band / H)), w / (2 * TAN * aspect)) * 1.04
     const ty = (top + bottom) / 2
     camera.position.set(Math.sin(az) * Math.cos(el) * dist, ty + Math.sin(el) * dist, Math.cos(az) * Math.cos(el) * dist)
     camera.lookAt(0, ty, 0)
+    camera.setViewOffset(W, H, 0, H / 2 - (padTop + band / 2), W, H)
+    camera.updateProjectionMatrix()
     camera.updateMatrixWorld()
 
     // project named anchors to canvas pixels
@@ -117,7 +127,8 @@ export default function ExplodedScene({ dpr, detail, onReady }) {
       style={{ position: 'absolute', inset: 0 }}
       aria-hidden
     >
-      <StudioEnvironment resolution={detail === 'low' ? 64 : 128} />
+      {/* no red kicker: the stainless washer's flat face mirrored it as red streaks */}
+      <StudioEnvironment resolution={detail === 'low' ? 64 : 128} kicker={false} />
       <ambientLight intensity={0.3} />
       <directionalLight position={[4, 8, 6]} intensity={1.1} />
       <Rig detail={detail} onReady={onReady} />

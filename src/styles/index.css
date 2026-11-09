@@ -89,7 +89,20 @@
   --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.5rem);
   --section-y: var(--spacing-section-sm);
   --container: 82.5rem;
+  /* Fixed chrome. --nav-h is the bar's design height (expanded). --header-h is the header's
+     live measured height (Navbar.jsx ResizeObserver: 72 px expanded, ~54 px condensed) and
+     --header-h-max its expanded height. The scroll ruler sits right under the header and
+     takes --ruler-h (line + counter). Content that must clear the fixed chrome uses
+     --chrome-h (live) or --chrome-h-max (at scroll 0, e.g. the hero). */
   --nav-h: 4.5rem;
+  --header-h: var(--nav-h);
+  --header-h-max: var(--nav-h);
+  --ruler-h: 1.375rem;
+  --chrome-h: calc(var(--header-h) + var(--ruler-h));
+  --chrome-h-max: calc(var(--header-h-max) + var(--ruler-h));
+  /* z-index scale: content < ruler < header < menu < loader < cursor */
+  --z-ruler: 40;
+  --z-header: 50;
   color-scheme: light;
 }
 
@@ -101,7 +114,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    scroll-padding-top: var(--nav-h);
+    scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
   }
   body {
     font-family: var(--font-sans);

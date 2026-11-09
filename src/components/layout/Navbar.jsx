@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 import { content, company } from '../../data/content.js'
 import { telHref, whatsappHref } from '../../lib/contact.js'
@@ -45,6 +45,7 @@ export default function Navbar() {
   const [menuLoaded, setMenuLoaded] = useState(false)
   const [caliper, setCaliper] = useState(false)
   const menuBtn = useRef(null)
+  const header = useRef(null)
 
   useEffect(() => {
     if (open) setMenuLoaded(true)
@@ -61,6 +62,23 @@ export default function Navbar() {
   // when crossing, so scrolling does not re-render the bar).
   useScrollProgress((y) => setCondensed(y > CONDENSE_AT))
 
+  // Publish the header's live height as --header-h (and the expanded height as
+  // --header-h-max): the ruler, the hero padding, pinned stages and scroll padding read them.
+  // The bar's height transition fires the observer every frame, so the ruler follows it.
+  useLayoutEffect(() => {
+    const el = header.current
+    const root = document.documentElement.style
+    const write = () => {
+      const h = el.getBoundingClientRect().height
+      root.setProperty('--header-h', `${h}px`)
+      if (el.dataset.condensed !== 'true') root.setProperty('--header-h-max', `${h}px`)
+    }
+    write()
+    const ro = new ResizeObserver(write)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // New page: close the menu.
   useEffect(() => {
     setOpen(false)
@@ -75,12 +93,14 @@ export default function Navbar() {
         {content.skipLink}
       </a>
 
-      {/* Fixed, outside <main> and the page transition: no transformed ancestor. --nav-h stays
-          72 px for layout (scroll padding, pinned stages); only the bar's own height shrinks. */}
+      {/* Fixed, outside <main> and the page transition: no transformed ancestor. */}
+      {/* No border of its own: the scroll ruler's track (NavProgress, fixed right under the
+          header) is the header's bottom edge, so there is only ever one line. */}
       <header
+        ref={header}
         data-condensed={condensed}
-        className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-300 ease-[var(--ease-out)] motion-reduce:transition-none ${
-          condensed ? 'border-steel-300 bg-paper/85 backdrop-blur-md' : 'border-transparent bg-transparent'
+        className={`fixed inset-x-0 top-0 z-[var(--z-header)] transition-[background-color,backdrop-filter] duration-300 ease-[var(--ease-out)] motion-reduce:transition-none ${
+          condensed ? 'bg-paper/85 backdrop-blur-md' : 'bg-transparent'
         }`}
       >
         <div
@@ -146,8 +166,8 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-        <NavProgress />
       </header>
+      <NavProgress />
 
       {menuLoaded && (
         <Suspense fallback={null}>

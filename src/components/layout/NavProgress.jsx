@@ -54,22 +54,29 @@ export default function NavProgress() {
     }
   })
 
+  // One fixed element right under the header (top: --header-h, which follows the header's
+  // height as it condenses), above page content and below the header. Its box is --ruler-h
+  // tall: the 1 px track (the header's bottom edge), ruler ticks hanging below it, and the
+  // readout right-aligned under the track's end. Content clears it via --chrome-h.
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0" aria-hidden>
-      <div className="container-x relative flex h-0 items-end gap-3">
-        <div className="relative h-px flex-1 bg-steel-300">
+    <div className="pointer-events-none fixed inset-x-0 top-[var(--header-h)] z-[var(--z-ruler)] h-[var(--ruler-h)]" aria-hidden>
+      <div className="container-x">
+        <div className="relative h-px bg-steel-300">
           <div ref={fill} className="absolute inset-0 origin-left bg-red" style={{ transform: 'scaleX(0)' }} />
           {TICKS.map((i) => (
             <span
               key={i}
-              className={`absolute bottom-0 w-px bg-steel-500 ${i % 5 === 0 ? 'h-1.5' : 'h-1'}`}
+              className={`absolute top-0 w-px bg-steel-500 ${i % 5 === 0 ? 'h-1.5' : 'h-1'}`}
               style={{ left: `${i * 10}%`, transform: i === 10 ? 'translateX(-1px)' : undefined }}
             />
           ))}
+          <span
+            ref={readout}
+            className="label-mono absolute top-2 right-0 hidden rounded-xs bg-paper/90 px-1.5 py-px text-[11px] leading-[1.2] tabular-nums text-steel-700 sm:block"
+          >
+            {t.progress(0)}
+          </span>
         </div>
-        <span ref={readout} className="label-mono hidden translate-y-[0.35em] text-[9px] tabular-nums text-steel-500 sm:block">
-          {t.progress(0)}
-        </span>
       </div>
     </div>
   )

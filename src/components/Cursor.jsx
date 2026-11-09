@@ -63,13 +63,24 @@ function HexCursor() {
       visible = false
       lastX = null
     }
+    // pointer left the window (pointerleave on <html> is not fired reliably for that), or the
+    // window lost focus: hide, so the hexagon is never left floating where the pointer was
+    const out = (e) => !e.relatedTarget && leave()
+    // a touch / pen interaction on a hybrid device: hide the mouse cursor
+    const notMouse = (e) => e.pointerType !== 'mouse' && visible && leave()
 
     window.addEventListener('pointermove', move, { passive: true })
     document.addEventListener('pointerover', over, { passive: true })
     window.addEventListener('pointerdown', down)
     window.addEventListener('pointerup', up)
     document.documentElement.addEventListener('pointerleave', leave)
+    document.addEventListener('mouseout', out)
+    window.addEventListener('blur', leave)
+    window.addEventListener('pointerdown', notMouse)
     return () => {
+      document.removeEventListener('mouseout', out)
+      window.removeEventListener('blur', leave)
+      window.removeEventListener('pointerdown', notMouse)
       document.documentElement.classList.remove('has-hex-cursor')
       window.removeEventListener('pointermove', move)
       document.removeEventListener('pointerover', over)

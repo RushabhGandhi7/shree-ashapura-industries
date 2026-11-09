@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { content } from '../../data/content.js'
-import { gallery, unitVideo } from '../../data/gallery.js'
+import { gallery, hasRealPhotos, unitVideo } from '../../data/gallery.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
 
 const t = content.gallery
@@ -101,6 +101,24 @@ function Lightbox({ index, onClose, onStep }) {
 function UnitVideo() {
   const v = t.video
   const [play, setPlay] = useState(false)
+  // No video yet: a compact strip instead of an empty 21:9 box.
+  if (!unitVideo)
+    return (
+      <figure className="relative mt-3 flex items-center gap-5 overflow-hidden rounded-xs border border-steel-300 bg-paper px-5 py-5 md:mt-4 md:px-7">
+        <div className="bp-grid absolute inset-0 opacity-60" aria-hidden />
+        <span className="relative grid size-12 shrink-0 place-items-center rounded-full border-2 border-dashed border-steel-500 text-steel-500" aria-hidden>
+          <svg viewBox="0 0 24 24" className="ml-0.5 size-5" fill="currentColor">
+            <path d="M7 4.5v15l12-7.5z" />
+          </svg>
+        </span>
+        <figcaption className="relative">
+          <p className="font-display text-[1.15rem] font-[760] [font-stretch:115%]">{v.title}</p>
+          <p className="label-mono mt-1 text-steel-500">
+            {v.soon} · {v.text}
+          </p>
+        </figcaption>
+      </figure>
+    )
   return (
     <figure className="relative mt-3 overflow-hidden rounded-xs border border-steel-300 bg-paper md:mt-4">
       <div className="relative aspect-video md:aspect-[21/9]">
@@ -168,10 +186,15 @@ export default function Gallery({ h1 = false } = {}) {
           <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
         </div>
 
-        {/* masonry via CSS columns: images keep their aspect ratio from width/height */}
-        <ul className="mt-12 columns-2 gap-3 md:mt-16 md:gap-4 lg:columns-3">
+        {/* Real photos: masonry via CSS columns (mixed aspect ratios). Renders + drawings only
+            (all 4:3): a regular grid, renders 4 per row and drawings 3 per row on lg, so no
+            column ends early and no cell is left empty. */}
+        <ul className={`mt-12 md:mt-16 ${hasRealPhotos ? 'columns-2 gap-3 md:gap-4 lg:columns-3' : 'grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-12'}`}>
           {gallery.map((g, i) => (
-            <li key={g.src} className="mb-3 break-inside-avoid md:mb-4">
+            <li
+              key={g.src}
+              className={hasRealPhotos ? 'mb-3 break-inside-avoid md:mb-4' : g.kind === 'drawing' ? 'col-span-2 lg:col-span-4' : 'lg:col-span-3'}
+            >
               <button
                 type="button"
                 onClick={() => setOpen(i)}

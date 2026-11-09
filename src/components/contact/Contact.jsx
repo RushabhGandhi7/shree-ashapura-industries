@@ -136,7 +136,7 @@ export default function Contact({ h1 = false } = {}) {
             </form>
           </div>
 
-          {/* details + map */}
+          {/* details + map; on lg the map fills what is left, so both columns end level */}
           <aside className="flex flex-col gap-6 lg:col-span-5">
             <div className="grid gap-6 rounded-xs border border-steel-300 bg-paper p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-1">
               <div>
@@ -195,7 +195,7 @@ export default function Contact({ h1 = false } = {}) {
                 </Button>
               </div>
             </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xs border border-steel-300 bg-paper-2 lg:flex-1">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xs border border-steel-300 bg-paper-2 lg:aspect-auto lg:min-h-64 lg:flex-1">
               <iframe
                 title={t.mapTitle}
                 src={mapSrc}

@@ -13,6 +13,10 @@ const MobileMenu = lazy(loadMenu)
 
 const t = content.nav
 
+const NAV_HIDE_AFTER = 480 // px from the top before the bar may hide
+const NAV_HIDE_TRAVEL = 64 // px of continuous downward travel to hide
+const NAV_SHOW_TRAVEL = 12 // px of continuous upward travel to show
+
 export default function Navbar() {
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
@@ -29,18 +33,41 @@ export default function Navbar() {
   }, [])
   const menuBtn = useRef(null)
 
+  // Auto-hide by travel since the last change of direction, not per scroll event: Lenis
+  // easing and trackpads send tiny deltas, which a per-event threshold never registers.
+  const turnY = useRef(0)
+  const dir = useRef(0)
+  const reveal = () => {
+    turnY.current = window.scrollY
+    setHidden(false)
+  }
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY
+      const d = y - lastY.current
       setScrolled(y > 8)
-      // Hide when scrolling down past the fold, show on any upward scroll.
-      if (y > 480 && y > lastY.current + 4) setHidden(true)
-      else if (y < lastY.current - 4 || y < 480) setHidden(false)
+      const now = Math.sign(d)
+      if (now !== 0 && now !== dir.current) {
+        dir.current = now
+        turnY.current = lastY.current
+      }
+      if (y < NAV_HIDE_AFTER) setHidden(false)
+      else if (dir.current === 1 && y - turnY.current >= NAV_HIDE_TRAVEL) setHidden(true)
+      else if (dir.current === -1 && turnY.current - y >= NAV_SHOW_TRAVEL) setHidden(false)
       lastY.current = y
+    }
+    // Pointer at the top edge brings the bar back (mouse / trackpad only).
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const onMove = (e) => {
+      if (fine.matches && e.clientY < 72) reveal()
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('mousemove', onMove)
+    }
   }, [])
 
   // New page: close the menu and show the bar again.
@@ -59,6 +86,7 @@ export default function Navbar() {
       </a>
 
       <header
+        onFocus={reveal}
         className={`fixed inset-x-0 top-0 z-50 transition-[transform,background-color,box-shadow] duration-500 ease-[var(--ease-out)] ${
           hidden && !open ? '-translate-y-full' : 'translate-y-0'
         } ${scrolled ? 'bg-paper/85 shadow-[0_1px_0_var(--color-steel-300)] backdrop-blur-md' : 'bg-transparent'}`}

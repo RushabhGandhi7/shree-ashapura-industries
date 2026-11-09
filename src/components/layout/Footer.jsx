@@ -22,7 +22,7 @@ export default function Footer() {
     <footer className="relative overflow-hidden border-t border-steel-300 bg-paper-2">
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-70" aria-hidden />
 
-      <div className="container-x relative pt-20 pb-10 md:pt-28">
+      <div className="container-x relative pt-14 pb-10 md:pt-16">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12">
           <div className="sm:col-span-2 lg:col-span-5">
             <Logo size="footer" />

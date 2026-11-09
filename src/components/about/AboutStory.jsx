@@ -6,7 +6,7 @@ const t = content.about
 /** About: the story since 1990, key facts and the CEO. */
 export default function AboutStory() {
   return (
-    <section aria-labelledby="about-title" className="relative pb-20 pt-10 md:pb-28 md:pt-14">
+    <section aria-labelledby="about-title" className="relative pb-14 pt-10 md:pb-12 md:pt-14">
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-50" aria-hidden />
       <div className="container-x relative grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-7">
@@ -39,14 +39,15 @@ export default function AboutStory() {
               </div>
             ))}
           </dl>
-          <figure className="border border-ink bg-paper p-6">
-            <blockquote className="font-display text-[1.25rem] leading-snug font-[760] [font-stretch:112%]">“{t.leader.quote.replace(/^Our mission: /, '')}”</blockquote>
-            <figcaption className="mt-4 text-small">
-              <span className="font-semibold">{t.leader.name}</span>
-              <span className="text-steel-700">, {t.leader.role}</span>
-            </figcaption>
-          </figure>
         </div>
+        {/* full width under both columns, so neither column is left with a gap */}
+        <figure className="border border-ink bg-paper p-6 md:flex md:items-end md:justify-between md:gap-10 lg:col-span-12">
+          <blockquote className="font-display text-[1.25rem] leading-snug font-[760] [font-stretch:112%]">“{t.leader.quote.replace(/^Our mission: /, '')}”</blockquote>
+          <figcaption className="mt-4 shrink-0 text-small md:mt-0">
+            <span className="font-semibold">{t.leader.name}</span>
+            <span className="text-steel-700">, {t.leader.role}</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
   )

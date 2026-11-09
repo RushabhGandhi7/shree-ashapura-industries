@@ -76,7 +76,7 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - Finishes live in `src/data/products.js` (`finishes`). Dimension tables live in `src/three/specs.js`.
 - Inspect parts at `/lab` (deep links: `/lab?type=nut&head=wing&finish=brass&normals=1`).
 
-## Current status (2026-11-08, after Phase 9B)
+## Current status (2026-11-09, after Fix 9C)
 Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 
 ### Completed phases
@@ -90,6 +90,7 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - **8B Configurator top view**: live SVG top view (`customise/TopView.jsx`) sharing proportions with the 3D heads via `three/headGeometry.js`.
 - **8C Safari scroll-drift fix**: `SyncCanvasRect` in `products/ProductViews.jsx` writes the live canvas rect each frame so drei Views stop drifting; `scripts/check-view-drift.mjs` measures it. Same commit: `SITE_URL` from `VITE_SITE_URL`.
 - **9A**: live 3D product cards on Home (`ProductsTeaser` reuses the shared-canvas grid), finishes by material (`data/materialFinishes.js`: swatches, spec, DWG code and WhatsApp text all read it), footer wordmark removed.
+- **9C Navbar + dead space**: nav auto-hide now counts travel since the last change of direction (hide after 64 px down past 480 px, show after 12 px up), and also shows on Tab focus and top-edge hover; the old per-event 4 px check missed Lenis / trackpad deltas. Section rhythm `--section-y: clamp(3.5rem, 6vw, 5.5rem)`, bottom 0.6×; footer, quote, about and category paddings trimmed; /quality Lean and /about CEO quote go full width under their grids; /contact map fills the column; gallery fallback is a regular grid (renders 4 per row, drawings 3 per row) plus a compact "video coming soon" strip. Rule: no gap over 160 px between sections at 1440.
 - **9B Logo**: client master `public/brand/sa-logo.svg` inlined via generated `ui/logoMark.js` in navbar, mobile menu, footer and loader; favicons / touch / manifest icons from `scripts/brand-icons.mjs`.
 
 ### Routes
@@ -113,9 +114,9 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 ### Commands
 `npm run dev` (5173) · `npm run build` (vite build → sitemap → prerender) · `npm run preview` (Vercel-like server on 4173) · `npm run build:spa` · `npm run render:products` · `node scripts/brand-icons.mjs` · `node scripts/check-view-drift.mjs <outDir> [tag] [baseUrl] [route]`.
 
-### Health check (2026-11-08)
+### Health check (2026-11-09)
 - `npm run build`: passes, 17 pages prerendered, sitemap 16 URLs.
-- ScrollTrigger baseline (every route visited twice by in-app links, desktop Chromium): triggers and pin spacers identical on revisit for all routes; peak WebGL contexts 1. One expected warning: `/` on a cold load records `gl: 0` because the hero canvas mounts ~1–2.5 s after load, after the 2.5 s snapshot; later visits show 1. Timing, not a leak.
+- ScrollTrigger baseline (every route visited twice by in-app links, desktop Chromium): triggers and pin spacers identical on revisit for all routes; peak WebGL contexts 1. Dead-space audit at 1440: no band over 160 px between sections on any route, no grid row with columns more than 160 px apart. One expected warning: `/` on a cold load records `gl: 0` because the hero canvas mounts ~1–2.5 s after load, after the 2.5 s snapshot; later visits show 1. Timing, not a leak.
 
 ### Half-finished or risky
 - Prerender on Vercel (`@sparticuz/chromium` via `playwright-core`) has **never been tested on a real Vercel build**; fallback is `vercel build` locally + `deploy --prebuilt`.
@@ -125,6 +126,7 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - Customer logos not supplied (wordmarks shown). Working hours hidden (`hours: null`).
 - `public/llms.txt` and the `<noscript>` text in `index.html` repeat contact, capability and partner facts by hand: update them when `content.js` changes.
 - Console noise: React Router "No HydrateFallback" warning and a three.js `THREE.Clock` deprecation (from R3F / drei).
+- Home exploded view: the pinned stage is full height with its copy vertically centred, so about 220 to 300 px of empty grid sits above the copy while it is pinned (the parts spread into that height as they separate). Left as designed.
 - Large lazy chunks: `StudioEnvironment` ~179 kB gzip, `headGeometry` ~104 kB gzip (three.js bundled there).
 
 ### Open items: `// CONFIRM` (client to confirm)

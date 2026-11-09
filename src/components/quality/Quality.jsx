@@ -158,52 +158,42 @@ export default function Quality({ h1 = false } = {}) {
 
         <div className="mt-14 grid gap-12 lg:grid-cols-12 lg:gap-10">
           {/* PPAP checklist, ticks with scroll */}
-          <section aria-labelledby="q-ppap" className="min-w-0 lg:col-span-7">
-            <div className="mb-4 flex items-baseline justify-between gap-4">
-              <Hs id="q-ppap" className="label-mono font-medium [font-stretch:100%] text-steel-500">
-                {t.ppap.title}
-              </Hs>
-              <span ref={count} className="font-mono text-small text-red" aria-hidden>
-                {t.ppapProgress(0, total)}
-              </span>
-            </div>
-            <ol className="grid border-t border-steel-300 sm:grid-cols-2 sm:gap-x-8">
-              {t.ppap.items.map((it, i) => (
-                <li key={it} data-ppap data-done="false" className="group flex items-center gap-3 border-b border-steel-300 py-2.5">
-                  <svg viewBox="0 0 20 20" className="size-5 shrink-0" aria-hidden>
-                    <rect x="1.5" y="1.5" width="17" height="17" rx="2" className="fill-paper stroke-steel-500 transition-colors duration-300 group-data-[done=true]:stroke-red" strokeWidth="1.2" />
-                    <path
-                      d="M5.5 10.5 l3 3 l6 -7"
-                      fill="none"
-                      stroke="var(--color-red)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      pathLength="1"
-                      strokeDasharray="1"
-                      className="transition-[stroke-dashoffset] duration-500 ease-[var(--ease-out)] [stroke-dashoffset:1] group-data-[done=true]:[stroke-dashoffset:0]"
-                    />
-                  </svg>
-                  <span className="font-mono text-[11px] text-steel-500">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="text-small transition-colors group-data-[done=true]:text-ink">{it}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          <div className="min-w-0 space-y-10 lg:col-span-5">
-            <section aria-labelledby="q-lean">
-              <Heading as={Hs} id="q-lean">{t.lean.title}</Heading>
-              <p className="font-display text-[1.2rem] font-[760] [font-stretch:115%]">{t.lean.text}</p>
-              <ul className="mt-4 flex flex-wrap gap-1.5">
-                {t.lean.items.map((it) => (
-                  <li key={it} className="label-mono rounded-xs border border-steel-300 bg-paper-2 px-2 py-1 text-[11px] text-ink">
-                    {it}
+          <div className="min-w-0 lg:col-span-7">
+            <section aria-labelledby="q-ppap">
+              <div className="mb-4 flex items-baseline justify-between gap-4">
+                <Hs id="q-ppap" className="label-mono font-medium [font-stretch:100%] text-steel-500">
+                  {t.ppap.title}
+                </Hs>
+                <span ref={count} className="font-mono text-small text-red" aria-hidden>
+                  {t.ppapProgress(0, total)}
+                </span>
+              </div>
+              <ol className="grid border-t border-steel-300 sm:grid-cols-2 sm:gap-x-8">
+                {t.ppap.items.map((it, i) => (
+                  <li key={it} data-ppap data-done="false" className="group flex items-center gap-3 border-b border-steel-300 py-2.5">
+                    <svg viewBox="0 0 20 20" className="size-5 shrink-0" aria-hidden>
+                      <rect x="1.5" y="1.5" width="17" height="17" rx="2" className="fill-paper stroke-steel-500 transition-colors duration-300 group-data-[done=true]:stroke-red" strokeWidth="1.2" />
+                      <path
+                        d="M5.5 10.5 l3 3 l6 -7"
+                        fill="none"
+                        stroke="var(--color-red)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        pathLength="1"
+                        strokeDasharray="1"
+                        className="transition-[stroke-dashoffset] duration-500 ease-[var(--ease-out)] [stroke-dashoffset:1] group-data-[done=true]:[stroke-dashoffset:0]"
+                      />
+                    </svg>
+                    <span className="font-mono text-[11px] text-steel-500">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="text-small transition-colors group-data-[done=true]:text-ink">{it}</span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </section>
+          </div>
 
+          <div className="min-w-0 lg:col-span-5">
             {/* short quality policy, signed */}
             <figure className="border border-steel-300 bg-paper p-6">
               <p className="label-mono text-steel-500">{t.policy.title}</p>
@@ -225,6 +215,19 @@ export default function Quality({ h1 = false } = {}) {
               </figcaption>
             </figure>
           </div>
+
+          {/* full width under both columns: keeps PPAP and the policy card level */}
+          <section aria-labelledby="q-lean" className="lg:col-span-12">
+            <Heading as={Hs} id="q-lean">{t.lean.title}</Heading>
+            <p className="font-display text-[1.2rem] font-[760] [font-stretch:115%]">{t.lean.text}</p>
+            <ul className="mt-4 flex flex-wrap gap-1.5">
+              {t.lean.items.map((it) => (
+                <li key={it} className="label-mono rounded-xs border border-steel-300 bg-paper-2 px-2 py-1 text-[11px] text-ink">
+                  {it}
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
     </section>

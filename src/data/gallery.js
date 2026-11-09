@@ -31,7 +31,8 @@ const drawings = t.illustrations.map((i) => ({
 }))
 
 export const hasRealPhotos = real.photos.length > 0
-// Without photos: renders with a machine-area drawing after every third one.
-const fallback = renders.flatMap((r, i) => (i % 3 === 2 && drawings[(i - 2) / 3] ? [r, drawings[(i - 2) / 3]] : [r]))
+// Without photos: the 8 renders, then the 3 machine-area drawings. All are 4:3, so the
+// gallery lays them out as a regular grid (4 renders per row, then 3 drawings) with no gaps.
+const fallback = [...renders, ...drawings]
 export const gallery = hasRealPhotos ? [...real.photos, ...renders] : fallback
 export const unitVideo = real.video

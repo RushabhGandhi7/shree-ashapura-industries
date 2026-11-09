@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { heroStore, dimsAt } from '../../lib/heroStore.js'
+
+const FS = 11 // one label size, never below 11 px
 import { content } from '../../data/content.js'
 
 const t = content.hero.dims
@@ -20,7 +22,7 @@ export default function HeroDimensions({ compact = false }) {
     const els = {}
     ;[
       'dia', 'diaLabel', 'diaLead',
-      'lenExtA', 'lenExtB', 'len', 'lenLabel',
+      'lenExtA', 'lenExtB', 'len', 'lenLabel', 'lenBg',
       'thrDot', 'thr', 'thrLabel',
       'pA', 'pB', 'pBar', 'pLabel',
       'afExtA', 'afExtB', 'af', 'afLabel',
@@ -49,6 +51,8 @@ export default function HeroDimensions({ compact = false }) {
       el.setAttribute('marker-end', show)
     }
 
+    let lenW = 0
+    document.fonts?.ready.then(() => (lenW = 0))
     const render = (p) => {
       const a = heroStore.anchors
       if (!a) return
@@ -72,6 +76,15 @@ export default function HeroDimensions({ compact = false }) {
       const ang = (Math.atan2(a[3].y - a[2].y, a[3].x - a[2].x) * 180) / Math.PI
       text(els.lenLabel, mx, my, fadeIn(d.len), ang - 180)
       els.lenLabel.setAttribute('dy', '0.35em')
+      // knockout box behind the label: the line breaks around the text (the glyph halo
+      // alone lets the line show between the letter-spaced characters)
+      lenW ||= els.lenLabel.getComputedTextLength()
+      els.lenBg.setAttribute('x', mx - lenW / 2 - 4)
+      els.lenBg.setAttribute('y', my - FS * 0.75)
+      els.lenBg.setAttribute('width', lenW + 8)
+      els.lenBg.setAttribute('height', FS * 1.5)
+      els.lenBg.setAttribute('transform', `rotate(${ang - 180} ${mx} ${my})`)
+      els.lenBg.style.opacity = fadeIn(d.len)
 
       // Thread callout: dot + elbow leader + label (red, the key spec)
       const th = a[6]
@@ -141,9 +154,10 @@ export default function HeroDimensions({ compact = false }) {
         <circle data-k="thrDot" r="3" fill="currentColor" stroke="var(--color-paper)" strokeWidth="1.5" style={{ opacity: 0 }} />
       </g>
 
+      <rect data-k="lenBg" rx="1" fill="var(--color-paper)" style={{ opacity: 0 }} />
       <g
         className="font-mono uppercase"
-        style={{ fontSize: compact ? 9.5 : 11, letterSpacing: '0.12em', paintOrder: 'stroke', strokeLinejoin: 'round' }}
+        style={{ fontSize: FS, letterSpacing: '0.12em', paintOrder: 'stroke', strokeLinejoin: 'round' }}
         stroke="var(--color-paper)"
         strokeWidth="4"
       >

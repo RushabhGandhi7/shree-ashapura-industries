@@ -12,6 +12,8 @@ import { useEffect, useRef } from 'react'
 const clamp01 = (v) => Math.min(1, Math.max(0, v))
 const easeOut = (t) => 1 - Math.pow(1 - t, 3)
 const prog = (p, [a, b]) => easeOut(clamp01((p - a) / (b - a)))
+// one monospace size for every label, sub-label and dimension (never below 11 px)
+const FS = 11
 
 export default function Annotations({ store, items, compact = false, id = 'an' }) {
   const svg = useRef(null)
@@ -26,6 +28,8 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
       eb: q(`${it.id}-eb`),
       dot: q(`${it.id}-dot`),
       label: q(`${it.id}-label`),
+      bg: q(`${it.id}-bg`),
+      tw: 0, // label text width (measured once the font has loaded)
       sub: q(`${it.id}-sub`),
     }))
     const k = compact ? 0.55 : 1
@@ -65,11 +69,29 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
           if (ang > 90) ang -= 180
           if (ang < -90) ang += 180
           const vertical = Math.abs(ang) > 45
+          // vertical dimensions read bottom to top (text direction points up the screen)
+          if (vertical && ang > 0) ang -= 180
+          const rot = vertical ? `rotate(${ang} ${mx} ${my})` : ''
           e.label.setAttribute('x', mx)
           e.label.setAttribute('y', my)
-          e.label.setAttribute('transform', vertical ? `rotate(${ang} ${mx} ${my})` : '')
+          e.label.setAttribute('transform', rot)
           e.label.setAttribute('dy', vertical ? '0.35em' : '-0.6em')
           e.label.style.opacity = o
+          // A rotated label sits ON its dimension line: a paper-coloured knockout box behind
+          // it breaks the line around the text (the glyph stroke alone leaves the line
+          // showing between the letter-spaced characters).
+          if (e.bg) {
+            if (vertical) {
+              if (!e.tw) e.tw = e.label.getComputedTextLength()
+              const bw = e.tw + 8
+              e.bg.setAttribute('x', mx - bw / 2)
+              e.bg.setAttribute('y', my - FS * 0.75)
+              e.bg.setAttribute('width', bw)
+              e.bg.setAttribute('height', FS * 1.5)
+              e.bg.setAttribute('transform', rot)
+            }
+            e.bg.style.opacity = vertical ? o : 0
+          }
         } else {
           const P = a[it.anchor]
           if (!P) continue
@@ -77,7 +99,7 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
           const elbow = { x: P.x + dir * it.dx * k, y: P.y + it.dy * k }
           const end = { x: elbow.x + dir * (compact ? 54 : it.len ?? 120), y: elbow.y }
           // keep the label inside the canvas: shift elbow/end back if the text would overflow
-          const textW = it.label.length * (compact ? 7.2 : 8.2) + 8
+          const textW = it.label.length * 8.2 + 8
           const over = dir > 0 ? elbow.x + textW - (W - 6) : 6 - (elbow.x - textW)
           if (over > 0) {
             const shift = Math.min(over, Math.abs(elbow.x - P.x) - 6)
@@ -106,13 +128,17 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
     }
     store.onFrame = render
     render(store.p ?? 0)
+    // label widths change once the mono web font has loaded
+    document.fonts?.ready.then(() => {
+      els.forEach((e) => (e.tw = 0))
+      render(store.p ?? 0)
+    })
     return () => {
       ro.disconnect()
       if (store.onFrame === render) store.onFrame = null
     }
   }, [store, items, compact, id])
 
-  const fs = compact ? 9.5 : 11
   return (
     <svg ref={svg} className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
       <defs>
@@ -129,6 +155,7 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
                 {it.ea && <line data-k={`${it.id}-ea`} stroke="currentColor" strokeOpacity=".5" pathLength="1" strokeDasharray="1" strokeDashoffset="1" />}
                 {it.eb && <line data-k={`${it.id}-eb`} stroke="currentColor" strokeOpacity=".5" pathLength="1" strokeDasharray="1" strokeDashoffset="1" />}
                 <line data-k={`${it.id}-main`} stroke="currentColor" pathLength="1" strokeDasharray="1" strokeDashoffset="1" />
+                <rect data-k={`${it.id}-bg`} rx="1" fill="var(--color-paper)" style={{ opacity: 0 }} />
               </>
             ) : (
               <>
@@ -143,7 +170,7 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
               fill={red ? 'var(--color-red)' : 'var(--color-ink)'}
               stroke="var(--color-paper)"
               strokeWidth="4"
-              style={{ fontSize: it.kind === 'leader' ? fs + 1 : fs, letterSpacing: '0.12em', paintOrder: 'stroke', opacity: 0, fontWeight: it.kind === 'leader' ? 500 : 400 }}
+              style={{ fontSize: FS, letterSpacing: '0.12em', paintOrder: 'stroke', opacity: 0, fontWeight: it.kind === 'leader' ? 500 : 400 }}
             >
               {it.label}
             </text>
@@ -154,7 +181,7 @@ export default function Annotations({ store, items, compact = false, id = 'an' }
                 fill="var(--color-steel-700)"
                 stroke="var(--color-paper)"
                 strokeWidth="4"
-                style={{ fontSize: fs - 1, letterSpacing: '0.12em', paintOrder: 'stroke', opacity: 0 }}
+                style={{ fontSize: FS, letterSpacing: '0.12em', paintOrder: 'stroke', opacity: 0 }}
               >
                 {it.sub}
               </text>

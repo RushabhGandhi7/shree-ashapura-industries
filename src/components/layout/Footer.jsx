@@ -22,7 +22,7 @@ export default function Footer() {
     <footer className="relative overflow-hidden border-t border-steel-300 bg-paper-2">
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-70" aria-hidden />
 
-      <div className="container-x relative pt-14 pb-10 md:pt-16">
+      <div className="container-x relative pt-section-sm pb-10 md:pt-section-md lg:pt-section-lg">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12">
           <div className="sm:col-span-2 lg:col-span-5">
             <Logo size="footer" />
@@ -100,7 +100,8 @@ export default function Footer() {
             </div>
             <div className="lg:col-span-9">
               <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.productsTitle}</h2>
-              <ul className="grid gap-x-6 gap-y-2 text-small sm:grid-cols-2">
+              {/* even grid: 8 lines = 2 full rows of 4 on desktop, 4 rows of 2 below */}
+              <ul className="grid grid-cols-2 gap-x-8 gap-y-2 text-small lg:grid-cols-4">
                 {categories.map((c) => (
                   <li key={c.slug}>
                     <Link to={`/products/${c.slug}`} className="font-medium hover:text-red">

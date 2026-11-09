@@ -76,11 +76,18 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --breakpoint-xs: 22.5rem;
+
+  /* Spacing scale (the one source for vertical rhythm; also generates p-section-lg, mb-head…):
+     section padding 48 mobile / 64 tablet (768+) / 96 desktop (1024+), header-to-content 48. */
+  --spacing-section-sm: 3rem;
+  --spacing-section-md: 4rem;
+  --spacing-section-lg: 6rem;
+  --spacing-head: 3rem;
 }
 
 :root {
   --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.5rem);
-  --section-y: clamp(3.5rem, 6vw, 5.5rem);
+  --section-y: var(--spacing-section-sm);
   --container: 82.5rem;
   --nav-h: 4.5rem;
   color-scheme: light;
@@ -169,9 +176,23 @@ html.lenis body {
 }
 
 @utility section-y {
-  /* bottom is lighter so two stacked sections do not leave a dead band (~150 px at 1440) */
-  padding-top: var(--section-y);
-  padding-bottom: calc(var(--section-y) * 0.6);
+  padding-block: var(--section-y);
+}
+@media (min-width: 48rem) {
+  :root {
+    --section-y: var(--spacing-section-md);
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --section-y: var(--spacing-section-lg);
+  }
+}
+/* Stacked sections of the same tone share one gap (96 / 64 / 48), not two paddings.
+   A change of tint keeps both, since the colour change already separates them. */
+.section-y.bg-paper + .section-y.bg-paper,
+.section-y.bg-paper-2 + .section-y.bg-paper-2 {
+  padding-top: 0;
 }
 
 /* Blueprint grid: 8px minor, 40px major. Pure CSS. */

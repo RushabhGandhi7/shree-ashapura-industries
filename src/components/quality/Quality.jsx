@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react'
 import { company, content } from '../../data/content.js'
 import { prefersReducedMotion } from '../../lib/device.js'
 import InstrumentIcon from './InstrumentIcon.jsx'
+import SectionHead from '../ui/SectionHead.jsx'
 
 const t = content.quality
 const N_TICKS = 5 // first piece + 4 two-hour checks on the timeline
@@ -96,27 +97,30 @@ export default function Quality({ h1 = false } = {}) {
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-50" aria-hidden />
       <div className="container-x relative">
         {/* header: title + ISO seal + mission */}
-        <div className="grid gap-8 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-7">
-            <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-              <span className="h-px w-8 bg-red" aria-hidden />
-              {t.label}
-            </p>
-            <H id="quality-title" className="text-h2 max-w-[16ch]">
+        <SectionHead
+          id="quality-title"
+          as={H}
+          label={t.label}
+          titleClassName="text-h2 max-w-[16ch]"
+          title={
+            <>
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </H>
-          </div>
-          <div className="flex items-center gap-5 md:col-span-5">
-            <IsoSeal />
-            <div>
-              <p className="font-display text-[1.15rem] leading-snug font-[760] [font-stretch:112%]">{t.mission}</p>
-              <p className="mt-2 text-small text-steel-700">{t.lead}</p>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+          asideClassName="flex items-center gap-5"
+          aside={
+            <>
+              <IsoSeal />
+              <div>
+                <p className="font-display text-[1.15rem] leading-snug font-[760] text-ink [font-stretch:112%]">{t.mission}</p>
+                <p className="mt-2 text-small text-steel-700">{t.lead}</p>
+              </div>
+            </>
+          }
+        />
 
         {/* in-process checks: first piece, then every 2 hours */}
-        <div className="mt-12 grid gap-px border border-steel-300 bg-steel-300 md:mt-16 md:grid-cols-[1fr_1fr_1.3fr]">
+        <div className="grid gap-px border border-steel-300 bg-steel-300 md:grid-cols-[1fr_1fr_1.3fr]">
           {t.inProcess.steps.map((s) => (
             <div key={s.k} className="bg-paper p-5 sm:p-7">
               <p className="font-mono text-small font-medium text-red">{s.k}</p>
@@ -142,7 +146,7 @@ export default function Quality({ h1 = false } = {}) {
         </div>
 
         {/* instruments */}
-        <section aria-labelledby="q-instruments" className="mt-14">
+        <section aria-labelledby="q-instruments" className="mt-head">
           <Heading as={Hs} id="q-instruments">{t.instrumentsTitle}</Heading>
           <ul className="grid grid-cols-2 gap-px border border-steel-300 bg-steel-300 sm:grid-cols-3 lg:grid-cols-7">
             {t.instruments.map((it) => (
@@ -156,7 +160,7 @@ export default function Quality({ h1 = false } = {}) {
           <p className="label-mono mt-4 text-steel-500">{t.design}</p>
         </section>
 
-        <div className="mt-14 grid gap-12 lg:grid-cols-12 lg:gap-10">
+        <div className="mt-head grid items-start gap-12 lg:grid-cols-12 lg:gap-10">
           {/* PPAP checklist, ticks with scroll */}
           <div className="min-w-0 lg:col-span-7">
             <section aria-labelledby="q-ppap">

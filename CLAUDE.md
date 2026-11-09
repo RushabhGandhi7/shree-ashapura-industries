@@ -76,7 +76,7 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - Finishes live in `src/data/products.js` (`finishes`). Dimension tables live in `src/three/specs.js`.
 - Inspect parts at `/lab` (deep links: `/lab?type=nut&head=wing&finish=brass&normals=1`).
 
-## Current status (2026-11-09, after Fix 9C)
+## Current status (2026-11-09, after Phase 10)
 Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 
 ### Completed phases
@@ -90,7 +90,8 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - **8B Configurator top view**: live SVG top view (`customise/TopView.jsx`) sharing proportions with the 3D heads via `three/headGeometry.js`.
 - **8C Safari scroll-drift fix**: `SyncCanvasRect` in `products/ProductViews.jsx` writes the live canvas rect each frame so drei Views stop drifting; `scripts/check-view-drift.mjs` measures it. Same commit: `SITE_URL` from `VITE_SITE_URL`.
 - **9A**: live 3D product cards on Home (`ProductsTeaser` reuses the shared-canvas grid), finishes by material (`data/materialFinishes.js`: swatches, spec, DWG code and WhatsApp text all read it), footer wordmark removed.
-- **9C Navbar + dead space**: nav auto-hide now counts travel since the last change of direction (hide after 64 px down past 480 px, show after 12 px up), and also shows on Tab focus and top-edge hover; the old per-event 4 px check missed Lenis / trackpad deltas. Section rhythm `--section-y: clamp(3.5rem, 6vw, 5.5rem)`, bottom 0.6×; footer, quote, about and category paddings trimmed; /quality Lean and /about CEO quote go full width under their grids; /contact map fills the column; gallery fallback is a regular grid (renders 4 per row, drawings 3 per row) plus a compact "video coming soon" strip. Rule: no gap over 160 px between sections at 1440.
+- **9C Dead space**: footer, quote, about and category paddings trimmed; /quality Lean and /about CEO quote go full width under their grids; /contact map fills the column; gallery fallback is a regular grid (renders 4 per row, drawings 3 per row) plus a compact "video coming soon" strip. Rule: no gap over 160 px between sections at 1440.
+- **10 Blueprint navbar + spacing system**: nav is always visible (no auto-hide), shrinks 72 → 54 px past 80 px (logo scales, sub-line folds, blur + 1 px steel border); `--nav-h` stays 72 px for layout. Caliper indicator (`layout/NavLinksCaliper.jsx`, lazy, xl only, Framer `layoutId` + `domMax`) springs under the hovered / active link with its measured width. Scroll progress dimension line (`layout/NavProgress.jsx`, `useScrollProgress`: Lenis `scroll` event, window listener only when Lenis is absent). Mobile menu is a slide-down panel with 01–07 labels and Call / WhatsApp at the bottom. Spacing scale in `@theme` (`--spacing-section-sm/md/lg` 48 / 64 / 96, `--spacing-head` 48); `section-y` uses it, and stacked same-tone sections collapse to one gap. `ui/SectionHead.jsx` = label + title + baseline-aligned aside, always 48 px above content. `lib/reveal.js` `revealOnce()` = one-shot reveal that snaps to the end state if unreachable / reduced motion (Capability, DimensionLine). Exploded pin stops at p 0.8 with a pin shortened to match (no idle tail). Gallery real-photo mode uses the same grid, the last card spans the rest of its row. Footer product links: even 2 / 4-column grid.
 - **9B Logo**: client master `public/brand/sa-logo.svg` inlined via generated `ui/logoMark.js` in navbar, mobile menu, footer and loader; favicons / touch / manifest icons from `scripts/brand-icons.mjs`.
 
 ### Routes
@@ -108,6 +109,8 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - **Shared canvas**: the product grid (Products page and Home teaser) is ONE `<Canvas>` with eight drei `<View>`s portalled into card slots; it renders on the GSAP tick only when dirty and on screen.
 - **WebGL gate** (`lib/glGate.js`): at most one live WebGL context per page. Sections register with `useGLGate`; the most-visible one owns it; handoff is two-phase (`useGLHold`), and `useReleaseGL` force-loses the context on unmount so two never overlap (Safari / phone context limits). `window.__glContexts` / `__glMax` count them.
 - **Route change**: window jumps to top, each section's `useGSAP` context reverts its pins/triggers on unmount, `RouteLifecycle` calls `ScrollTrigger.refresh()` after two frames and again after fonts load, and sets `window.__pageReady` for the prerenderer.
+- **Navbar**: fixed, outside `<main>` and PageTransition (keep transforms off its ancestors). Condensed state and the progress line both come from `useScrollProgress` (Lenis); never add window scroll listeners for scroll UI while Lenis exists.
+- **Spacing**: vertical rhythm only from the `@theme` scale (`section-y`, `mb-head`, `p*-section-*`); new section headers use `SectionHead`; new scroll reveals use `revealOnce`.
 - **Leak check (dev)**: `RouteLifecycle` stores triggers / pin spacers / GL contexts per route on first visit (`window.__routeBaseline`) and warns `[route-leak]` on mismatch.
 - Phones get `detail="low"`, capped DPR, lazy 3D chunks (three only loads on Home, Products, Category, Custom).
 
@@ -127,6 +130,7 @@ Built from the code, not from notes. Last commit before this refresh: `2a3f6f8`.
 - `public/llms.txt` and the `<noscript>` text in `index.html` repeat contact, capability and partner facts by hand: update them when `content.js` changes.
 - Console noise: React Router "No HydrateFallback" warning and a three.js `THREE.Clock` deprecation (from R3F / drei).
 - Home exploded view: the pinned stage is full height with its copy vertically centred, so about 220 to 300 px of empty grid sits above the copy while it is pinned (the parts spread into that height as they separate). Left as designed.
+- `Process.jsx` intro panel keeps its own header layout (it lives inside the pinned horizontal track), not `SectionHead`.
 - Large lazy chunks: `StudioEnvironment` ~179 kB gzip, `headGeometry` ~104 kB gzip (three.js bundled there).
 
 ### Open items: `// CONFIRM` (client to confirm)

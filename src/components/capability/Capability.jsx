@@ -3,7 +3,9 @@ import { Link } from 'react-router'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { content, machines } from '../../data/content.js'
+import SectionHead from '../ui/SectionHead.jsx'
 import { whatsappHref } from '../../lib/contact.js'
+import { revealOnce } from '../../lib/reveal.js'
 import { prefersReducedMotion } from '../../lib/device.js'
 
 const t = content.capability
@@ -40,14 +42,23 @@ export default function Capability({ h1 = false, teaser = false } = {}) {
         row.querySelectorAll('[data-reveal]').forEach((el) => (el.style.opacity = 1))
       }
       if (prefersReducedMotion()) return rows.forEach(finish)
-      rows.forEach((row) => {
+      const cleanups = rows.map((row) => {
         const band = row.querySelector('[data-band]')
         const glyphs = row.querySelectorAll('[data-glyph]')
-        const tl = gsap.timeline({ scrollTrigger: { trigger: row, start: 'top 82%', once: true } })
+        const tl = gsap.timeline({ paused: true })
         tl.fromTo(band, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power3.out' })
           .fromTo(row.querySelectorAll('[data-reveal]'), { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.08 }, '-=0.5')
           .add(() => glyphs.forEach((g, i) => setTimeout(() => (g.dataset.on = 'true'), i * 70)), '-=0.6')
+        // never left hidden: plays on scroll, or snaps to the end state if it can't be reached
+        return revealOnce(row, {
+          play: () => tl.play(),
+          finish: () => {
+            tl.progress(1)
+            finish(row)
+          },
+        })
       })
+      return () => cleanups.forEach((c) => c())
     },
     { scope: root },
   )
@@ -56,20 +67,19 @@ export default function Capability({ h1 = false, teaser = false } = {}) {
     <section id="capability" ref={root} aria-labelledby="capability-title" className="relative section-y bg-paper-2">
       <div className="bp-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden />
       <div className="container-x relative">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-7">
-            <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-              <span className="h-px w-8 bg-red" aria-hidden />
-              {t.label}
-            </p>
-            <H id="capability-title" className="text-h2 max-w-[16ch]">
+        <SectionHead
+          id="capability-title"
+          as={H}
+          label={t.label}
+          title={
+            <>
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </H>
-          </div>
-          <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
-        </div>
+            </>
+          }
+          aside={<p className="max-w-[44ch]">{t.lead}</p>}
+        />
 
-        <div className="mt-12 grid gap-10 md:mt-16 lg:grid-cols-12">
+        <div className="grid gap-10 lg:grid-cols-12">
           {/* range chart */}
           <div className={`flex min-w-0 flex-col border border-steel-300 bg-paper p-5 sm:p-8 ${teaser ? 'lg:col-span-12' : 'lg:col-span-8'}`}>
             <ul className="flex flex-1 flex-col justify-between gap-9">

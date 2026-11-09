@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { content } from '../../data/content.js'
+import SectionHead from '../ui/SectionHead.jsx'
 import { gallery, hasRealPhotos, unitVideo } from '../../data/gallery.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
 
@@ -164,6 +165,16 @@ function UnitVideo() {
   )
 }
 
+// Grid cell per item. Real photos: 4 per row on lg, 2 below; the last card stretches over
+// the rest of a short last row (literal classes so Tailwind sees them).
+const LAST_LG = { 1: 'lg:col-span-4', 2: 'lg:col-span-3', 3: 'lg:col-span-2' }
+function cellClass(g, i) {
+  if (!hasRealPhotos) return g.kind === 'drawing' ? 'col-span-2 lg:col-span-4' : 'lg:col-span-3'
+  if (i !== gallery.length - 1) return ''
+  const sm = gallery.length % 2 ? 'col-span-2' : ''
+  return `${sm} ${LAST_LG[gallery.length % 4] ?? ''}`.trim()
+}
+
 export default function Gallery({ h1 = false } = {}) {
   const H = h1 ? 'h1' : 'h2'
   const [open, setOpen] = useState(null)
@@ -173,28 +184,15 @@ export default function Gallery({ h1 = false } = {}) {
   return (
     <section id="gallery" aria-labelledby="gallery-title" className="relative section-y bg-paper-2">
       <div className="container-x">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-7">
-            <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-              <span className="h-px w-8 bg-red" aria-hidden />
-              {t.label}
-            </p>
-            <H id="gallery-title" className="text-h2">
-              {t.title}
-            </H>
-          </div>
-          <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
-        </div>
+        <SectionHead id="gallery-title" as={H} label={t.label} titleClassName="text-h2" title={t.title} aside={<p className="max-w-[44ch]">{t.lead}</p>} />
 
         {/* Real photos: masonry via CSS columns (mixed aspect ratios). Renders + drawings only
-            (all 4:3): a regular grid, renders 4 per row and drawings 3 per row on lg, so no
-            column ends early and no cell is left empty. */}
-        <ul className={`mt-12 md:mt-16 ${hasRealPhotos ? 'columns-2 gap-3 md:gap-4 lg:columns-3' : 'grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-12'}`}>
+            (all 4:3): a regular grid, renders 4 per row and drawings 3 per row on lg.
+            With real photos: the same 4-column grid with 4:3 crops, and the last card spans
+            whatever is left of its row. Either way no row has an empty cell. */}
+        <ul className={`grid grid-cols-2 gap-3 md:gap-4 ${hasRealPhotos ? 'lg:grid-cols-4' : 'lg:grid-cols-12'}`}>
           {gallery.map((g, i) => (
-            <li
-              key={g.src}
-              className={hasRealPhotos ? 'mb-3 break-inside-avoid md:mb-4' : g.kind === 'drawing' ? 'col-span-2 lg:col-span-4' : 'lg:col-span-3'}
-            >
+            <li key={g.src} className={cellClass(g, i)}>
               <button
                 type="button"
                 onClick={() => setOpen(i)}
@@ -208,7 +206,7 @@ export default function Gallery({ h1 = false } = {}) {
                   loading="lazy"
                   decoding="async"
                   style={g.small ? { maxWidth: g.width } : undefined}
-                  className="mx-auto block h-auto w-full transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.045] motion-reduce:transition-none"
+                  className={`mx-auto block w-full ${hasRealPhotos && !g.small ? 'aspect-[4/3] object-cover' : 'h-auto'} transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.045] motion-reduce:transition-none`}
                 />
                 <span className="sr-only">{t.open}: </span>
                 {/* caption strip: always readable, no dark overlay on light renders */}

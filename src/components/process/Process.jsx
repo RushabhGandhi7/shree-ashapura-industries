@@ -188,7 +188,7 @@ export default function Process({ h1 = false } = {}) {
                 <span className="relative block h-px w-12 overflow-hidden bg-steel-300">
                   <span className="absolute inset-y-0 left-0 w-1/2 animate-[sa-slide_1.6s_var(--ease-machine)_infinite] bg-red" />
                 </span>
-                Scroll
+                {t.scrollCue}
               </p>
             )}
           </header>

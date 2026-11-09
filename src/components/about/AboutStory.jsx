@@ -6,9 +6,9 @@ const t = content.about
 /** About: the story since 1990, key facts and the CEO. */
 export default function AboutStory() {
   return (
-    <section aria-labelledby="about-title" className="relative pb-14 pt-10 md:pb-12 md:pt-14">
+    <section aria-labelledby="about-title" className="relative pt-10 md:pt-14 pb-section-sm md:pb-section-md lg:pb-section-lg">
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-50" aria-hidden />
-      <div className="container-x relative grid gap-12 lg:grid-cols-12">
+      <div className="container-x relative grid items-start gap-12 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
             <span className="h-px w-8 bg-red" aria-hidden />

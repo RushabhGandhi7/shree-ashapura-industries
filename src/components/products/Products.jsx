@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { content } from '../../data/content.js'
+import SectionHead from '../ui/SectionHead.jsx'
 import { whatsappHref } from '../../lib/contact.js'
 import { hasFinePointer } from '../../lib/device.js'
 import ProductGrid from './ProductGrid.jsx'
@@ -14,23 +15,20 @@ export default function Products({ h1 = false } = {}) {
     <section id="products" aria-labelledby="products-title" className="relative section-y bg-paper">
       <div className="bp-grid bp-grid-fade pointer-events-none absolute inset-0 opacity-60" aria-hidden />
       <div className="container-x relative">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-7">
-            <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-              <span className="h-px w-8 bg-red" aria-hidden />
-              {t.label}
-            </p>
-            <H id="products-title" className="text-h2 max-w-[16ch]">
-              {t.title}
-            </H>
-          </div>
-          <div className="md:col-span-5">
-            <p className="max-w-[44ch] text-steel-700">{t.lead}</p>
-            <p className="label-mono mt-4 text-steel-500">{touch ? t.hintTouch : t.hint}</p>
-          </div>
-        </div>
+        <SectionHead
+          id="products-title"
+          as={H}
+          label={t.label}
+          title={t.title}
+          aside={
+            <>
+              <p className="max-w-[44ch]">{t.lead}</p>
+              <p className="label-mono mt-4 text-steel-500">{touch ? t.hintTouch : t.hint}</p>
+            </>
+          }
+        />
 
-        <ProductGrid Hc={h1 ? 'h2' : 'h3'} className="mt-12 md:mt-16" />
+        <ProductGrid Hc={h1 ? 'h2' : 'h3'} />
       </div>
 
       <div className="container-x relative mt-px">
@@ -39,7 +37,7 @@ export default function Products({ h1 = false } = {}) {
           <div className="relative">
             <p className="label-mono mb-2 flex items-center gap-2 text-red">
               <span className="size-1.5 rounded-full bg-red" aria-hidden />
-              DWG → PART
+              {t.custom.tag}
             </p>
             <h3 className="text-h3 max-w-[24ch]">{t.custom.title}</h3>
             <p className="mt-2 max-w-[60ch] text-small leading-relaxed text-steel-700">{t.custom.text}</p>

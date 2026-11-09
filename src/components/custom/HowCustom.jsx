@@ -1,4 +1,5 @@
 import { content } from '../../data/content.js'
+import SectionHead from '../ui/SectionHead.jsx'
 import { whatsappHref } from '../../lib/contact.js'
 import Button from '../ui/Button.jsx'
 import { WhatsAppIcon } from '../ui/Icons.jsx'
@@ -10,14 +11,8 @@ export default function HowCustom() {
   return (
     <section aria-labelledby="how-custom-title" className="relative section-y bg-paper">
       <div className="container-x">
-        <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-          <span className="h-px w-8 bg-red" aria-hidden />
-          {t.label}
-        </p>
-        <h2 id="how-custom-title" className="text-h2 max-w-[18ch]">
-          {t.title}
-        </h2>
-        <ol className="mt-10 grid gap-px border border-steel-300 bg-steel-300 sm:grid-cols-2 lg:grid-cols-4 md:mt-14">
+        <SectionHead id="how-custom-title" label={t.label} titleClassName="text-h2 max-w-[18ch]" title={t.title} />
+        <ol className="grid gap-px border border-steel-300 bg-steel-300 sm:grid-cols-2 lg:grid-cols-4">
           {t.steps.map((s, i) => (
             <li key={s.k} className="relative bg-paper p-5 sm:p-7">
               <div className="flex items-center gap-3">

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { SHOW_CUSTOMERS, content, yearsInBusiness } from '../../data/content.js'
+import SectionHead from '../ui/SectionHead.jsx'
 import { categories } from '../../data/products.js'
 import Customers from './Customers.jsx'
 import { prefersReducedMotion } from '../../lib/device.js'
@@ -154,21 +155,10 @@ export default function Industries({ h1 = false } = {}) {
   return (
     <section id="industries" ref={root} aria-labelledby="industries-title" className="relative section-y bg-paper">
       <div className="container-x">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-7">
-            <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-              <span className="h-px w-8 bg-red" aria-hidden />
-              {t.label}
-            </p>
-            <H id="industries-title" className="text-h2 max-w-[16ch]">
-              {t.title}
-            </H>
-          </div>
-          <p className="max-w-[44ch] text-steel-700 md:col-span-5">{t.lead}</p>
-        </div>
+        <SectionHead id="industries-title" as={H} label={t.label} title={t.title} aside={<p className="max-w-[44ch]">{t.lead}</p>} />
 
         {/* counters */}
-        <dl className="mt-12 grid grid-cols-2 gap-y-10 border-y border-steel-300 py-10 md:mt-16 lg:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-y-10 border-y border-steel-300 py-10 lg:grid-cols-4">
           {counters.map((c, i) => (
             <div key={c.label} className="flex flex-col gap-3 px-1 lg:px-6 lg:not-first:border-l lg:not-first:border-steel-300">
               <dt className="label-mono order-2 text-steel-700">
@@ -196,7 +186,7 @@ export default function Industries({ h1 = false } = {}) {
           </div>
         </dl>
 
-        <div className="mt-16 grid gap-14 lg:grid-cols-12 lg:gap-10">
+        <div className="mt-head grid gap-14 lg:grid-cols-12 lg:gap-10">
           {/* why us */}
           <div className="min-w-0 lg:col-span-7">
             <h3 className="text-h3">{t.whyTitle}</h3>

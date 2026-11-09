@@ -21,6 +21,7 @@ class Boundary extends Component {
 }
 
 // When each part's annotations appear (scroll progress), used for the legend too.
+const P_END = 0.8 // final pose: everything apart, all dimensions drawn
 const PART_AT = [
   [0.14, 0.26],
   [0.38, 0.48],
@@ -75,21 +76,24 @@ export default function Exploded() {
         explodedStore.invalidate?.()
       }
       if (profile.reduced) {
-        explodedStore.p = 0.8
-        sync(0.8)
+        explodedStore.p = P_END
+        sync(P_END)
         return
       }
       explodedStore.p = 0
       sync(0)
       const mm = gsap.matchMedia()
       mm.add({ desktop: '(min-width: 768px)', mobile: '(max-width: 767px)' }, (ctx) => {
+        // The last motion (nut-height dimension) ends at p 0.72; scrubbing on to 1 left a long
+        // pinned stretch where nothing moved. Stop at P_END (the reduced-motion pose) and
+        // shorten the pin by the same factor, so the speed per scrolled px is unchanged.
         gsap.to(explodedStore, {
-          p: 1,
+          p: P_END,
           ease: 'none',
           scrollTrigger: {
             trigger: section.current,
             start: 'top top',
-            end: ctx.conditions.desktop ? '+=200%' : '+=150%',
+            end: ctx.conditions.desktop ? `+=${200 * P_END}%` : `+=${150 * P_END}%`,
             pin: stage.current,
             scrub: 0.6,
             anticipatePin: 1,

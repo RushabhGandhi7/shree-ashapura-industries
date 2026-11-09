@@ -1,5 +1,6 @@
 import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { content } from '../../data/content.js'
+import SectionHead from '../ui/SectionHead.jsx'
 import { customiser as C, finishes } from '../../data/products.js'
 import { pitchFor } from '../../three/specs.js'
 import { whatsappHref } from '../../lib/contact.js'
@@ -140,20 +141,20 @@ export default function Customiser({ h1 = false } = {}) {
   return (
     <section id="customise" ref={section} aria-labelledby="customise-title" className="relative section-y bg-paper-2">
       <div className="container-x relative">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-7">
-            <p className="label-mono mb-6 flex items-center gap-3 text-steel-700">
-              <span className="h-px w-8 bg-red" aria-hidden />
-              {t.label}
-            </p>
-            <H id="customise-title" className="text-h2">
+        <SectionHead
+          id="customise-title"
+          as={H}
+          label={t.label}
+          titleClassName="text-h2"
+          title={
+            <>
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
-            </H>
-          </div>
-          <p className="max-w-[46ch] text-steel-700 md:col-span-5">{t.lead}</p>
-        </div>
+            </>
+          }
+          aside={<p className="max-w-[46ch]">{t.lead}</p>}
+        />
 
-        <div className="mt-10 grid gap-px border border-steel-300 bg-steel-300 md:mt-14 lg:grid-cols-12">
+        <div className="grid gap-px border border-steel-300 bg-steel-300 lg:grid-cols-12">
           {/* Stage */}
           <div className="relative bg-paper lg:col-span-8">
             {/* Fixed-size box: top view card (left on desktop, toggled on phones) + 3D cell */}

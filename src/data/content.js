@@ -59,7 +59,12 @@ const en = {
     callWhatsapp: 'Call / WhatsApp',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
+    menuLabel: 'Menu',
     homeLabel: 'Shree Ashapura Industries, home',
+    brandLine: 'SHREE ASHAPURA',
+    subline: 'Industries · Mumbai',
+    progress: (n) => `${String(n).padStart(3, '0')} / 100`,
+    progressLabel: 'Page scroll progress',
   },
   loader: {
     spec: 'THREAD M12 × 1.75',
@@ -93,6 +98,7 @@ const en = {
     hint: 'Hover to turn the part. Click a card for the full range.',
     hintTouch: 'Tap a card for the full range.',
     custom: {
+      tag: 'DWG → PART',
       title: 'Custom products made to your drawing',
       text: 'Send a drawing or a sample. We develop and produce special-purpose parts to your requirement and design, drawn in AutoCAD 2D & 3D.',
       cta: 'Send your drawing',
@@ -192,6 +198,7 @@ const en = {
       },
     ],
     track: 'Part journey',
+    scrollCue: 'Scroll',
   },
   capability: {
     label: 'Capability',

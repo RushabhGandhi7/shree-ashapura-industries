@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { revealOnce } from '../../lib/reveal.js'
 import { prefersReducedMotion } from '../../lib/device.js'
 
 const ROT = { right: 0, down: 90, left: 180, up: 270 }
@@ -61,10 +61,8 @@ export default function DimensionLine({
       if (label) tl.from(q('[data-label]'), { autoAlpha: 0, scale: 0.92, duration: 0.5, ease: 'power2.out' }, '-=0.5')
 
       if (trigger === 'mount') tl.play()
-      if (trigger === 'scroll') {
-        ScrollTrigger.create({ trigger: root.current, start: 'top 88%', once: true, onEnter: () => tl.play() })
-      }
       if (timelineRef) timelineRef.current = tl
+      if (trigger === 'scroll') return revealOnce(root.current, { play: () => tl.play(), finish: () => tl.progress(1) })
     },
     { scope: root },
   )

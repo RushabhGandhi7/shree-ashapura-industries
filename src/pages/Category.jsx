@@ -8,6 +8,7 @@ import { dprCap, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from 
 import Seo from '../layout/Seo.jsx'
 import Breadcrumbs from '../components/ui/Breadcrumbs.jsx'
 import Button from '../components/ui/Button.jsx'
+import SectionHead from '../components/ui/SectionHead.jsx'
 import MonoLabel from '../components/ui/MonoLabel.jsx'
 import { PhoneIcon, WhatsAppIcon } from '../components/ui/Icons.jsx'
 import QuoteCTA from '../components/quote/QuoteCTA.jsx'
@@ -34,10 +35,8 @@ function Related({ current }) {
   return (
     <section aria-labelledby="related-title" className="relative section-y bg-paper-2">
       <div className="container-x">
-        <h2 id="related-title" className="text-h3">
-          {t.related}
-        </h2>
-        <ul className="mt-8 grid gap-px border border-steel-300 bg-steel-300 sm:grid-cols-3">
+        <SectionHead id="related-title" titleClassName="text-h3" title={t.related} />
+        <ul className="grid gap-px border border-steel-300 bg-steel-300 sm:grid-cols-3">
           {list.map((c) => (
             <li key={c.slug}>
               <Link to={`/products/${c.slug}`} className="shine group flex h-full bg-paper hover:bg-white max-sm:items-center sm:flex-col">
@@ -119,7 +118,7 @@ export default function Category() {
         </div>
       </section>
 
-      <section aria-labelledby="items-title" className="relative pb-14 md:pb-12">
+      <section aria-labelledby="items-title" className="relative pb-section-sm md:pb-section-md lg:pb-section-lg">
         <div className="container-x grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <h2 id="items-title" className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">

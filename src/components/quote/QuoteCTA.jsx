@@ -22,7 +22,7 @@ export default function QuoteCTA({ initial } = {}) {
   const href = whatsappHref(t.message({ category: name, details: details.trim() }))
 
   return (
-    <section id="quote" aria-labelledby="quote-title" className="relative overflow-hidden border-y border-steel-300 bg-paper-2 pt-14 pb-16 md:pt-16 md:pb-20">
+    <section id="quote" aria-labelledby="quote-title" className="relative overflow-hidden border-y border-steel-300 bg-paper-2 py-section-sm md:py-section-md lg:py-section-lg">
       <div className="bp-grid pointer-events-none absolute inset-0 opacity-50" aria-hidden />
       <div className="container-x relative grid gap-10 lg:grid-cols-12 lg:items-start">
         <div className="lg:col-span-5">

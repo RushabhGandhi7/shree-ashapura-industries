@@ -28,8 +28,27 @@ function apply() {
   }
 }
 
+// No section gets the gate before the page has loaded and the main thread has gone idle once:
+// three / R3F / drei (~280 KB gzip) then load and evaluate after first paint and the first
+// React commit, not during them. Until then each section shows its static poster.
+let ready = false
+if (typeof window !== 'undefined') {
+  const idle = window.requestIdleCallback ?? ((fn) => setTimeout(fn, 200))
+  const open = () =>
+    idle(
+      () => {
+        ready = true
+        schedule()
+      },
+      { timeout: 1500 },
+    )
+  if (document.readyState === 'complete') open()
+  else window.addEventListener('load', open, { once: true })
+}
+
 function measure() {
   raf = 0
+  if (!ready) return
   const vh = window.innerHeight || 1
   let best = null
   entries.forEach((e, id) => {

@@ -227,13 +227,13 @@ export default function Hero() {
           ref={copy}
           className="container-x relative z-10 pt-[clamp(1rem,3svh,2.5rem)] lg:flex lg:min-h-[calc(100svh-var(--chrome-h-max))] lg:flex-col lg:pb-[clamp(1rem,4svh,3rem)]"
         >
-          <div className="lg:my-auto lg:max-w-[min(38rem,46%)]">
+          <div className="@container lg:my-auto lg:max-w-[min(38rem,46%)]">
             <div data-fade>
               <MonoLabel dot>{t.eyebrow}</MonoLabel>
             </div>
             <h1
               id="hero-title"
-              className="display-wide mt-5 text-[clamp(2.6rem,min(1.2rem+5.6vw,12svh),6.9rem)] leading-[0.92] tracking-[-0.03em] lg:mt-[clamp(1rem,3.5svh,2rem)]"
+              className="display-wide mt-5 text-[clamp(2.6rem,min(1.2rem+5.6vw,12svh,14.5cqi),6.9rem)] leading-[0.92] tracking-[-0.03em] lg:mt-[clamp(1rem,3.5svh,2rem)]"
             >
               <span className="block overflow-hidden pb-[0.06em]">
                 <span data-line className="block">

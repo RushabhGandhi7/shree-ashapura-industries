@@ -34,9 +34,9 @@ function shellHTML(content, company) {
       </div>
       <section class="sa-shell-hero relative"><div class="relative flex h-[100svh] flex-col overflow-hidden bg-paper pt-[var(--chrome-h-max)] lg:block lg:h-auto lg:min-h-[100svh]">
         <div class="bp-grid bp-grid-fade pointer-events-none absolute inset-0"></div>
-        <div class="container-x relative z-10 pt-[clamp(1rem,3svh,2.5rem)] lg:flex lg:min-h-[calc(100svh-var(--chrome-h-max))] lg:flex-col lg:pb-[clamp(1rem,4svh,3rem)]"><div class="lg:my-auto lg:max-w-[min(38rem,46%)]">
+        <div class="container-x relative z-10 pt-[clamp(1rem,3svh,2.5rem)] lg:flex lg:min-h-[calc(100svh-var(--chrome-h-max))] lg:flex-col lg:pb-[clamp(1rem,4svh,3rem)]"><div class="@container lg:my-auto lg:max-w-[min(38rem,46%)]">
           <div><span class="label-mono inline-flex items-center gap-2 rounded-xs border bg-paper/80 px-2 py-1 text-steel-700 border-steel-300"><span class="size-1.5 rounded-full bg-red"></span>${esc(h.eyebrow)}</span></div>
-          <p class="display-wide mt-5 text-[clamp(2.6rem,min(1.2rem+5.6vw,12svh),6.9rem)] leading-[0.92] tracking-[-0.03em] lg:mt-[clamp(1rem,3.5svh,2rem)]" role="heading" aria-level="1">
+          <p class="display-wide mt-5 text-[clamp(2.6rem,min(1.2rem+5.6vw,12svh,14.5cqi),6.9rem)] leading-[0.92] tracking-[-0.03em] lg:mt-[clamp(1rem,3.5svh,2rem)]" role="heading" aria-level="1">
             <span class="block overflow-hidden pb-[0.06em]"><span class="block">${esc(h.title[0])}</span></span>
             <span class="block overflow-hidden pb-[0.06em]"><span class="block text-red">${esc(h.title[1])}</span></span>
           </p>

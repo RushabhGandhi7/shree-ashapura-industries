@@ -639,25 +639,7 @@ function connector(B, p) {
   return { extra: bolt, extraMatrix: mtx }
 }
 
-/** Steel plate with a tapped through-hole at the origin (top face y = 0). Used by the hero. */
-function tappedPlate(B, p) {
-  const N = SEGMENTS[p.detail]
-  const R = mm(p.diameter) / 2
-  const P = mm(p.pitch ?? pitchFor(p.diameter))
-  const t = p.thickness
-  const cs = R * 1.12
-  plate(B.main, {
-    outline: roundedRect2(-p.width / 2, -p.depth / 2, p.width / 2, p.depth / 2, 0.12, 6),
-    holes: [circle2(0, 0, cs, N)],
-    t,
-    basis: { O: [0, -t, 0], U: [1, 0, 0], W: [0, 0, 1], H: [0, 1, 0] },
-    chamfer: 0.035,
-    holeWalls: false,
-  })
-  threadSurface(B.dark, { major: R, pitch: P, y0: -t, y1: 0, segments: N, detail: p.detail, internal: true, csTop: cs, csBot: cs })
-}
-
-const BUILDERS = { bolt, screw, nut, washer, bracket, turned, clip, connector, plate: tappedPlate, cam: (B, p) => connector(B, { ...p, camOnly: true }), ...EXTRA.builders }
+const BUILDERS = { bolt, screw, nut, washer, bracket, turned, clip, connector, cam: (B, p) => connector(B, { ...p, camOnly: true }), ...EXTRA.builders }
 
 /* ───────────────────────── public API ───────────────────────── */
 

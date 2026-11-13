@@ -4,8 +4,8 @@ import { RouterProvider } from 'react-router'
 import './styles/index.css'
 import { router } from './router.jsx'
 
-// The prerendered HTML (scripts/prerender.mjs) already painted this page; Hero skips its
-// fade-in then. Its head tags are replaced by the ones React renders (see layout/Seo.jsx).
+// The prerendered HTML (scripts/prerender.mjs) already painted this page; the home hero
+// skips its fade-in then. Its head tags are replaced by the ones React renders (see layout/Seo.jsx).
 window.__saShell = !!document.getElementById('sa-shell')
 document.querySelectorAll('head [data-seo]').forEach((n) => n.remove())
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'

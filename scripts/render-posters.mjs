@@ -1,11 +1,12 @@
-// Renders the placeholder images for the hero and the configurator from the live 3D scenes,
-// so the swap from poster to live canvas is a pure opacity crossfade (same subject, same
-// framing, same materials). Starts the Vite dev server, opens each page in Chromium at 2×
+// Renders the configurator's placeholder image from its live 3D scene, so the swap from
+// poster to live canvas is a pure opacity crossfade (same subject, same framing, same
+// materials). Starts the Vite dev server, opens each page in Chromium at 2×
 // device pixels, hides everything but the canvas, and captures exactly the rect the camera
-// fits the subject into (window.__heroFit / window.__customFit, set by the scenes in dev).
+// fits the subject into (window.__customFit, set by the scene in dev).
 //   node scripts/render-posters.mjs
-// Writes public/posters/hero.webp (rest pose), hero-seated.webp (reduced motion: seated
-// pose) and custom.webp (the configurator's default part). Transparent backgrounds.
+// Writes public/posters/custom.webp (the configurator's default part), transparent.
+// (The home hero still, public/posters/hero-still.webp, was rendered once from the former
+// hero scene in phase 10F; that scene no longer exists.)
 import { spawn } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -36,7 +37,7 @@ const HIDE = `
 `
 
 // grow: capture this much more than the fitted rect around its centre (shadows reach past
-// it); the page scales the contain-fitted image up by the same factor (Hero.jsx POSTER.grow).
+// it); the page scales the contain-fitted image up by the same factor.
 async function capture(browser, { url, name, canvas, fit, reduced, scrollTo, grow = 1, viewport = { width: 1440, height: 900 } }) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 2, reducedMotion: reduced ? 'reduce' : 'no-preference' })
   await ctx.addInitScript(() => sessionStorage.setItem('sa-intro-seen', '1'))
@@ -72,9 +73,6 @@ const server = await startServer()
 const browser = await chromium.launch({ args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] })
 await mkdir(OUT, { recursive: true })
 try {
-  const hero = { canvas: '#top canvas', fit: '__heroFit', grow: 1.2, viewport: { width: 1920, height: 1080 } } // 2× the largest common hero box
-  await capture(browser, { url: `${server.url}/`, name: 'hero', ...hero })
-  await capture(browser, { url: `${server.url}/`, name: 'hero-seated', ...hero, reduced: true })
   await capture(browser, { url: `${server.url}/custom`, name: 'custom', canvas: '#customise canvas', fit: '__customFit', reduced: true, scrollTo: '#customise canvas, #customise' })
 } finally {
   await browser.close()

@@ -229,7 +229,4 @@ export const customiser = {
   defaults: { head: 'hex', diameter: 8, length: 40, fine: false, material: 'ht88', finish: 'zinc' },
 }
 
-/** The bolt that threads into the plate in the hero. */
-export const heroBolt = { type: 'bolt', head: 'hex', diameter: 12, length: 30, pitch: 1.75, finish: 'zinc' } // visual only
-
 export default categories

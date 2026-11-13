@@ -153,8 +153,8 @@
   }
 }
 
-/* Static first-paint shell (scripts/static-shell.js): hero text, or the loader's first
-   frame when the intro will run. React replaces it on mount. */
+/* Static first-paint shell (scripts/static-shell.js): the loader's first frame when the
+   intro will run. React replaces it on mount. */
 #sa-shell .sa-shell-loader {
   display: none;
 }
@@ -333,12 +333,24 @@ main > div > .section-y:last-of-type {
   }
 }
 
-@keyframes sa-cue {
-  0% {
-    transform: translateY(-100%);
+/* Home hero: static. Top padding clears the fixed header + scroll ruler at scroll 0, then
+   one --section-y; the bottom is one --section-y, shared with the products section below. */
+.hero.section-y {
+  padding-top: calc(var(--chrome-h-max) + var(--section-y));
+}
+/* Bolt-in-plate still: a very small CSS-only tilt on hover (fine pointers, motion allowed). */
+.hero-still {
+  perspective: 1200px;
+}
+.hero-still img {
+  transform-origin: 50% 60%;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .hero-still img {
+    transition: transform 0.9s var(--ease-machine);
   }
-  100% {
-    transform: translateY(200%);
+  .hero-still:hover img {
+    transform: rotateX(4deg) rotateY(-6deg) scale(1.015);
   }
 }
 

@@ -34,7 +34,7 @@ async function launch() {
 }
 
 // first-paint poster of routes whose LCP is a 3D placeholder
-const PRELOAD = { '/': '/posters/hero.webp', '/custom': '/posters/custom.webp' }
+const PRELOAD = { '/': '/posters/hero-still.webp', '/custom': '/posters/custom.webp' }
 const template = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8')
 if (!template.includes('<div id="root"></div>')) throw new Error('dist/index.html is already prerendered: run `npm run build` (vite build first).')
 fs.writeFileSync(path.join(DIST, '__spa.html'), template)

@@ -1,4 +1,4 @@
-// Flat plates with holes (bracket legs, the hero's steel plate) and simple sweeps
+// Flat plates with holes (bracket legs and other flat parts) and simple sweeps
 // (spring washer, sheet-metal bend).
 import * as THREE from 'three'
 import { TAU } from './builder.js'

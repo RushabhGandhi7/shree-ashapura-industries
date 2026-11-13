@@ -51,20 +51,4 @@ export const TurnedPart = typed('turned')
 export const MouldedClip = typed('clip')
 export const FurnitureConnector = typed('connector')
 
-/** Steel plate with a tapped hole at the origin, top face at y = 0 (hero scene). */
-export function TappedPlate({ diameter = 12, pitch, width = 4.6, depth = 3.2, thickness = 0.8, finish = 'mildSteel', detail = 'high', quality, ...props }) {
-  const part = useMemo(
-    () => buildPart({ type: 'plate', diameter, pitch, width, depth, thickness, detail }),
-    [diameter, pitch, width, depth, thickness, detail],
-  )
-  const q = quality ?? detail
-  return (
-    <group {...props}>
-      {Object.entries(part.geos).map(([role, geo]) => (
-        <mesh key={role} geometry={geo} material={getMaterial(finish, role, q)} />
-      ))}
-    </group>
-  )
-}
-
 export { buildPart }

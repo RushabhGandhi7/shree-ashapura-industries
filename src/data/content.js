@@ -79,17 +79,7 @@ const en = {
     callCta: 'Call now',
     whatsappCta: 'WhatsApp us',
     tolerance: 'EST. 1990',
-    scrollCue: 'Scroll to thread it in',
-    sceneLabel: 'Interactive 3D model: a hex bolt threading into a tapped steel plate as you scroll.',
-    posterAlt: 'Steel bolt above a tapped steel plate',
-    dims: { dia: 'Ø12', len: 'L 30', thread: 'M12 × 1.75', pitch: 'P 1.75', af: 'AF 18' },
-    readout: {
-      aria: 'Torque readout for the bolt being threaded into the plate',
-      torque: 'Torque',
-      turns: 'Turns',
-      spec: 'M12 × 1.75',
-      phases: { align: 'Aligning', thread: 'Threading', seat: 'Torquing', seated: 'Seated ✓' },
-    },
+    posterAlt: 'Steel hex bolt threaded into a tapped steel plate',
   },
   products: {
     label: 'What we make',
@@ -115,19 +105,6 @@ const en = {
       enquireMsg: (name) => `Hello Shree Ashapura Industries, I would like a quote for ${name}. Part / size / quantity: `,
       custom: 'Need something not listed? We make parts to your drawing.',
     },
-  },
-  exploded: {
-    label: 'Exploded view',
-    title: ['Every part,', 'to drawing.'],
-    lead: 'Bolt, washer and nut, taken apart. Every dimension is checked against the drawing with calibrated gauges.',
-    scrollCue: 'Scroll to take it apart',
-    sceneLabel: 'Interactive 3D exploded view of a hex bolt, plain washer and hex nut, with their dimensions.',
-    parts: [
-      { name: 'Hex bolt', std: 'M8 × 1.25' },
-      { name: 'Plain washer', std: 'Ø16' },
-      { name: 'Hex nut', std: 'AF 13' },
-    ],
-    dims: { dia: 'Ø8', len: 'L 25', thread: 'M8 × 1.25', washer: 'Ø16', nut: 'AF 13', nutH: 'm 6.8' },
   },
   customise: {
     label: 'Customise',

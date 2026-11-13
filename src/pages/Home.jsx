@@ -3,7 +3,6 @@ import { findPage } from '../routes.js'
 import { SHOW_CUSTOMERS, content } from '../data/content.js'
 import Hero from '../components/hero/Hero.jsx'
 import ProductsTeaser from '../components/products/ProductsTeaser.jsx'
-import Exploded from '../components/exploded/Exploded.jsx'
 import Capability from '../components/capability/Capability.jsx'
 import QualityTeaser from '../components/quality/QualityTeaser.jsx'
 import Customers from '../components/industries/Customers.jsx'
@@ -17,7 +16,6 @@ export default function Home() {
       <Hero />
       <ProductsTeaser />
       <GearDivider />
-      <Exploded />
       <Capability teaser />
       <QualityTeaser />
       {SHOW_CUSTOMERS && (

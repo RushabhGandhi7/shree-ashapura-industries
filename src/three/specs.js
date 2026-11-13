@@ -85,5 +85,7 @@ export const DEFAULTS = {
   cotterPin: { head: 'split', diameter: 3, length: 28, finish: 'zinc' }, // diameter = wire Ø
   leveller: { head: 'hex', diameter: 8, length: 28, finish: 'zinc' }, // diameter = stud Ø
   insert: { head: 'threaded', diameter: 6, length: 13, finish: 'zinc' }, // diameter = inner thread Ø
+  taperPin: { head: 'plain', diameter: 6, length: 40, finish: 'mildSteel' }, // diameter = small end Ø
+  plug: { head: 'finned', diameter: 25, length: 18, finish: 'nylonBlack' }, // diameter = tube outer Ø
   axle: { head: 'knurled', diameter: 8, length: 60, finish: 'mildSteel' }, // diameter = knurl Ø, length = overall
 }

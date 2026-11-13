@@ -51,6 +51,8 @@ export const Screw = typed('screw')
 export const Bracket = typed('bracket')
 export const TurnedPart = typed('turned')
 export const Axle = typed('axle')
+export const TaperPin = typed('taperPin')
+export const Plug = typed('plug')
 export const MouldedClip = typed('clip')
 export const FurnitureConnector = typed('connector')
 

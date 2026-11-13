@@ -13,6 +13,9 @@ The items below are still open. Each fact lives in one constant at the top of [`
 | 5 | Lean text | Part of Lean Cluster Mumbai. 5S, standard operating process, OEE, value stream mapping, Kaizen blitz, poka-yoke, 7QC, SMED, 3M and seven wastes training | TBD | `LEAN_TEXT` (`// CONFIRM`) |
 | 6 | Address spelling: "Agarwal" or "Agrawal" | Agarwal Co-op. Industrial Estate Ltd. (the rest of the address is confirmed) | TBD | `ADDRESS_TEXT` (`// CONFIRM Agarwal vs Agrawal`) |
 
+| 7 | Unnamed "new solutions" parts (names are ours) | Cream nylon ring, Brown 2-hole plate, Cream nylon disc, Black moulded part (Plastic Components); Metal cup, Zinc cam housing (Furniture Fittings & Cams) | TBD | `catalogueItems` in `content.js` (`// CONFIRM name`) |
+| 8 | Fibre / coloured washer | Listed under Washers | TBD | `catalogueItems` `fibre-washer` (`// CONFIRM`) |
+
 Items 4 and 5 were not in the client's confirmation, so they stay open. Delete them here and remove their `// CONFIRM` in `content.js` once they are confirmed.
 
 ## Logged, not changed (from phase 11)
@@ -22,3 +25,15 @@ Items 4 and 5 were not in the client's confirmation, so they stay open. Delete t
 - **Configurator.** Materials, grades and finish rules are unchanged (`customiser`, `materialFinishes.js`).
 - **Drilling / grinding rule.** Replaced in phase 11: the secondary machines list is shown on /manufacturing; the counts are unchanged.
 - **Earlier open items** (see CLAUDE.md): heat treatment and plating via approved partners, finishes for high tensile and brass, customiser options, EPDM, industries list, working hours.
+
+## Assumptions logged in phase 12B (not asked; raise when reviewing)
+
+1. No per-item pages: items are anchors on their category page (`/products/<line>#<item>`), so the sitemap and prerender list are unchanged.
+2. Placement of the unnamed parts: cream nylon ring, cream nylon disc, black moulded part and brown 2-hole plate → Plastic Components; metal cup and zinc cam housing → Furniture Fittings & Cams.
+3. "Rectangular and square tube end caps" are two items.
+4. Item names live in `content.js` (`catalogueItems`); their 3D part parameters in `products.js` (`itemModels`).
+5. "Brass nut", "Leveller" (as opposed to "Leveller bolt") and every item outside the 19-item priority list are line drawings, not 3D.
+6. Line drawings are generic shape families, not per-item technical drawings. "Metal cup / ferrule" and the unnamed "Metal cup" share one drawing.
+7. Washers show "Zinc / steel / black" as their spec line, not separate items.
+8. "Philips" is spelled "Phillips" (the drive's name).
+9. The list on /products shows text rows (no 3D) so the page stays light; 3D is on the category pages.

@@ -1,4 +1,6 @@
-// Lazy 3D layer for the category grid: ONE canvas, eight drei <View>s (gl.scissor).
+// Lazy 3D layer for a card grid: ONE canvas, one drei <View> per 3D card (gl.scissor).
+// `entries` = [{ key, parts, pose }]: the category cards (ProductGrid) or the catalogue
+// items with a 3D model on a category page (ItemGrid).
 // Each View is portalled into its card's slot element, so it tracks the card's box.
 //
 // The canvas is position:absolute over the grid, so the browser scrolls the canvas and
@@ -19,7 +21,6 @@ import { PerspectiveCamera, View } from '@react-three/drei'
 import { Fastener } from '../../three/Fastener.jsx'
 import { CARD_FOV as FOV, fitDistance, measure } from '../../three/categoryFit.js'
 import StudioEnvironment from '../../three/StudioEnvironment.jsx'
-import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
 import { glAntialias, maxDpr } from '../../lib/device.js'
@@ -34,6 +35,7 @@ function CardScene({ c, quality, reduced, visible }) {
   const st = useRef({ angle: 0, vel: 0 })
   const cam = useRef(null)
   const { c: center, radius, height } = useMemo(() => measure(c.parts), [c.parts])
+  const key = c.key
 
   // Fit the spinning, tilted part into the 4:3 card (inside a View, size is the canvas).
   const dist = useMemo(() => fitDistance(c.pose.tilt, { radius, height }), [c.pose.tilt, height, radius])
@@ -44,7 +46,7 @@ function CardScene({ c, quality, reduced, visible }) {
   }, [dist])
 
   useFrame((_, dt) => {
-    const spinning = !reduced && spinStore.isSpinning(c.slug)
+    const spinning = !reduced && spinStore.isSpinning(key)
     const s = st.current
     const target = spinning ? 1.7 : 0
     s.vel += (target - s.vel) * (1 - Math.exp(-3.2 * Math.min(dt, 0.05)))
@@ -52,7 +54,7 @@ function CardScene({ c, quality, reduced, visible }) {
     s.angle += s.vel * Math.min(dt, 0.05)
     inner.current.rotation.y = s.angle
     if (spinning || s.vel !== 0) requestRender()
-    if (visible) spinStore.markReady(c.slug) // drawn this frame: the card can drop its poster
+    if (visible) spinStore.markReady(key) // drawn this frame: the card can drop its poster
   })
 
   return (
@@ -142,7 +144,7 @@ function TickerBridge() {
 
 const MAX_BUFFER = 4096 // keep the drawing buffer inside WebGL's usual size limit (Safari clamps above it)
 
-export default function ProductViews({ slots, container, touch, quality, reduced }) {
+export default function ProductViews({ entries, slots, container, touch, quality, reduced }) {
   const lenis = useLenis()
   const onCreated = useReleaseGL()
   useEffect(() => () => spinStore.resetReady(), []) // canvas gone: posters back
@@ -200,14 +202,14 @@ export default function ProductViews({ slots, container, touch, quality, reduced
 
   return (
     <>
-      {categories.map((c) =>
-        slots[c.slug]
+      {entries.map((c) =>
+        slots[c.key]
           ? createPortal(
-              <View className="pointer-events-none absolute inset-0" visible={onScreen[c.slug] !== false}>
-                <CardScene c={c} quality={quality} reduced={reduced} visible={onScreen[c.slug] !== false} />
+              <View className="pointer-events-none absolute inset-0" visible={onScreen[c.key] !== false}>
+                <CardScene c={c} quality={quality} reduced={reduced} visible={onScreen[c.key] !== false} />
               </View>,
-              slots[c.slug],
-              c.slug,
+              slots[c.key],
+              c.key,
             )
           : null,
       )}

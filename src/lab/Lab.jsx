@@ -8,7 +8,7 @@ import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHel
 import { Fastener, buildPart } from '../three/Fastener.jsx'
 import StudioEnvironment from '../three/StudioEnvironment.jsx'
 import { DEFAULTS, metricSizes, pitchFor } from '../three/specs.js'
-import { categories, finishes, finishFor, metalFinishes, variants, washerFinishes } from '../data/products.js'
+import { categories, finishes, finishFor, itemModels, metalFinishes, variants, washerFinishes } from '../data/products.js'
 import { CARD_FOV, fitDistance, measure } from '../three/categoryFit.js'
 
 const TYPES = {
@@ -28,6 +28,8 @@ const TYPES = {
   leveller: 'Leveller',
   insert: 'Insert / bush',
   axle: 'Axle / rod',
+  taperPin: 'Taper pin',
+  plug: 'Plastic plug',
 }
 const DIAMETERS = {
   bolt: metricSizes,
@@ -46,6 +48,8 @@ const DIAMETERS = {
   leveller: [6, 8, 10, 12],
   insert: [4, 5, 6, 8, 10],
   axle: [5, 6, 8, 10, 12, 16],
+  taperPin: [3, 4, 5, 6, 8, 10],
+  plug: [16, 19, 20, 25, 32, 38],
 }
 const LENGTHS = {
   bolt: [6, 100],
@@ -60,6 +64,8 @@ const LENGTHS = {
   leveller: [12, 60],
   insert: [6, 40],
   axle: [20, 120],
+  taperPin: [16, 100],
+  plug: [12, 30],
 }
 const FINISH_KEYS = [...metalFinishes, 'yellowZinc', 'mildSteel', 'nylon', 'nylonBlack']
 
@@ -99,6 +105,11 @@ const GALLERY = [
   { type: 'insert', head: 'threaded', finish: 'zinc' },
   { type: 'insert', head: 'knurled', length: 12, finish: 'brass' },
   { type: 'axle', finish: 'mildSteel' },
+  { type: 'taperPin', finish: 'mildSteel' },
+  { type: 'plug', finish: 'nylonBlack' },
+  { type: 'bolt', head: 'flange', diameter: 8, length: 30, finish: 'zinc' },
+  { type: 'bolt', head: 'carriage', diameter: 8, length: 40, finish: 'zinc' },
+  { type: 'nut', head: 'dome', diameter: 10, finish: 'zinc' },
   { type: 'stud', finish: 'zinc' },
   { type: 'cotterPin', finish: 'zinc' },
   { type: 'cam', finish: 'zinc' },
@@ -295,7 +306,7 @@ function fromQuery() {
   }
 }
 
-/* ─────────── render mode: /lab?render=<category slug> ───────────
+/* ─────────── render mode: /lab?render=<category slug> | item:<model key> ───────────
    Used by scripts/render-products.mjs. Renders the category exactly like its live card /
    category stage at rest (same parts and detail, fit, camera, environment and lights; a
    transparent background), so the poster image and the live 3D that replaces it are the
@@ -332,8 +343,9 @@ function RenderScene({ category }) {
 }
 
 function RenderMode({ slug }) {
-  const category = categories.find((c) => c.slug === slug)
-  if (!category) return <p className="p-6 font-mono">Unknown category: {slug}</p>
+  // `<category slug>` or `item:<itemModels key>` (catalogue items with a 3D model, phase 12B)
+  const category = slug.startsWith('item:') ? itemModels[slug.slice(5)] : categories.find((c) => c.slug === slug)
+  if (!category) return <p className="p-6 font-mono">Unknown render target: {slug}</p>
   return (
     <div className="fixed inset-0">
       <Canvas className="!absolute inset-0" dpr={1} gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }} frameloop="demand">

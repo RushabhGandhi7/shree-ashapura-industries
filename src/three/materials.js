@@ -57,7 +57,7 @@ export function finishParams(finish = 'zinc', role = 'main') {
     metalness: f.metalness,
     roughness,
     envMapIntensity,
-    anisotropy: !dark ? f.aniso ?? 0 : 0,
+    anisotropy: !dark && role !== 'smooth' ? f.aniso ?? 0 : 0, // smooth: spun / pressed domes, no turning marks
     clearcoat: f.clearcoat ?? 0,
     iridescence: !dark ? f.iridescence ?? 0 : 0,
     sheen: f.metalness === 0 ? 0.25 : 0,
@@ -76,7 +76,7 @@ function applyExtras(m) {
 
 /**
  * @param {string} finish  key of `finishes` in src/data/products.js
- * @param {'main'|'dark'|'nylon'|'knurl'} role
+ * @param {'main'|'dark'|'nylon'|'knurl'|'black'|'smooth'} role
  * @param {'high'|'low'} quality
  */
 export function getMaterial(finish = 'zinc', role = 'main', quality = 'high') {

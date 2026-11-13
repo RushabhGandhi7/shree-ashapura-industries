@@ -4,6 +4,7 @@
 // exactly like behind the live canvas) plus an Open Graph collage
 // (public/products/og-products.webp, 1200×630).
 //
+//   (phase 12B) also one poster per `itemModels` entry: public/products/items/<key>.webp
 //   npm run render:products            # starts Vite on :5179 for the run
 //   BASE_URL=http://localhost:5173 npm run render:products   # reuse a running dev server
 //
@@ -21,7 +22,10 @@ const OUT = path.join(ROOT, 'public/products')
 const W = 1600 // ≥ 2× every container that shows it (cards, category stage)
 const H = 1200
 
-const { categories } = await import(pathToFileURL(path.join(ROOT, 'src/data/products.js')).href)
+const { categories, itemModels } = await import(pathToFileURL(path.join(ROOT, 'src/data/products.js')).href)
+const ITEMS_OUT = path.join(OUT, 'items')
+const IW = 1200 // item cards are smaller (≤ ~400 px wide): 1200×900 is ≥ 2× (phase 12B)
+const IH = 900
 
 async function startServer() {
   if (process.env.BASE_URL) return { url: process.env.BASE_URL, stop: () => {} }
@@ -68,10 +72,25 @@ try {
     console.log(`${c.slug}.webp  ${(info.size / 1024).toFixed(0)} kB`)
   }
 
+  // Catalogue items with a 3D model: public/products/items/<key>.webp (transparent poster)
+  await mkdir(ITEMS_OUT, { recursive: true })
+  await page.setViewportSize({ width: IW, height: IH })
+  for (const key of Object.keys(itemModels)) {
+    await page.goto(`${server.url}/lab?render=item:${key}`)
+    await page.waitForFunction(() => window.__renderReady === true, null, { timeout: 30000 })
+    await page.addStyleTag({ content: 'html, body { background: transparent !important }' })
+    await page.waitForTimeout(300)
+    const png = await page.locator('canvas').screenshot({ omitBackground: true })
+    const info = await sharp(png).resize(IW, IH).webp({ quality: 82, alphaQuality: 90, effort: 6 }).toFile(path.join(ITEMS_OUT, `${key}.webp`))
+    console.log(`items/${key}.webp  ${(info.size / 1024).toFixed(0)} kB`)
+  }
+
   // Open Graph collage: 4 × 2 tiles on paper, 1200 × 630
   const tw = 300
   const th = 225
-  const tiles = await Promise.all(files.map((f) => sharp(f).resize(tw, th).toBuffer()))
+  // 7 category renders + item posters to fill the 4 × 2 grid (no empty tile)
+  const fill = Object.keys(itemModels).slice(0, Math.max(0, 8 - files.length)).map((k) => path.join(ITEMS_OUT, `${k}.webp`))
+  const tiles = await Promise.all([...files, ...fill].slice(0, 8).map((f) => sharp(f).resize(tw, th).toBuffer()))
   const head = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90">
     <svg x="36" y="27" width="60" height="38" viewBox="${MARK.viewBox}"><path fill="${MARK.ink}" d="${MARK.d}"/><circle fill="${MARK.dot.fill}" cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}"/></svg>
     <text x="112" y="56" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#1E1F21">SHREE ASHAPURA INDUSTRIES</text>

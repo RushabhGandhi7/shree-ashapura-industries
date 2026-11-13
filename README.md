@@ -98,7 +98,9 @@ Anything marked `// PLACEHOLDER` is sample content to replace (today only the dr
 Edit `src/data/content.js`. Components read only from `content`. To add a language, copy the `en` object to `hi` or `gu`, translate it, and point `content` at the locale you want (`export const content = locales.hi`), or add a switcher.
 
 ### Swap products
-Edit `categories` in `src/data/products.js`: name, blurb, `items`, `materials`, `notes`. Each card's 3D model comes from `parts`, a list of part specs:
+Every product the site lists is one entry in `catalogueItems` in `src/data/content.js`: `{ slug, name, category, group?, spec?, model?, drawing, photo }`. Category pages, the /products search, SEO text and the quote form all read it. To show a real photo of an item, put the file in `public/products/photos/` and set its `photo` path; until then the card shows a blueprint drawing (`drawing`, see `src/components/products/ItemDrawing.jsx`) or, if `model` is set, live 3D from `itemModels` in `src/data/products.js`. `npm run check:catalogue` (after a build) counts items per category and confirms each one is on its page.
+
+The category cards themselves are `categories` in `src/data/products.js`: name, blurb, `materials`, `notes`. Each card's 3D model comes from `parts`, a list of part specs:
 
 ```js
 parts: [{ type: 'bolt', head: 'hex', diameter: 10, length: 30, finish: 'zinc' }]

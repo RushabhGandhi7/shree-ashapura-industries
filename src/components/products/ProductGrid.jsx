@@ -1,4 +1,4 @@
-// The 8 category cards with live 3D (one shared canvas, drei Views), used on /products
+// The 7 category cards with live 3D (one shared canvas, drei Views), used on /products
 // and on Home. Each card shows its pre-rendered WebP (public/products/) as a poster until
 // its live view has drawn a frame. The canvas mounts only while the grid holds the page's
 // WebGL slot (src/lib/glGate.js: near the viewport, at most one canvas per page).
@@ -12,6 +12,8 @@ import { hasFinePointer, hasWebGL, partDetail, prefersReducedMotion } from '../.
 
 const ProductViews = lazy(() => import('./ProductViews.jsx'))
 const t = content.products
+// 3D entries for the shared canvas: one per category card (key = slug)
+const ENTRIES = categories.map((c) => ({ key: c.slug, parts: c.parts, pose: c.pose }))
 
 class Boundary extends Component {
   state = { failed: false }
@@ -184,7 +186,7 @@ export default function ProductGrid({ compact = false, Hc = 'h3', className = ''
       {live3D && (
         <Boundary onFail={() => setGlFailed(true)}>
           <Suspense fallback={null}>
-            <ProductViews slots={slots} container={grid} touch={profile.touch} quality={profile.quality} reduced={profile.reduced} />
+            <ProductViews entries={ENTRIES} slots={slots} container={grid} touch={profile.touch} quality={profile.quality} reduced={profile.reduced} />
           </Suspense>
         </Boundary>
       )}

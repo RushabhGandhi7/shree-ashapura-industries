@@ -80,6 +80,127 @@ const mSpec = (key) => {
   return `${m.count} machines · ${m.min} – ${m.max} ${m.unit}`
 }
 
+/* ── Full product catalogue (phase 12B) ───────────────────────────────────────────────
+   Every product in the client's catalogue, by name. One item = { slug, name, category,
+   group?, spec?, model?, drawing, photo }:
+     category  category slug (categories in products.js)
+     group     sub-heading inside a category (screws / bolts / nuts)
+     spec      short spec line, only where the catalogue states it
+     model     key into `itemModels` (products.js): real procedural 3D in the shared canvas
+     drawing   line-drawing family (components/products/ItemDrawing.jsx) when there is no model
+     photo     path to a real photo (e.g. '/products/photos/<slug>.webp'); null = "Photo coming"
+   No catalogue photos, ever. Slugs are unique across the whole catalogue (deep links:
+   /products/<category>#<slug>). */
+const SBN = 'screws-fasteners'
+const W = 'washers'
+const PL = 'plastic-components'
+const BR = 'brackets-press-parts'
+const BS = 'brass-parts'
+const ST = 'studs-pins-turned'
+const FF = 'furniture-fittings'
+const item = (slug, name, category, o = {}) => ({ slug, name, category, group: null, spec: null, model: null, drawing: 'moulded', photo: null, ...o })
+const screw = (slug, name, o) => item(slug, name, SBN, { group: 'screws', drawing: 'screw', ...o })
+const bolt = (slug, name, o) => item(slug, name, SBN, { group: 'bolts', drawing: 'bolt', ...o })
+const nut = (slug, name, o) => item(slug, name, SBN, { group: 'nuts', drawing: 'nut', ...o })
+
+export const catalogueItems = [
+  // 1 · Screws, Bolts & Nuts — screws
+  screw('hex-screw', 'Hex screw', { drawing: 'hexScrew' }),
+  screw('phillips-pan-head-screw', 'Phillips pan-head screw', { model: 'panScrew' }),
+  screw('slotted-screw', 'Slotted screw', { drawing: 'slottedScrew' }),
+  screw('countersunk-screw', 'Countersunk screw', { drawing: 'cskScrew' }),
+  screw('chipboard-screw', 'Chipboard screw', { model: 'chipboardScrew' }),
+  screw('machine-screw', 'Machine screw', { drawing: 'machineScrew' }),
+  screw('special-screw', 'Special (SPL) screw', { drawing: 'splScrew' }),
+  screw('projection-weld-screw', 'Projection weld screw', { drawing: 'weldScrew' }),
+  screw('step-screw', 'Step screw', { drawing: 'stepScrew' }),
+  screw('flange-screw', 'Flange screw', { drawing: 'flangeBolt' }),
+  screw('self-tapping-screw', 'Self-tapping screw', { drawing: 'tappingScrew' }),
+  screw('screw-assortment-set', 'Screw assortment set', { drawing: 'set' }),
+  // bolts
+  bolt('hex-bolt', 'Hex bolt', { model: 'hexBolt' }),
+  bolt('nut-bolt', 'Nut bolt', { drawing: 'nutBolt' }),
+  bolt('step-bolt', 'Step bolt', { drawing: 'stepScrew' }),
+  bolt('carriage-bolt', 'Carriage bolt', { model: 'carriageBolt' }),
+  bolt('flange-bolt', 'Flange bolt', { model: 'flangeBolt' }),
+  bolt('projection-weld-bolt', 'Projection weld bolt', { drawing: 'weldScrew' }),
+  bolt('bolt-nut-washer-set', 'Bolt + nut + washer set', { drawing: 'set' }),
+  // nuts
+  nut('hex-nut', 'Hex nut', { model: 'hexNut' }),
+  nut('thin-lock-nut', 'Thin / lock nut', { drawing: 'thinNut' }),
+  nut('nyloc-nut', 'Nyloc nut', { model: 'nylocNut' }),
+  nut('flange-nut', 'Flange (serrated) nut', { model: 'flangeNut' }),
+  nut('castle-nut', 'Castle nut', { drawing: 'castleNut' }),
+  nut('dome-nut', 'Dome nut', { model: 'domeNut' }),
+  nut('brass-nut', 'Brass nut', { spec: 'Brass' }),
+
+  // 2 · Washers (finishes: zinc, steel or black)
+  item('plain-washer', 'Plain washer', W, { model: 'plainWasher', spec: 'Zinc / steel / black' }),
+  item('spring-washer', 'Spring washer', W, { model: 'springWasher', spec: 'Zinc / steel / black' }),
+  item('circlip', 'Circlip', W, { drawing: 'circlip', spec: 'Zinc / steel / black' }),
+  item('star-lock-washer', 'Star / tooth lock washer', W, { drawing: 'starWasher', spec: 'Zinc / steel / black' }),
+  item('fibre-washer', 'Fibre / coloured washer', W, { drawing: 'washer' }), // CONFIRM fibre / coloured washer
+
+  // 3 · Plastic Components
+  item('round-cap-leg', 'Cap / leg (round)', PL, { drawing: 'cap' }),
+  item('plastic-plug', 'Plastic plug', PL, { model: 'plasticPlug' }),
+  item('rectangular-tube-end-cap', 'Rectangular tube end cap', PL, { drawing: 'rectCap' }),
+  item('square-tube-end-cap', 'Square tube end cap', PL, { drawing: 'squareCap' }),
+  item('moulded-plastic-parts', 'Moulded plastic parts (plastic compound)', PL, { drawing: 'moulded' }),
+  item('leveller', 'Leveller', PL, { drawing: 'leveller' }),
+  item('leveller-bolt', 'Leveller bolt', PL, { model: 'levellerBolt' }),
+  item('adjustable-glide-base', 'Adjustable glide base', PL, { drawing: 'glide' }),
+  item('nylon-bush-ring', 'Nylon bush / ring', PL, { drawing: 'bush', spec: 'Nylon' }),
+  item('nylon-cam-wheel', 'Nylon cam wheel', PL, { drawing: 'camWheel', spec: 'Nylon' }),
+  // unnamed "new solutions" parts
+  item('cream-nylon-ring', 'Cream nylon ring', PL, { drawing: 'ring', spec: 'Nylon' }), // CONFIRM name
+  item('brown-two-hole-plate', 'Brown 2-hole plate', PL, { drawing: 'plate2' }), // CONFIRM name
+  item('cream-nylon-disc', 'Cream nylon disc', PL, { drawing: 'disc', spec: 'Nylon' }), // CONFIRM name
+  item('black-moulded-part', 'Black moulded part', PL, { drawing: 'moulded' }), // CONFIRM name
+
+  // 4 · Brackets & Press Parts
+  item('l-bracket', 'L bracket', BR, { model: 'lBracket' }),
+  item('c-bracket', 'C bracket', BR, { drawing: 'cBracket' }),
+  item('t-plate', 'T plate', BR, { drawing: 'tPlate' }),
+  item('flat-plate-with-holes', 'Flat plate with holes', BR, { drawing: 'plate' }),
+  item('corner-bracket', 'Corner bracket', BR, { drawing: 'corner' }),
+  item('u-clamp-bracket', 'U-clamp bracket', BR, { drawing: 'uClamp' }),
+  item('press-sheet-metal-parts', 'Press / sheet-metal parts', BR, { drawing: 'press' }),
+
+  // 5 · Brass Parts
+  item('knurled-turned-bush', 'Knurled turned bush', BS, { model: 'brassBush', spec: 'Brass' }),
+  item('brass-nozzle', 'Brass nozzle', BS, { drawing: 'nozzle', spec: 'Brass' }),
+  item('brass-turned-pin', 'Brass turned pin', BS, { drawing: 'pin', spec: 'Brass' }),
+  item('brass-cross-connector', 'Brass cross connector', BS, { drawing: 'cross', spec: 'Brass' }),
+  item('brass-bush', 'Brass bush', BS, { drawing: 'bush', spec: 'Brass' }),
+
+  // 6 · Studs, Pins & Turned Parts
+  item('stud', 'Stud (threaded both ends)', ST, { drawing: 'stud' }),
+  item('machine-part', 'Machine part (turned / hex / square rod)', ST, { drawing: 'rod' }),
+  item('taper-pin', 'Taper pin', ST, { model: 'taperPin' }),
+  item('cotter-pin', 'Cotter pin', ST, { model: 'cotterPin' }),
+  item('dowel-pin', 'Dowel pin', ST, { drawing: 'dowelPin' }),
+  item('knurled-axle', 'Axle / rod with double-side knurling', ST, { model: 'knurledAxle' }),
+
+  // 7 · Furniture Fittings & Cams
+  item('cam', 'Cam', FF, { model: 'cam' }),
+  item('cam-lock-with-keys', 'Cam lock with keys', FF, { drawing: 'camLock' }),
+  item('door-handle', 'Door handle', FF, { drawing: 'handle' }),
+  item('bed-handle', 'Bed handle', FF, { drawing: 'bedHandle' }),
+  item('threaded-insert', 'Threaded insert (ribbed / knurled)', FF, { drawing: 'insert' }),
+  item('cam-connector-bolt', 'Cam connector bolt', FF, { drawing: 'connector' }),
+  item('wooden-dowel', 'Wooden dowel', FF, { drawing: 'woodDowel' }),
+  item('slide-clip-fitting', 'Slide / clip fitting', FF, { drawing: 'slide' }),
+  item('metal-cup-ferrule', 'Metal cup / ferrule', FF, { drawing: 'cup' }),
+  item('furniture-lock-fastener-kits', 'Furniture and lock fastener kits', FF, { drawing: 'kit' }),
+  // unnamed "new solutions" parts
+  item('metal-cup', 'Metal cup', FF, { drawing: 'cup' }), // CONFIRM name
+  item('zinc-cam-housing', 'Zinc cam housing', FF, { drawing: 'camHousing', spec: 'Zinc' }), // CONFIRM name
+]
+
+/** Items of one category, in catalogue order. */
+export const itemsOf = (category) => catalogueItems.filter((i) => i.category === category)
+
 /** Whole years in business, computed so it never goes stale. */
 export const yearsInBusiness = () => new Date().getFullYear() - company.founded
 
@@ -148,6 +269,20 @@ const en = {
       materialsLabel: 'Materials',
       materials: ['M.S.', 'S.S.', 'Brass', 'Aluminium', 'Copper', 'EN8 high tensile', 'Plastic'],
       kits: 'We make kits for furniture and locks, and parts to your drawing and raw material.',
+    },
+    // searchable list of every catalogue item (phase 12B)
+    index: {
+      label: 'Full catalogue',
+      title: 'Every product, by name.',
+      lead: 'Search the full list or filter by product line. Each item links to its card on the product line page.',
+      search: 'Search products',
+      placeholder: 'e.g. nyloc, bracket, brass',
+      all: 'All',
+      filterLabel: 'Filter by product line',
+      results: (n, total) => (n === total ? `${total} products` : `${n} of ${total} products`),
+      none: 'No product matches. We also make parts to your drawing.',
+      noneCta: 'Custom orders',
+      model3d: '3D',
     },
     drawer: {
       close: 'Close',
@@ -464,6 +599,17 @@ const en = {
     related: 'Related product lines',
     view: 'View range',
     imageAlt: (name) => `${name}: rendered example parts`,
+    // item grid (phase 12B)
+    count: (n) => `${n} ${n === 1 ? 'item' : 'items'}`,
+    groups: { screws: 'Screw', bolts: 'Bolt', nuts: 'Nut' },
+    groupSummary: (g) => g.map(([label, n]) => `${n} ${label.toLowerCase()}${n === 1 ? '' : 's'}`).join(' · '),
+    photoComing: 'Photo coming',
+    itemCode: (code, i) => `${code}-${String(i + 1).padStart(2, '0')}`,
+    itemAlt: (name) => `${name}: rendered part`,
+    photoAlt: (name) => `${name}: photo`,
+    notListed: 'Not listed?',
+    notListedText: 'We make parts to your drawing or sample.',
+    notListedCta: 'Custom orders',
   },
   howCustom: {
     label: 'How custom orders work',

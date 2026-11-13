@@ -4,7 +4,7 @@
 //   head: variant key from `variants[type]`
 //   diameter / length / pitch in mm, finish: key of `finishes`.
 
-import { CUSTOMER_NAMES } from './content.js'
+import { CUSTOMER_NAMES, itemsOf } from './content.js'
 
 // Surface finishes. Colours / PBR values are read by src/three/materials.js.
 // `aniso` = strength of the brushed/turned highlight; `clearcoat` / `iridescence` are optional extras.
@@ -30,8 +30,8 @@ export const metalFinishes = ['zinc', 'blackOxide', 'brass', 'stainless', 'redAn
 
 /** Variants per part type (the `head` prop of <Fastener />). */
 export const variants = {
-  bolt: { hex: 'Hex head', socket: 'Socket head', pan: 'Pan head', countersunk: 'Countersunk' },
-  nut: { hex: 'Hex nut', nyloc: 'Nyloc', flange: 'Flange nut', wing: 'Wing nut' },
+  bolt: { hex: 'Hex head', socket: 'Socket head', pan: 'Pan head', countersunk: 'Countersunk', flange: 'Hex flange', carriage: 'Carriage' },
+  nut: { hex: 'Hex nut', nyloc: 'Nyloc', flange: 'Flange nut', wing: 'Wing nut', dome: 'Dome nut' },
   washer: { flat: 'Plain', spring: 'Spring', star: 'Star', circlip: 'Circlip', cap: 'Cap' },
   screw: {
     pan: 'Pan head',
@@ -56,10 +56,13 @@ export const variants = {
   leveller: { hex: 'Leveller' },
   insert: { threaded: 'Threaded insert', knurled: 'Knurled brass bush' },
   axle: { knurled: 'Axle / rod, double-side knurl' },
+  taperPin: { plain: 'Taper pin' },
+  plug: { finned: 'Tube end plug' },
 }
 
 // The 7 "What we make" cards. Item lists from the client's new catalogue (phase 11, client-assets/CLIENT_FACTS.md).
-// `items` / `materials` / `notes` are the client's own lists (shown in the drawer).
+// `items` (names) is derived from `catalogueItems` in content.js (the full catalogue, phase 12B);
+// `materials` / `notes` are the client's own lists.
 // `parts` are rendered with the procedural library (src/three, detail "low"); `pose.tilt`
 // angles the group in the card and the hover spin turns it about its own axis.
 // `image` is rendered from /lab by `npm run render:products` (never a catalogue photo).
@@ -75,7 +78,6 @@ export const categories = [
       { type: 'screw', head: 'combiWasher', diameter: 5, length: 16, finish: 'zinc', position: [0.7, 0.9, 0] },
     ],
     pose: { tilt: [0, 0, -1.05] },
-    items: ['Hex screw', 'Nut bolt', 'Step bolt', 'Projection weld screw', 'Phillips screw', 'Chipboard screw', 'Carriage bolt', 'Flange bolt', 'Special screws', 'Dome nut', 'Nyloc nut', 'Flange nut'],
     materials: [],
     notes: ['Special sizes made to your drawing.'],
   },
@@ -91,7 +93,6 @@ export const categories = [
       { type: 'washer', head: 'star', diameter: 12, finish: 'zinc', position: [1.15, 0, 0.75] },
     ],
     pose: { tilt: [0.75, 0, 0] },
-    items: ['Plain washer', 'Spring washer', 'Circlip', 'Lock washer'],
     materials: [],
     notes: [],
   },
@@ -103,7 +104,6 @@ export const categories = [
     callout: 'M8 stud',
     parts: [{ type: 'leveller', diameter: 8, length: 28, finish: 'zinc' }],
     pose: { tilt: [0.35, 0, 0] },
-    items: ['Caps and legs', 'Leveller', 'Adjustable glide base', 'Moulded plastic parts'],
     materials: ['PP', 'LD', 'ABS', 'HD-Nylon', 'EPDM'], // CONFIRM EPDM
     notes: ['Colour as required.'],
   },
@@ -118,7 +118,6 @@ export const categories = [
       { type: 'bracket', head: 'T', diameter: 14, length: 50, finish: 'zinc', position: [2.0, 0.2, 0.5], rotation: [0, 0.4, 0] },
     ],
     pose: { tilt: [0.35, 0.5, 0] },
-    items: ['L bracket', 'C bracket', 'Press parts'],
     materials: [],
     notes: [],
   },
@@ -130,7 +129,6 @@ export const categories = [
     callout: 'Ø6 knurl',
     parts: [{ type: 'insert', head: 'knurled', diameter: 6, length: 14, finish: 'brass' }], // the knurled brass turned bush only
     pose: { tilt: [0.55, 0, 0.3] },
-    items: ['Nozzles', 'Turned brass parts', 'Pins'],
     materials: ['Brass'],
     notes: ['Size as required.'],
   },
@@ -146,7 +144,6 @@ export const categories = [
       { type: 'axle', head: 'knurled', diameter: 8, length: 50, finish: 'mildSteel', position: [1.5, -0.4, 0] },
     ],
     pose: { tilt: [0, 0, -0.35] },
-    items: ['Studs', 'Taper pin', 'Cotter pin', 'Axle / rod with double-side knurling', 'Machine parts'],
     materials: [],
     notes: ['Made to your drawing or sample.'],
   },
@@ -161,11 +158,38 @@ export const categories = [
       { type: 'insert', head: 'threaded', diameter: 6, length: 13, finish: 'zinc', position: [0.85, 0.3, 0] },
     ],
     pose: { tilt: [0.5, -0.5, 0] },
-    items: ['Cams', 'Door handles', 'Bed handles', 'Lock components'],
     materials: [],
     notes: [],
   },
-].map((c) => ({ ...c, image: `/products/${c.slug}.webp` }))
+].map((c) => ({ ...c, image: `/products/${c.slug}.webp`, items: itemsOf(c.slug).map((i) => i.name) }))
+
+/**
+ * Real procedural 3D for the priority catalogue items (phase 12B), keyed by `model` in
+ * `catalogueItems` (content.js). Same shape as a category card: `parts` + `pose.tilt`.
+ * Rendered in the category page's single shared canvas; posters from `npm run render:products`
+ * (public/products/items/<key>.webp).
+ */
+export const itemModels = {
+  hexBolt: { parts: [{ type: 'bolt', head: 'hex', diameter: 10, length: 40, finish: 'zinc' }], pose: { tilt: [0, 0, -0.9] } },
+  carriageBolt: { parts: [{ type: 'bolt', head: 'carriage', diameter: 8, length: 40, finish: 'zinc' }], pose: { tilt: [0, 0, -0.9] } },
+  flangeBolt: { parts: [{ type: 'bolt', head: 'flange', diameter: 8, length: 30, finish: 'zinc' }], pose: { tilt: [0, 0, -0.9] } },
+  panScrew: { parts: [{ type: 'screw', head: 'pan', diameter: 5, length: 20, finish: 'zinc' }], pose: { tilt: [0, 0, -0.9] } },
+  chipboardScrew: { parts: [{ type: 'screw', head: 'cskPhillips', diameter: 4.2, length: 40, finish: 'yellowZinc' }], pose: { tilt: [0, 0, -0.9] } },
+  hexNut: { parts: [{ type: 'nut', head: 'hex', diameter: 10, finish: 'zinc' }], pose: { tilt: [0.7, 0, 0] } },
+  nylocNut: { parts: [{ type: 'nut', head: 'nyloc', diameter: 10, finish: 'stainless' }], pose: { tilt: [0.7, 0, 0] } },
+  flangeNut: { parts: [{ type: 'nut', head: 'flange', diameter: 10, finish: 'zinc' }], pose: { tilt: [0.7, 0, 0] } },
+  domeNut: { parts: [{ type: 'nut', head: 'dome', diameter: 10, finish: 'zinc' }], pose: { tilt: [0.5, 0, 0] } },
+  plainWasher: { parts: [{ type: 'washer', head: 'flat', diameter: 12, finish: 'zinc' }], pose: { tilt: [0.8, 0, 0] } },
+  springWasher: { parts: [{ type: 'washer', head: 'spring', diameter: 12, finish: 'blackOxide' }], pose: { tilt: [0.8, 0, 0] } },
+  taperPin: { parts: [{ type: 'taperPin', diameter: 6, length: 40, finish: 'mildSteel' }], pose: { tilt: [0, 0, -0.9] } },
+  cotterPin: { parts: [{ type: 'cotterPin', diameter: 3, length: 30, finish: 'zinc' }], pose: { tilt: [0, 0, -0.9] } },
+  lBracket: { parts: [{ type: 'bracket', head: 'angle', diameter: 20, length: 40, finish: 'zinc' }], pose: { tilt: [0.35, 0.5, 0] } },
+  knurledAxle: { parts: [{ type: 'axle', head: 'knurled', diameter: 8, length: 50, finish: 'mildSteel' }], pose: { tilt: [0, 0, -0.9] } },
+  brassBush: { parts: [{ type: 'insert', head: 'knurled', diameter: 6, length: 14, finish: 'brass' }], pose: { tilt: [0.55, 0, 0.3] } },
+  cam: { parts: [{ type: 'cam', diameter: 5, finish: 'zinc' }], pose: { tilt: [0.6, -0.4, 0] } },
+  levellerBolt: { parts: [{ type: 'leveller', diameter: 8, length: 28, finish: 'zinc' }], pose: { tilt: [0.35, 0, 0] } },
+  plasticPlug: { parts: [{ type: 'plug', diameter: 25, length: 18, finish: 'nylonBlack' }], pose: { tilt: [0.5, 0, 0] } },
+}
 
 /** Customers (approved for the site; shown when SHOW_CUSTOMERS in content.js). Names: CUSTOMER_NAMES in content.js (// CONFIRM list and logo files). Set `logo: '/brand/customers/<file>.svg'` when files arrive. */
 const customerLogos = {}

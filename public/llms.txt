@@ -16,13 +16,13 @@
 
 Range: M2 to M14 / #2 to #14, length 3 to 100 mm. Materials: M.S., S.S., brass, aluminium, copper, EN8 high tensile, plastic. Kits for furniture and locks; parts made to customer drawings and raw material.
 
-- [Screws, Bolts & Nuts](/products/screws-fasteners): hex screw, nut bolt, step bolt, projection weld screw, Phillips screw, chipboard screw, carriage bolt, flange bolt, special screws, dome nut, nyloc nut, flange nut
-- [Washers](/products/washers): plain, spring, circlip, lock washers
-- [Plastic Components](/products/plastic-components): caps and legs, leveller, adjustable glide base, moulded plastic parts (PP, LD, ABS, HD-Nylon, EPDM; colour as required)
-- [Brackets & Press Parts](/products/brackets-press-parts): L bracket, C bracket, press parts
-- [Brass Parts](/products/brass-parts): nozzles, turned brass parts, pins (size as required)
-- [Studs, Pins & Turned Parts](/products/studs-pins-turned): studs, taper pin, cotter pin, machine parts
-- [Furniture Fittings & Cams](/products/furniture-fittings): cams, door handles, bed handles, lock components
+- [Screws, Bolts & Nuts](/products/screws-fasteners): Hex screw, Phillips pan-head screw, Slotted screw, Countersunk screw, Chipboard screw, Machine screw, Special (SPL) screw, Projection weld screw, Step screw, Flange screw, Self-tapping screw, Screw assortment set, Hex bolt, Nut bolt, Step bolt, Carriage bolt, Flange bolt, Projection weld bolt, Bolt + nut + washer set, Hex nut, Thin / lock nut, Nyloc nut, Flange (serrated) nut, Castle nut, Dome nut, Brass nut
+- [Washers](/products/washers): Plain washer, Spring washer, Circlip, Star / tooth lock washer, Fibre / coloured washer
+- [Plastic Components](/products/plastic-components): Cap / leg (round), Plastic plug, Rectangular tube end cap, Square tube end cap, Moulded plastic parts (plastic compound), Leveller, Leveller bolt, Adjustable glide base, Nylon bush / ring, Nylon cam wheel, Cream nylon ring, Brown 2-hole plate, Cream nylon disc, Black moulded part
+- [Brackets & Press Parts](/products/brackets-press-parts): L bracket, C bracket, T plate, Flat plate with holes, Corner bracket, U-clamp bracket, Press / sheet-metal parts
+- [Brass Parts](/products/brass-parts): Knurled turned bush, Brass nozzle, Brass turned pin, Brass cross connector, Brass bush
+- [Studs, Pins & Turned Parts](/products/studs-pins-turned): Stud (threaded both ends), Machine part (turned / hex / square rod), Taper pin, Cotter pin, Dowel pin, Axle / rod with double-side knurling
+- [Furniture Fittings & Cams](/products/furniture-fittings): Cam, Cam lock with keys, Door handle, Bed handle, Threaded insert (ribbed / knurled), Cam connector bolt, Wooden dowel, Slide / clip fitting, Metal cup / ferrule, Furniture and lock fastener kits, Metal cup, Zinc cam housing
 - Custom products made to your drawing (AutoCAD 2D & 3D)
 
 ## Manufacturing (units 24 & 25)

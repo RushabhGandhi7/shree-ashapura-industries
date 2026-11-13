@@ -7,7 +7,7 @@
 import * as THREE from 'three'
 import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { makeBuilders, ring, stitch, up, down, arc, TAU } from './lib/builder.js'
-import { lathe, roundedRectProfile } from './lib/lathe.js'
+import { lathe, roundedRectProfile, ellipseDomeGroups } from './lib/lathe.js'
 import { threadSurface, minorRadius } from './lib/thread.js'
 import { hexPrism } from './lib/hex.js'
 import { hexSocket, crossRecess } from './lib/recess.js'
@@ -18,7 +18,7 @@ import { HEAD } from './headGeometry.js'
 
 export const mm = (v) => v / 10
 export const SEGMENTS = { high: 48, low: 24 }
-const ROLES = ['main', 'dark', 'nylon', 'knurl', 'black']
+const ROLES = ['main', 'dark', 'nylon', 'knurl', 'black', 'smooth']
 
 /* ───────────────────────── shared pieces ───────────────────────── */
 
@@ -101,6 +101,54 @@ export function head(B, kind, { d, D, R, N, detail, shankPts, drive }) {
       const hp = hexPrism(main, { s: S, y0: WF, y1: K, chamferTop: true, rCh: HEAD.hex.chamfer * S, detail })
       stitch(main, hp.botLoop, ring(DW / 2, WF, N), down)
       stitch(main, hp.topLoop, [[0, K, 0]], up)
+      return K
+    }
+    case 'flange': {
+      // hex flange bolt (phase 12B): plain flange disc under a hex, the flange-nut profile
+      const { s } = dims.hex
+      const S = mm(s)
+      const K = mm(dims.hex.k) * 1.25
+      const rF = mm(nutDims(d).flange.dc) / 2
+      const fH = K * 0.3
+      const e = K * 0.06
+      lathe(
+        [
+          { pts: [...shankPts, [rF - e, 0]], builder: main },
+          { pts: [[rF - e, 0], [rF, e]], builder: main },
+          { pts: [[rF, e], [rF, fH * 0.45]], builder: main },
+          { pts: [[rF, fH * 0.45], [S * 0.47, fH]], builder: main },
+        ],
+        { segments: N },
+      )
+      const hp = hexPrism(main, { s: S, y0: fH * 0.6, y1: K, chamferTop: true, rCh: HEAD.hex.chamfer * S, detail })
+      stitch(main, hp.topLoop, [[0, K, 0]], up)
+      return K
+    }
+    case 'carriage': {
+      // carriage bolt (phase 12B): low mushroom dome over a square neck that locks in the wood
+      const Rh = R * 2.15
+      const K = D * 0.55
+      const yn = D * 0.6 // square neck height, under the bearing face (y < 0)
+      const Rs = R * 1.04 // half the neck's square side
+      const square = (phi, r) => (r >= Rs - 1e-9 ? Rs / Math.max(Math.abs(Math.sin(phi)), Math.abs(Math.cos(phi))) : r)
+      // the round shank runs on inside the neck (Rs > R), so the neck just wraps it
+      lathe([{ pts: [...shankPts, [Rh - K * 0.08, 0]], builder: main }], { segments: N })
+      lathe(
+        [
+          { pts: [[R * 0.98, -yn], [Rs, -yn]], builder: main, mod: square },
+          { pts: [[Rs, -yn], [Rs, 0]], builder: main, mod: square },
+        ],
+        { segments: N },
+      )
+      // rim edge, then a quarter-ellipse dome with analytic normals (smooth at the pole)
+      const e = K * 0.12
+      lathe(
+        [
+          { pts: [[Rh - K * 0.08, 0], [Rh, e]], builder: B.smooth },
+          ...ellipseDomeGroups(B.smooth, Rh, e, K - e, hi ? 14 : 7),
+        ],
+        { segments: N },
+      )
       return K
     }
     case 'socket': {
@@ -312,6 +360,20 @@ function nut(B, p) {
         { segments: N },
       )
       inner(0, H)
+      break
+    }
+    case 'dome': {
+      // dome (acorn) nut, phase 12B: hex body with a closed dome cap, blind thread
+      const S = mm(nd.hex.s)
+      const M = mm(nd.hex.m)
+      const rD = S * 0.47
+      const hD = rD * 0.95
+      const hp = hexPrism(main, { s: S, y0: 0, y1: M, chamferTop: false, chamferBot: true, detail: p.detail })
+      stitch(main, hp.botLoop, ring(cs, 0, N), down)
+      stitch(main, hp.topLoop, ring(rD, M, N), up)
+      lathe(ellipseDomeGroups(B.smooth, rD, M, hD, p.detail === 'low' ? 6 : 12), { segments: N })
+      inner(0, M * 0.92, { csTop: R * 0.98 })
+      lathe([{ pts: [[R * 0.98, M * 0.92], [0, M * 0.92]], builder: B.dark }], { segments: N })
       break
     }
     case 'wing': {

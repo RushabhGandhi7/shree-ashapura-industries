@@ -1,6 +1,6 @@
 import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { content } from '../data/content.js'
+import { content, itemsOf } from '../data/content.js'
 import { categories } from '../data/products.js'
 import { findPage } from '../routes.js'
 import { whatsappHref, telHref } from '../lib/contact.js'
@@ -12,7 +12,7 @@ import SectionHead from '../components/ui/SectionHead.jsx'
 import MonoLabel from '../components/ui/MonoLabel.jsx'
 import { PhoneIcon, WhatsAppIcon } from '../components/ui/Icons.jsx'
 import QuoteCTA from '../components/quote/QuoteCTA.jsx'
-import { quoteStore } from '../lib/quoteStore.js'
+import ItemGrid from '../components/products/ItemGrid.jsx'
 import NotFound from './NotFound.jsx'
 import { useGLGate, useGLHold } from '../lib/glGate.js'
 
@@ -71,6 +71,9 @@ export default function Category() {
   }, [allowed])
   if (!c) return <NotFound slug={slug} />
   const page = findPage(`/products/${c.slug}`)
+  const items = itemsOf(c.slug)
+  // sub-groups (screws / bolts / nuts) in catalogue order, with counts
+  const groups = [...new Set(items.map((i) => i.group).filter(Boolean))].map((g) => [t.groups[g], items.filter((i) => i.group === g).length])
 
   return (
     <>
@@ -119,53 +122,43 @@ export default function Category() {
       </section>
 
       <section aria-labelledby="items-title" className="relative section-y bg-paper pt-0!">
-        <div className="container-x grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <h2 id="items-title" className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">
-              {t.items}
-            </h2>
-            <ul className="grid gap-x-8 border-t border-steel-300 sm:grid-cols-2">
-              {c.items.map((item, i) => (
-                <li key={item} className="flex items-baseline gap-3 border-b border-steel-300 py-3">
-                  <span className="font-mono text-[11px] text-steel-500">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="font-medium">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <aside className="space-y-8 lg:col-span-4">
-            {c.materials.length > 0 && (
-              <div>
-                <h2 className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.materials}</h2>
-                <ul className="flex flex-wrap gap-1.5">
-                  {c.materials.map((m) => (
-                    <li key={m}>
-                      <MonoLabel>{m}</MonoLabel>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {c.notes.length > 0 && (
-              <div>
-                <h2 className="label-mono mb-3 font-medium [font-stretch:100%] text-steel-500">{t.notes}</h2>
-                <ul className="space-y-1.5">
+        <div className="container-x">
+          {/* head: title + count on the left; materials, notes and the group split on the right */}
+          <div className="mb-head flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h2 id="items-title" className="text-h3">
+                {t.items}
+              </h2>
+              <p className="label-mono mt-2 text-steel-500">
+                <span className="text-red">{t.count(items.length)}</span>
+                {groups.length > 1 && <span> · {t.groupSummary(groups)}</span>}
+              </p>
+            </div>
+            <dl className="flex flex-wrap gap-x-8 gap-y-3 text-small lg:max-w-[60%] lg:justify-end">
+              {c.materials.length > 0 && (
+                <div>
+                  <dt className="label-mono mb-1.5 text-steel-500">{t.materials}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {c.materials.map((m) => (
+                      <MonoLabel key={m}>{m}</MonoLabel>
+                    ))}
+                  </dd>
+                </div>
+              )}
+              {c.notes.length > 0 && (
+                <div>
+                  <dt className="label-mono mb-1.5 text-steel-500">{t.notes}</dt>
                   {c.notes.map((n) => (
-                    <li key={n} className="flex items-center gap-2">
+                    <dd key={n} className="flex items-center gap-2">
                       <span className="size-1.5 rounded-full bg-red" aria-hidden />
                       {n}
-                    </li>
+                    </dd>
                   ))}
-                </ul>
-              </div>
-            )}
-            <div className="border border-steel-300 bg-paper-2 p-5">
-              <p className="text-small text-steel-700">{t.custom}</p>
-              <Link to="/custom" onClick={() => quoteStore.set(c.slug)} className="label-mono mt-3 inline-flex items-center gap-2 text-ink hover:text-red">
-                {t.customCta} <span aria-hidden>→</span>
-              </Link>
-            </div>
-          </aside>
+                </div>
+              )}
+            </dl>
+          </div>
+          <ItemGrid category={c} />
         </div>
       </section>
 

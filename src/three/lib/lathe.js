@@ -80,6 +80,40 @@ export function lathe(groups, { segments: N, phi0 = 0, phiLen = TAU, skip } = {}
   }
 }
 
+/**
+ * Analytic outward normal of a dome that is a quarter ellipse in (r, y): centre (0, y0),
+ * radial semi-axis a, axial semi-axis c. Pass as a lathe group's `normal` so the pole is
+ * smooth (the finite-difference tangent there tilts and pinches the highlight).
+ */
+export function ellipsoidNormal(y0, a, c) {
+  return ([x, y, z]) => {
+    const n = [x / (a * a), (y - y0) / (c * c), z / (a * a)]
+    const l = Math.hypot(n[0], n[1], n[2]) || 1
+    return [n[0] / l, n[1] / l, n[2] / l]
+  }
+}
+
+/**
+ * Lathe groups for a quarter-ellipse dome from the rim (a, y0) towards the pole (0, y0 ± c).
+ * With `flat` > 0 it stops at radius `flat · a` and closes with a flat centre (a separate,
+ * sharp-edged group, optionally in `capBuilder`, e.g. a darker centre mark). Build domes with
+ * the `smooth` role: a brushed (anisotropic) highlight converges to a pinch at the pole.
+ * dir = 1: dome on top (profile runs rim -> centre); dir = -1: dome underneath (centre -> rim).
+ */
+export function ellipseDomeGroups(builder, a, y0, c, n, { dir = 1, flat = 0, capBuilder = builder } = {}) {
+  const tEnd = Math.acos(flat)
+  const pts = []
+  for (let i = 0; i <= n; i++) {
+    const t = (i / n) * tEnd
+    pts.push([i === n && !flat ? 0 : a * Math.cos(t), y0 + dir * c * Math.sin(t)])
+  }
+  const [rf, yf] = pts[n]
+  const dome = { pts, builder, normal: ellipsoidNormal(y0, a, c) }
+  if (!flat) return [dir === 1 ? dome : { ...dome, pts: [...pts].reverse() }]
+  const cap = { pts: [[rf, yf], [0, yf]], builder: capBuilder }
+  return dir === 1 ? [dome, cap] : [{ pts: [[0, yf], [rf, yf]], builder: capBuilder }, { ...dome, pts: [...pts].reverse() }]
+}
+
 /** Rounded rectangle in (r, y), counter-clockwise, as one smooth closed loop. */
 export function roundedRectProfile(r0, r1, y0, y1, rad, steps = 3) {
   const pts = []

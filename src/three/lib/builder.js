@@ -98,6 +98,7 @@ export const makeBuilders = () => ({
   nylon: new MeshBuilder(),
   knurl: new MeshBuilder(),
   black: new MeshBuilder(), // moulded black plastic (leveller bases)
+  smooth: new MeshBuilder(), // part finish without the brushed highlight (domes: it would pinch at the pole)
 })
 
 /** Ring of N points at radius r, height y, angles phi0 + TAU·j/N (j < N). */

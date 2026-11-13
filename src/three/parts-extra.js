@@ -1,13 +1,13 @@
 // Catalogue part builders (Phase 7A, 12A): washers (star / circlip / cap), brackets (T /
 // square / hook), rivet, male-female screw, leveller, inserts (threaded / knurled), stud,
-// cotter pin and the double-side knurled axle.
+// cotter pin, the double-side knurled axle, taper pin and plastic tube plug.
 // Same conventions as parts.js: 1 = 10 mm, Y is the axis, origin on the bearing face.
 // parts.js imports this module and this module imports helpers from parts.js. That
 // circular import is safe because only hoisted function declarations are used, and only
 // at call time.
 import * as THREE from 'three'
 import { makeBuilders, ring, stitch, up, down, arc, TAU } from './lib/builder.js'
-import { lathe } from './lib/lathe.js'
+import { lathe, ellipseDomeGroups } from './lib/lathe.js'
 import { threadSurface, minorRadius } from './lib/thread.js'
 import { hexPrism } from './lib/hex.js'
 import { plate, roundedRect2, circle2, roundedSection } from './lib/sheet.js'
@@ -422,8 +422,59 @@ function axle(B, p) {
   )
 }
 
+/* ───────────────────────── taper pin, plug (phase 12B) ───────────────────────── */
+
+/** Taper pin: 1:50 taper (ISO 2339 shape), domed ends. diameter = small end Ø, y = 0 .. L. */
+function taperPin(B, p) {
+  const N = p.detail === 'low' ? 32 : 64
+  const r0 = mm(p.diameter) / 2
+  const L = mm(p.length)
+  const r1 = r0 + L / 100 // 1:50 on the diameter
+  const n = p.detail === 'low' ? 4 : 8
+  const k = 0.35 // dome height / radius
+  lathe(
+    [
+      ...ellipseDomeGroups(B.smooth, r0, 0, r0 * k, n, { dir: -1, flat: 0.45 }),
+      { pts: [[r0, 0], [r1, L]], builder: B.main },
+      ...ellipseDomeGroups(B.smooth, r1, L, r1 * k, n, { flat: 0.45 }),
+    ],
+    { segments: N },
+  )
+}
+
+/**
+ * Plastic tube end plug: a flat cap disc (y = 0 .. t) on top of a finned body pushed into the
+ * tube (y < 0). diameter = tube outer Ø, length = overall. Moulded: finish nylonBlack.
+ */
+function plug(B, p) {
+  const N = SEG[p.detail]
+  const Rc = mm(p.diameter) / 2
+  const L = mm(p.length)
+  const t = L * 0.18
+  const Rb = Rc * 0.78 // body inside the tube
+  const Rf = Rc * 0.86 // fin tips
+  const fins = 4
+  const pitch = (L - t) / (fins + 0.6)
+  const c = t * 0.35
+  const body = [[Rb * 0.7, -(L - t)]]
+  for (let i = fins - 1; i >= 0; i--) {
+    const y = -(i + 0.6) * pitch
+    body.push([Rb, y - pitch * 0.55], [Rf, y - pitch * 0.1], [Rf, y], [Rb, y + pitch * 0.05])
+  }
+  body.push([Rb, 0])
+  lathe(
+    [
+      { pts: [[0, -(L - t)], [Rb * 0.7, -(L - t)]], builder: B.main },
+      { pts: body, builder: B.main },
+      { pts: [[Rb, 0], [Rc - c, 0], [Rc, c * 0.6]], builder: B.main },
+      { pts: [[Rc, c * 0.6], [Rc, t - c], ...arc(Rc - c, t - c, c, 0, Math.PI / 2, 4).slice(1), [0, t]], builder: B.main },
+    ],
+    { segments: N },
+  )
+}
+
 export const EXTRA = {
   washerVariant: { star, circlip, cap },
   bracketVariant: { T: tBracket, square: squarePlate, hook },
-  builders: { rivet, maleFemale, stud, cotterPin, leveller, insert, axle },
+  builders: { rivet, maleFemale, stud, cotterPin, leveller, insert, axle, taperPin, plug },
 }

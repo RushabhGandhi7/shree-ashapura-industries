@@ -48,3 +48,14 @@ Customers (text only, behind SHOW_CUSTOMERS flag, CONFIRM permission): Godrej In
 - Bharat Jain, Chief Executive Officer, may be named in the quality section.
 - DO NOT use any image extracted from the catalogue on the site. Skip the image-extraction step. Use the catalogue only as visual reference for part shapes.
 - Create our own product images: add a script (scripts/render-products) that uses Playwright to capture each part from /lab on a clean light background, saved to public/products/ as optimised WebP, to be used in drawers, SEO and Open Graph.
+
+---
+
+## PHASE 11 OVERRIDES (new catalogue, 2026-11-14; these win over everything above)
+- Castors removed: 7 product categories. /products/castors redirects to /products.
+- Category 1 renamed "Screws, Bolts & Nuts" (slug stays screws-fasteners).
+- Product lists per category replaced from the new catalogue (see `items` in src/data/products.js).
+- Range: M2 to M14 / #2 to #14, length 3 to 100 mm. Materials (text only): M.S., S.S., brass, aluminium, copper, EN8 high tensile, plastic. Configurator finish rules unchanged.
+- Kits for furniture and locks; parts to customer drawings and raw material.
+- Secondary machines may be listed on /manufacturing (replaces the "do not mention drilling, grinding" rule above): Traub A25 1.6 to 25 mm, drilling and tapping, grinding, milling, lathe, drum polish, welding. Counted machines (5 / 8 / 4) unchanged.
+- Conflicting facts (firm name, since year, address, phones, emails, machine counts, customers, Bharat Jain's title, ISO / PPAP / Lean) stay as on the site until the client confirms: see CONFIRM.md.

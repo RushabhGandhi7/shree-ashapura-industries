@@ -1,6 +1,6 @@
 // Route tree. Each page is its own lazy chunk; three / R3F only load through the lazy
 // scenes used on Home, Products, Category and Custom.
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, redirect } from 'react-router'
 import RootLayout from './layout/RootLayout.jsx'
 
 const page = (load) => () => load().then((m) => ({ Component: m.default }))
@@ -12,6 +12,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, lazy: page(() => import('./pages/Home.jsx')) },
       { path: 'products', lazy: page(() => import('./pages/Products.jsx')) },
+      // Castors were dropped (phase 11); old links land on the product list (also a 301 in vercel.json).
+      { path: 'products/castors', loader: () => redirect('/products') },
       { path: 'products/:slug', lazy: page(() => import('./pages/Category.jsx')) },
       { path: 'custom', lazy: page(() => import('./pages/Custom.jsx')) },
       { path: 'manufacturing', lazy: page(() => import('./pages/Manufacturing.jsx')) },

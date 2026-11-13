@@ -2,37 +2,78 @@
 // Shape: one object per locale. Components read from `content` (the active locale).
 
 // Real company facts: client-assets/CLIENT_FACTS.md (its OVERRIDES win).
+
+/* ── Facts awaiting client confirmation (phase 11) ───────────────────────────────────
+   The new catalogue differs from the site on these. Each value lives in ONE constant
+   below and every string on the site reads it from here. Current vs catalogue values:
+   CONFIRM.md (repo root). Change a value here and the whole site follows. */
+export const FIRM_NAME = 'Shree Ashapura Industries' // CONFIRM firm name
+export const FOUNDED = 1990 // CONFIRM year established ("since")
+export const ADDRESS = {
+  // CONFIRM address
+  lines: ['Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd.', '121 S.V. Road, near Dahisar Petrol Pump', 'Dahisar (East), Mumbai 400068'],
+  street: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump',
+  short: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate, S.V. Road, Dahisar (East), Mumbai 400068',
+  locality: 'Dahisar (East), Mumbai',
+  postalCode: '400068',
+  mapQuery: 'Agarwal Co-op Industrial Estate, 121 S.V. Road, Dahisar East, Mumbai 400068',
+}
+export const PHONES = {
+  // CONFIRM phone numbers
+  mobile: { display: '+91 70215 80583', e164: '+917021580583', wa: '917021580583' },
+  landline: { display: '022-2089 1665', e164: '+912220891665' },
+}
+export const EMAILS = ['ashapura56@gmail.com', 'b_jaan@hotmail.com'] // CONFIRM email addresses (first = primary)
+/** Machines in units 24 & 25 only. Read by Capability and the Manufacturing stations. */
+export const MACHINE_COUNTS = [
+  // CONFIRM machine counts and ranges
+  { key: 'heading', name: 'Cold heading', count: 5, min: 1.6, max: 7.5, unit: 'mm' },
+  { key: 'rolling', name: 'Thread rolling', count: 8, min: 3, max: 50, unit: 'mm' },
+  { key: 'slotting', name: 'Slotting & BT', count: 4, min: 4, max: 55, unit: 'mm' },
+]
+/** Customer names (wordmarks; `customers` in products.js adds the logo field). */
+export const CUSTOMER_NAMES = ['Godrej Interio', 'IFB', 'Elica', 'Crompton Greaves', 'Belden', 'SmartLink', 'Saakshi', 'CA.BE Springs & Fasteners'] // CONFIRM customer names
+export const LEADER = { name: 'Bharat Jain', title: 'Chief Executive Officer' } // CONFIRM Bharat Jain's title
+export const ISO_TEXT = 'ISO 9001:2015' // CONFIRM ISO text and certificate details (number, body, validity)
+export const PPAP_TEXT = [
+  // CONFIRM PPAP document list
+  'PSW',
+  'In-process drawing',
+  'Process flow diagram',
+  'Control plan',
+  'PFMEA',
+  'Final-cum-PDIR inspection reports',
+  'Layout inspection',
+  'In-process inspection reports',
+  'Check list',
+  'Standard packing format',
+  'Raw material test reports',
+  'Cross-lab test reports',
+  'Hardening / plating TC reports',
+]
+export const LEAN_TEXT = {
+  // CONFIRM Lean text
+  cluster: 'Lean Cluster Mumbai',
+  practices: ['5S', 'Standard operating process', 'OEE', 'Value stream mapping', 'Kaizen blitz', 'Poka-yoke', '7QC', 'SMED', '3M and seven wastes training'],
+}
+
 export const company = {
-  name: 'Shree Ashapura Industries',
+  name: FIRM_NAME,
   shortName: 'Ashapura',
   tagline: 'Your trust, our mission.',
-  founded: 1990,
-  iso: 'ISO 9001:2015', // CONFIRM certificate details (number, body, validity)
-  address: {
-    lines: ['Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd.', '121 S.V. Road, near Dahisar Petrol Pump', 'Dahisar (East), Mumbai 400068'],
-    street: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump',
-    locality: 'Dahisar (East), Mumbai',
-    postalCode: '400068',
-    mapQuery: 'Agarwal Co-op Industrial Estate, 121 S.V. Road, Dahisar East, Mumbai 400068',
-  },
-  phone: { display: '+91 70215 80583', e164: '+917021580583', wa: '917021580583' },
-  landline: { display: '022-2089 1665', e164: '+912220891665' },
-  emails: ['ashapura56@gmail.com', 'b_jaan@hotmail.com'],
-  email: 'ashapura56@gmail.com', // primary (mailto from the enquiry form)
+  founded: FOUNDED,
+  iso: ISO_TEXT,
+  address: ADDRESS,
+  phone: PHONES.mobile,
+  landline: PHONES.landline,
+  emails: EMAILS,
+  email: EMAILS[0], // primary (mailto from the enquiry form)
 }
 
 /** Show the "Trusted by" customer marquee (customer list: `customers` in products.js). */
 export const SHOW_CUSTOMERS = true
 
-/**
- * Machines in units 24 & 25 only (client override). Read by the Capability section and
- * the Manufacturing stations, so the numbers live in one place.
- */
-export const machines = [
-  { key: 'heading', name: 'Cold heading', count: 5, min: 1.6, max: 7.5, unit: 'mm' }, // CONFIRM
-  { key: 'rolling', name: 'Thread rolling', count: 8, min: 3, max: 50, unit: 'mm' }, // CONFIRM
-  { key: 'slotting', name: 'Slotting & BT', count: 4, min: 4, max: 55, unit: 'mm' }, // CONFIRM
-]
+export const machines = MACHINE_COUNTS
 const mSpec = (key) => {
   const m = machines.find((x) => x.key === key)
   return `${m.count} machines · ${m.min} – ${m.max} ${m.unit}`
@@ -40,6 +81,8 @@ const mSpec = (key) => {
 
 /** Whole years in business, computed so it never goes stale. */
 export const yearsInBusiness = () => new Date().getFullYear() - company.founded
+
+const BRAND_SHORT = FIRM_NAME.replace(/ Industries$/, '')
 
 const en = {
   skipLink: 'Skip to content',
@@ -60,8 +103,8 @@ const en = {
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     menuLabel: 'Menu',
-    homeLabel: 'Shree Ashapura Industries, home',
-    brandLine: 'SHREE ASHAPURA',
+    homeLabel: `${FIRM_NAME}, home`,
+    brandLine: BRAND_SHORT.toUpperCase(),
     subline: 'Industries · Mumbai',
     progress: (n) => `${String(n).padStart(3, '0')} / 100`,
     progressLabel: 'Page scroll progress',
@@ -73,27 +116,36 @@ const en = {
     skip: 'Skip intro',
   },
   hero: {
-    eyebrow: 'Since 1990 · ISO 9001:2015', // CONFIRM ISO certificate details
+    eyebrow: `Since ${FOUNDED} · ${ISO_TEXT}`,
     title: ['Your trust,', 'our mission.'],
     lead: 'Fasteners and machine components for the lock and furniture industry, plus precision turned, press and plastic moulded parts. Special products developed to your requirement and design.',
     callCta: 'Call now',
     whatsappCta: 'WhatsApp us',
-    tolerance: 'EST. 1990',
+    tolerance: `EST. ${FOUNDED}`,
     posterAlt: 'Steel hex bolt threaded into a tapped steel plate',
   },
   products: {
     label: 'What we make',
-    title: 'Eight product lines, made to order.',
-    lead: 'From chipboard screws and washers to castors, brass inserts and complete furniture fitting kits.',
+    title: 'Seven product lines, made to order.',
+    lead: 'From screws, bolts and nuts to washers, brass parts, and fittings for furniture and locks.',
     open: 'View range',
     hint: 'Hover to turn the part. Click a card for the full range.',
     hintTouch: 'Tap a card for the full range.',
     custom: {
       tag: 'DWG → PART',
       title: 'Custom products made to your drawing',
+      shortTitle: 'Made to your drawing',
       text: 'Send a drawing or a sample. We develop and produce special-purpose parts to your requirement and design, drawn in AutoCAD 2D & 3D.',
       cta: 'Send your drawing',
-      message: 'Hello Shree Ashapura Industries, I would like a custom part made to my drawing. Part / quantity: ',
+      message: `Hello ${FIRM_NAME}, I would like a custom part made to my drawing. Part / quantity: `,
+    },
+    // From the client's new catalogue (phase 11). Text only; the configurator's options are separate.
+    catalogue: {
+      rangeLabel: 'Range',
+      range: 'M2 – M14 · #2 – #14 · L 3 – 100 mm',
+      materialsLabel: 'Materials',
+      materials: ['M.S.', 'S.S.', 'Brass', 'Aluminium', 'Copper', 'EN8 high tensile', 'Plastic'],
+      kits: 'We make kits for furniture and locks, and parts to your drawing and raw material.',
     },
     drawer: {
       close: 'Close',
@@ -102,7 +154,7 @@ const en = {
       notes: 'Notes',
       imageAlt: (name) => `${name}: rendered example parts`,
       enquire: 'Enquire on WhatsApp',
-      enquireMsg: (name) => `Hello Shree Ashapura Industries, I would like a quote for ${name}. Part / size / quantity: `,
+      enquireMsg: (name) => `Hello ${FIRM_NAME}, I would like a quote for ${name}. Part / size / quantity: `,
       custom: 'Need something not listed? We make parts to your drawing.',
     },
   },
@@ -112,7 +164,7 @@ const en = {
     lead: 'Pick a head, size, length, material and finish. The part on the stage updates as you go, and the title block below becomes your enquiry.',
     controls: { head: 'Head', size: 'Thread size', pitch: 'Pitch', coarse: 'Coarse', fine: 'Fine', length: 'Length', material: 'Material', finish: 'Finish' },
     note: 'Visual preview only. Options are examples; final specification follows your drawing.', // CONFIRM options with the client
-    block: { part: 'Part', thread: 'Thread', length: 'Length', head: 'Standard', headDim: 'Head', view: 'View', material: 'Material', finish: 'Finish', dwg: 'Dwg no.', scale: 'Scale', rev: 'Rev', company: 'Shree Ashapura Industries' },
+    block: { part: 'Part', thread: 'Thread', length: 'Length', head: 'Standard', headDim: 'Head', view: 'View', material: 'Material', finish: 'Finish', dwg: 'Dwg no.', scale: 'Scale', rev: 'Rev', company: FIRM_NAME },
     cta: 'Request a custom order',
     dragHint: 'Drag to turn',
     views: { label: 'View', front: 'Front (3D)', top: 'Top', block: 'Front (3D) / Top' },
@@ -132,7 +184,7 @@ const en = {
     },
     message: ({ part, head, thread, root, length, material, finish, dwg }) =>
       [
-        'Hello Shree Ashapura Industries, I would like a quote for a custom part:',
+        `Hello ${FIRM_NAME}, I would like a quote for a custom part:`,
         `• Part: ${part}`,
         `• Head: ${head}`,
         `• Thread: ${thread}`,
@@ -184,6 +236,12 @@ const en = {
     title: ['Capacity on', 'the shop floor.'],
     lead: 'Machine ranges in units 24 & 25, on one scale. Wire and part diameters in millimetres.',
     scale: 'Ø mm',
+    productRange: 'Product range',
+    // Secondary list (phase 11, from the catalogue). Does not change `machines` above.
+    extra: {
+      title: 'Also on the shop floor',
+      items: ['Traub A25 · 1.6 – 25 mm', 'Drilling & tapping', 'Grinding', 'Milling', 'Lathe', 'Drum polish', 'Welding'],
+    },
     machinesLabel: (n) => `${n} machines`,
     rangeLabel: (m) => `Ø${m.min} – Ø${m.max} ${m.unit}`,
     drawing: {
@@ -191,7 +249,7 @@ const en = {
       title: 'Send a drawing or a sample. We develop the part.',
       text: 'Special-purpose parts are developed to your requirement and design. Drawings are made in AutoCAD 2D & 3D.',
       cta: 'Send your drawing',
-      message: 'Hello Shree Ashapura Industries, I would like a part made to my drawing. Part / size / quantity: ',
+      message: `Hello ${FIRM_NAME}, I would like a part made to my drawing. Part / size / quantity: `,
       tags: ['AutoCAD 2D', 'AutoCAD 3D', 'Sample to part'],
     },
   },
@@ -210,8 +268,8 @@ const en = {
       { icon: 'report', name: 'Test reports', note: 'Raw material, plating, TC' },
     ],
     ppapProgress: (n, total) => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`,
-    lead: 'Shree Ashapura Industries was established in 1990 to provide fasteners and machine components to the lock and furniture industry. We work to an ISO 9001:2015 quality system.', // CONFIRM ISO certificate details
-    isoBadge: { title: 'ISO 9001:2015', text: 'Quality management system' }, // CONFIRM
+    lead: `${FIRM_NAME} was established in ${FOUNDED} to provide fasteners and machine components to the lock and furniture industry. We work to an ${ISO_TEXT} quality system.`,
+    isoBadge: { title: ISO_TEXT, text: 'Quality management system' },
     inProcess: {
       title: 'In-process checks',
       steps: [
@@ -221,26 +279,12 @@ const en = {
     },
     ppap: {
       title: 'PPAP documents',
-      items: [
-        'PSW',
-        'In-process drawing',
-        'Process flow diagram',
-        'Control plan',
-        'PFMEA',
-        'Final-cum-PDIR inspection reports',
-        'Layout inspection',
-        'In-process inspection reports',
-        'Check list',
-        'Standard packing format',
-        'Raw material test reports',
-        'Cross-lab test reports',
-        'Hardening / plating TC reports',
-      ],
+      items: PPAP_TEXT,
     },
     lean: {
       title: 'Lean manufacturing',
-      text: 'We are part of Lean Cluster Mumbai.',
-      items: ['5S', 'Standard operating process', 'OEE', 'Value stream mapping', 'Kaizen blitz', 'Poka-yoke', '7QC', 'SMED', '3M and seven wastes training'],
+      text: `We are part of ${LEAN_TEXT.cluster}.`,
+      items: LEAN_TEXT.practices,
     },
     design: 'Drawings and development in AutoCAD 2D & 3D.',
     policy: {
@@ -253,21 +297,21 @@ const en = {
         'Defining quality objectives',
         'Management reviews of internal audits and customer complaints',
       ],
-      name: 'Bharat Jain',
-      role: 'Chief Executive Officer',
+      name: LEADER.name,
+      role: LEADER.title,
     },
   },
   industries: {
     label: 'Industries & why us',
-    title: 'Trusted since 1990.',
+    title: `Trusted since ${FOUNDED}.`,
     lead: 'Fasteners and components for furniture, appliance, electrical, lock and cable makers.', // CONFIRM industries list
     // 'years' / 'categories' / 'industries' are computed in Industries.jsx
     counters: [
-      { value: 'years', suffix: '+', label: 'Years in business', note: 'Since 1990' },
+      { value: 'years', suffix: '+', label: 'Years in business', note: `Since ${FOUNDED}` },
       { value: 'categories', label: 'Product lines', note: 'Plus parts to drawing' },
       { value: 'industries', label: 'Industries supplied', note: 'Furniture to cables' },
     ],
-    iso: { title: 'ISO 9001:2015', note: 'Quality system' }, // CONFIRM
+    iso: { title: ISO_TEXT, note: 'Quality system' },
     whyTitle: 'Why Ashapura',
     why: [
       { icon: 'clock', title: 'Quality, quantity, on time', text: 'The right parts, in the quantity you need, delivered on time.' },
@@ -325,7 +369,7 @@ const en = {
     fromDrawer: 'Request a custom quote',
     message: ({ category, details }) =>
       [
-        'Hello Shree Ashapura Industries, I would like a custom quote.',
+        `Hello ${FIRM_NAME}, I would like a custom quote.`,
         `Product line: ${category}`,
         details && `Details: ${details}`,
       ]
@@ -351,7 +395,7 @@ const en = {
       errors: { name: 'Please enter your name.', phone: 'Please enter a phone number we can reach.', requirement: 'Please describe the part you need.' },
       message: ({ name, company, phone, requirement, quantity }) =>
         [
-          'Hello Shree Ashapura Industries, I have an enquiry:',
+          `Hello ${FIRM_NAME}, I have an enquiry:`,
           `Name: ${name}`,
           company && `Company: ${company}`,
           `Phone: ${phone}`,
@@ -370,10 +414,10 @@ const en = {
     emailTitle: 'Email',
     hoursTitle: 'Hours',
     hours: null, // CONFIRM working hours with the client (hidden until supplied)
-    mapTitle: 'Map showing Shree Ashapura Industries, Dahisar East, Mumbai',
+    mapTitle: `Map showing ${FIRM_NAME}, Dahisar East, Mumbai`,
   },
   footer: {
-    blurb: 'Manufacturer and supplier of fasteners and machine components for the lock and furniture industry, plus precision turned, press and plastic moulded parts. Since 1990.',
+    blurb: `Manufacturer and supplier of fasteners and machine components for the lock and furniture industry, plus precision turned, press and plastic moulded parts. Since ${FOUNDED}.`,
     addressTitle: 'Works',
     contactTitle: 'Contact',
     linksTitle: 'Site',
@@ -384,24 +428,24 @@ const en = {
     rights: 'All rights reserved.',
   },
   pages: {
-    home: { title: 'Fastener Manufacturer in Mumbai | Screws, Turned Parts & Furniture Fittings', description: 'Shree Ashapura Industries, Mumbai, since 1990: fasteners, screws, washers, precision turned parts, brass inserts, castors and furniture fittings, made to your drawing.' },
-    products: { title: 'Products: Fasteners, Washers, Brackets, Castors & Furniture Fittings', description: 'Eight product lines from Shree Ashapura Industries, Mumbai: screws and fasteners, washers, plastic components, brackets and press parts, brass parts, studs and turned parts, castors, furniture fittings and cams.', crumb: 'Products' },
+    home: { title: 'Fastener Manufacturer in Mumbai | Screws, Turned Parts & Furniture Fittings', description: `${FIRM_NAME}, Mumbai, since ${FOUNDED}: screws, bolts, nuts, washers, turned and brass parts, and kits for furniture and locks, made to your drawing.` },
+    products: { title: 'Products: Screws, Bolts, Nuts, Washers, Brackets & Furniture Fittings', description: `Seven product lines from ${FIRM_NAME}, Mumbai: screws, bolts and nuts, washers, plastic components, brackets and press parts, brass parts, studs and turned parts, furniture fittings and cams. M2 to M14, length 3 to 100 mm.`, crumb: 'Products' },
     category: {
       title: (c) => `${c.name}: ${c.items.slice(0, 3).join(', ')}`,
-      description: (c) => `${c.name} from Shree Ashapura Industries, Mumbai: ${c.items.join(', ')}. Made to your drawing; request a quote on WhatsApp.`.slice(0, 300),
+      description: (c) => `${c.name} from ${FIRM_NAME}, Mumbai: ${c.items.join(', ')}. Made to your drawing; request a quote on WhatsApp.`.slice(0, 300),
     },
-    custom: { title: 'Custom Fasteners & Parts Made to Your Drawing', description: 'Configure a custom bolt or screw, or send your drawing or sample. Shree Ashapura Industries develops special-purpose parts to your requirement, drawn in AutoCAD 2D & 3D.', crumb: 'Custom orders' },
+    custom: { title: 'Custom Fasteners & Parts Made to Your Drawing', description: `Configure a custom bolt or screw, or send your drawing or sample. ${FIRM_NAME} develops special-purpose parts to your requirement, drawn in AutoCAD 2D & 3D.`, crumb: 'Custom orders' },
     manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting and BT, thread rolling, heat treatment and plating via approved partners, inspection and packing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' }, // CONFIRM approved partners
-    quality: { title: 'Quality & Certifications: ISO 9001:2015, PPAP, Inspection', description: 'ISO 9001:2015 quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.', crumb: 'Quality' },
-    about: { title: 'About Us: Fastener Makers Since 1990', description: 'Shree Ashapura Industries has made fasteners and machine components for the lock and furniture industry since 1990. Meet the team, our industries and customers.', crumb: 'About' },
+    quality: { title: `Quality & Certifications: ${ISO_TEXT}, PPAP, Inspection`, description: `${ISO_TEXT} quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.`, crumb: 'Quality' },
+    about: { title: `About Us: Fastener Makers Since ${FOUNDED}`, description: `${FIRM_NAME} has made fasteners and machine components for the lock and furniture industry since ${FOUNDED}. Meet the team, our industries and customers.`, crumb: 'About' },
     gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, and the cold-heading, thread-rolling and slotting areas of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },
-    contact: { title: 'Contact: Call, WhatsApp or Visit Us in Dahisar (East), Mumbai', description: 'Send your requirement on WhatsApp or email, call +91 70215 80583, or visit Gala No. 24 & 25, Agarwal Co-op. Industrial Estate, S.V. Road, Dahisar (East), Mumbai 400068.', crumb: 'Contact' },
-    notFound: { title: 'Page not found', description: 'This page does not exist. Browse our products or contact Shree Ashapura Industries.', crumb: 'Not found' },
+    contact: { title: 'Contact: Call, WhatsApp or Visit Us in Dahisar (East), Mumbai', description: `Send your requirement on WhatsApp or email, call ${PHONES.mobile.display}, or visit ${ADDRESS.short}.`, crumb: 'Contact' },
+    notFound: { title: 'Page not found', description: `This page does not exist. Browse our products or contact ${FIRM_NAME}.`, crumb: 'Not found' },
     home_crumb: 'Home',
-    titleSuffix: ' | Shree Ashapura Industries',
+    titleSuffix: ` | ${FIRM_NAME}`,
   },
   teasers: {
-    products: { label: 'What we make', title: 'Eight product lines.', lead: 'From chipboard screws and washers to castors, brass inserts and complete furniture fitting kits.', cta: 'All products' },
+    products: { label: 'What we make', title: 'Seven product lines.', lead: 'From screws, bolts and nuts to washers, brass parts, and fittings for furniture and locks.', cta: 'All products' },
     capability: { cta: 'See manufacturing' },
     quality: { label: 'Quality', title: ['Checked at', 'every step.'], cta: 'Quality & certifications' },
     final: { cta: 'Contact us' },
@@ -412,7 +456,7 @@ const en = {
     materials: 'Materials',
     notes: 'Notes',
     quote: 'Request a quote on WhatsApp',
-    quoteMsg: (name) => `Hello Shree Ashapura Industries, I would like a quote for ${name}. Part / size / quantity: `,
+    quoteMsg: (name) => `Hello ${FIRM_NAME}, I would like a quote for ${name}. Part / size / quantity: `,
     call: 'Call',
     custom: 'Need something not listed? We make parts to your drawing.',
     customCta: 'Custom orders',
@@ -430,23 +474,23 @@ const en = {
       { k: '04', title: 'Production', text: 'The approved part goes into production, with first-piece approval and in-process checks.' },
     ],
     cta: 'Send your drawing',
-    message: 'Hello Shree Ashapura Industries, I would like a custom part made to my drawing. Part / size / quantity: ',
+    message: `Hello ${FIRM_NAME}, I would like a custom part made to my drawing. Part / size / quantity: `,
   },
   about: {
     label: 'About us',
     title: ['Your trust,', 'our mission.'],
     story: [
-      'Shree Ashapura Industries was established in 1990 to provide fasteners and machine components to the lock and furniture industry.',
-      'Today we manufacture and supply screws and fasteners, washers, plastic components, brackets and press parts, brass parts, studs and precision turned parts, castors and furniture fittings, from units 24 & 25 in Dahisar (East), Mumbai.',
-      'We also develop and produce special-purpose products to customer requirement and design, drawn in AutoCAD 2D & 3D.',
+      `${FIRM_NAME} was established in ${FOUNDED} to provide fasteners and machine components to the lock and furniture industry.`,
+      'Today we manufacture and supply screws, bolts and nuts, washers, plastic components, brackets and press parts, brass parts, studs and precision turned parts, and furniture fittings, from units 24 & 25 in Dahisar (East), Mumbai.',
+      'We make kits for furniture and locks, and develop special-purpose products to customer drawings and raw material, drawn in AutoCAD 2D & 3D.',
     ],
     facts: [
-      { k: 'Established', v: '1990' },
-      { k: 'Quality system', v: 'ISO 9001:2015' }, // CONFIRM certificate details
-      { k: 'Lean', v: 'Lean Cluster Mumbai' },
+      { k: 'Established', v: String(FOUNDED) },
+      { k: 'Quality system', v: ISO_TEXT },
+      { k: 'Lean', v: LEAN_TEXT.cluster },
       { k: 'Design', v: 'AutoCAD 2D & 3D' },
     ],
-    leader: { name: 'Bharat Jain', role: 'Chief Executive Officer', quote: 'Our mission: high-quality parts for manufacturing industries.' },
+    leader: { name: LEADER.name, role: LEADER.title, quote: 'Our mission: high-quality parts for manufacturing industries.' },
   },
   notFound: {
     code: 'ERR 404',
@@ -458,7 +502,7 @@ const en = {
     home: 'Back to home',
   },
   whatsappMessages: {
-    general: 'Hello Shree Ashapura Industries, I would like to enquire about your products.',
+    general: `Hello ${FIRM_NAME}, I would like to enquire about your products.`,
   },
 }
 

@@ -15,14 +15,15 @@
 
 ## Products
 
-- [Screws & Fasteners](/products/screws-fasteners): CSK Phillips and PHHD chipboard, Allen flat and button head, combi head, Phillips combi washer, male-female, rivets, pan head slotted, hex head, hex nuts, wood, self-tapping, machine, hex flange, locking and umbrella screws, high-tensile items
-- [Washers](/products/washers): plain, spring, circlip, star, cap
-- [Plastic Components](/products/plastic-components): levellers, leg tube caps, male-female parts (PP, LD, ABS, HD-Nylon, EPDM; colour as required)
-- [Brackets & Press Parts](/products/brackets-press-parts): L, door, T, square and hook brackets
-- [Brass Parts](/products/brass-parts): pins, knurled inserts (size as required)
-- [Studs, Pins & Turned Parts](/products/studs-pins-turned): studs, cotter pins, machine parts, precision turned parts
-- [Castors](/products/castors): plate castors with wheel, threaded-stem castors
-- [Furniture Fittings & Cams](/products/furniture-fittings): cams, cam locks, threaded inserts, ferrules / bushes, locks, furniture fitting kits
+Range: M2 to M14 / #2 to #14, length 3 to 100 mm. Materials: M.S., S.S., brass, aluminium, copper, EN8 high tensile, plastic. Kits for furniture and locks; parts made to customer drawings and raw material.
+
+- [Screws, Bolts & Nuts](/products/screws-fasteners): hex screw, nut bolt, step bolt, projection weld screw, Phillips screw, chipboard screw, carriage bolt, flange bolt, special screws, dome nut, nyloc nut, flange nut
+- [Washers](/products/washers): plain, spring, circlip, lock washers
+- [Plastic Components](/products/plastic-components): caps and legs, leveller, adjustable glide base, moulded plastic parts (PP, LD, ABS, HD-Nylon, EPDM; colour as required)
+- [Brackets & Press Parts](/products/brackets-press-parts): L bracket, C bracket, press parts
+- [Brass Parts](/products/brass-parts): nozzles, turned brass parts, pins (size as required)
+- [Studs, Pins & Turned Parts](/products/studs-pins-turned): studs, taper pin, cotter pin, machine parts
+- [Furniture Fittings & Cams](/products/furniture-fittings): cams, door handles, bed handles, lock components
 - Custom products made to your drawing (AutoCAD 2D & 3D)
 
 ## Manufacturing (units 24 & 25)
@@ -31,6 +32,7 @@
 - Thread rolling: 8 machines, 3 – 50 mm
 - Slotting and BT: 4 machines, 4 – 55 mm
 - Heat treatment and plating via approved partners
+- Also: Traub A25 (1.6 – 25 mm), drilling and tapping, grinding, milling, lathe, drum polish, welding
 
 ## Quality
 

@@ -7,7 +7,7 @@ import { MailIcon, PhoneIcon, WhatsAppIcon, ArrowUpRight } from '../ui/Icons.jsx
 const t = content.contact
 const f = t.form
 const address = company.address.lines.join(', ')
-const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`Shree Ashapura Industries, ${address}`)}&z=16&output=embed`
+const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${company.name}, ${address}`)}&z=16&output=embed`
 const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`
 
 function Field({ id, label, optional, error, hint, children }) {

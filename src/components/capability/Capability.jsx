@@ -76,7 +76,16 @@ export default function Capability({ h1 = false, teaser = false } = {}) {
               {t.title[0]} <span className="text-red">{t.title[1]}</span>
             </>
           }
-          aside={<p className="max-w-[44ch]">{t.lead}</p>}
+          aside={
+            <>
+              <p className="max-w-[44ch]">{t.lead}</p>
+              {!teaser && (
+                <p className="label-mono mt-4 text-ink">
+                  <span className="text-steel-500">{t.productRange}</span> {content.products.catalogue.range}
+                </p>
+              )}
+            </>
+          }
         />
 
         <div className="grid gap-10 lg:grid-cols-12">
@@ -162,6 +171,19 @@ export default function Capability({ h1 = false, teaser = false } = {}) {
               <span className="relative z-[2]">{t.drawing.cta} →</span>
             </a>
           </aside>}
+          {/* secondary machines: a plain list, separate from the counted machines above */}
+          {!teaser && (
+            <div className="lg:col-span-12">
+              <p className="label-mono mb-3 text-steel-500">{t.extra.title}</p>
+              <ul className="flex flex-wrap gap-2">
+                {t.extra.items.map((m) => (
+                  <li key={m} className="label-mono rounded-xs border border-steel-300 bg-paper px-2.5 py-1.5 text-ink">
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { company, content } from '../../data/content.js'
+import { company, content, ISO_TEXT } from '../../data/content.js'
 import { prefersReducedMotion } from '../../lib/device.js'
 import InstrumentIcon from './InstrumentIcon.jsx'
 import SectionHead from '../ui/SectionHead.jsx'
@@ -15,7 +15,10 @@ const Heading = ({ children, id, as: Tag = 'h3' }) => (
   </Tag>
 )
 
-/** ISO 9001:2015 seal (certificate details // CONFIRM in content.js). */
+// "ISO" / "9001:2015" from ISO_TEXT (// CONFIRM in content.js).
+const ISO_SEAL = [ISO_TEXT.split(' ')[0], ISO_TEXT.split(' ').slice(1).join(' ')]
+
+/** ISO seal (certificate details // CONFIRM in content.js). */
 export function IsoSeal() {
   const teeth = Array.from({ length: 24 }, (_, i) => i)
   return (
@@ -27,10 +30,10 @@ export function IsoSeal() {
       })}
       <circle cx="60" cy="60" r="42" fill="none" stroke="var(--color-red)" strokeWidth="1.2" />
       <text x="60" y="52" textAnchor="middle" className="font-display" fontSize="17" fontWeight="800" fill="var(--color-ink)">
-        ISO
+        {ISO_SEAL[0]}
       </text>
       <text x="60" y="70" textAnchor="middle" className="font-mono" fontSize="11" letterSpacing="0.5" fill="var(--color-ink)">
-        9001:2015
+        {ISO_SEAL[1]}
       </text>
       <path d="M50 80 l6 6 l13 -14" fill="none" stroke="var(--color-red)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>

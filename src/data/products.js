@@ -4,6 +4,8 @@
 //   head: variant key from `variants[type]`
 //   diameter / length / pitch in mm, finish: key of `finishes`.
 
+import { CUSTOMER_NAMES } from './content.js'
+
 // Surface finishes. Colours / PBR values are read by src/three/materials.js.
 // `aniso` = strength of the brushed/turned highlight; `clearcoat` / `iridescence` are optional extras.
 export const finishes = {
@@ -51,7 +53,7 @@ export const variants = {
   castor: { plate: 'Plate castor', stem: 'Threaded-stem castor' },
 }
 
-// The 8 "What we make" cards, from the client's catalogue (client-assets/CLIENT_FACTS.md).
+// The 7 "What we make" cards. Item lists from the client's new catalogue (phase 11, client-assets/CLIENT_FACTS.md).
 // `items` / `materials` / `notes` are the client's own lists (shown in the drawer).
 // `parts` are rendered with the procedural library (src/three, detail "low"); `pose.tilt`
 // angles the group in the card and the hover spin turns it about its own axis.
@@ -60,34 +62,15 @@ export const categories = [
   {
     slug: 'screws-fasteners',
     code: '01',
-    name: 'Screws & Fasteners',
-    blurb: 'Chipboard, Allen, combi, machine and self-tapping screws, rivets, nuts and high-tensile items.',
+    name: 'Screws, Bolts & Nuts',
+    blurb: 'Hex, Phillips, chipboard and special screws; nut, step, carriage and flange bolts; dome, nyloc and flange nuts.',
     callout: 'CSK · PHHD',
     parts: [
       { type: 'screw', head: 'cskPhillips', diameter: 4.2, length: 30, finish: 'zinc', position: [-0.6, 0, 0] },
       { type: 'screw', head: 'combiWasher', diameter: 5, length: 16, finish: 'zinc', position: [0.7, 0.9, 0] },
     ],
     pose: { tilt: [0, 0, -1.05] },
-    items: [
-      'CSK Phillips chipboard screw',
-      'PHHD chipboard screw',
-      'Allen flat head screw',
-      'Allen button head screw',
-      'Combi head screw',
-      'Phillips combi washer screw',
-      'Male-female screw',
-      'Rivet',
-      'Pan head slotted screw',
-      'Hex head screw',
-      'Hex nut',
-      'Wood screw',
-      'Self-tapping screw',
-      'Machine screw',
-      'Hex flange head screw',
-      'Locking screw',
-      'Umbrella screw',
-      'High-tensile items',
-    ],
+    items: ['Hex screw', 'Nut bolt', 'Step bolt', 'Projection weld screw', 'Phillips screw', 'Chipboard screw', 'Carriage bolt', 'Flange bolt', 'Special screws', 'Dome nut', 'Nyloc nut', 'Flange nut'],
     materials: [],
     notes: ['Special sizes made to your drawing.'],
   },
@@ -95,7 +78,7 @@ export const categories = [
     slug: 'washers',
     code: '02',
     name: 'Washers',
-    blurb: 'Plain, spring, circlip, star and cap washers.',
+    blurb: 'Plain, spring and lock washers, and circlips.',
     callout: 'Ø12',
     parts: [
       { type: 'washer', head: 'flat', diameter: 12, finish: 'zinc', position: [-1.2, 0, 0.2] },
@@ -103,7 +86,7 @@ export const categories = [
       { type: 'washer', head: 'star', diameter: 12, finish: 'zinc', position: [1.15, 0, 0.75] },
     ],
     pose: { tilt: [0.75, 0, 0] },
-    items: ['Plain washer', 'Spring washer', 'Circlip', 'Star washer', 'Cap washer'],
+    items: ['Plain washer', 'Spring washer', 'Circlip', 'Lock washer'],
     materials: [],
     notes: [],
   },
@@ -111,11 +94,11 @@ export const categories = [
     slug: 'plastic-components',
     code: '03',
     name: 'Plastic Components',
-    blurb: 'Levellers, leg tube caps and male-female parts, moulded in the colour you need.',
+    blurb: 'Caps and legs, levellers, adjustable glide bases and moulded plastic parts, in the colour you need.',
     callout: 'M8 stud',
     parts: [{ type: 'leveller', diameter: 8, length: 28, finish: 'zinc' }],
     pose: { tilt: [0.35, 0, 0] },
-    items: ['Leveller', 'Leg tube cap', 'Male-female parts'],
+    items: ['Caps and legs', 'Leveller', 'Adjustable glide base', 'Moulded plastic parts'],
     materials: ['PP', 'LD', 'ABS', 'HD-Nylon', 'EPDM'], // CONFIRM EPDM
     notes: ['Colour as required.'],
   },
@@ -123,14 +106,14 @@ export const categories = [
     slug: 'brackets-press-parts',
     code: '04',
     name: 'Brackets & Press Parts',
-    blurb: 'L, T, door, square and hook brackets pressed from sheet.',
+    blurb: 'L and C brackets and press parts from sheet.',
     callout: 'L · T',
     parts: [
       { type: 'bracket', head: 'angle', diameter: 20, length: 40, finish: 'zinc', position: [-2.2, 0, 0] },
       { type: 'bracket', head: 'T', diameter: 14, length: 50, finish: 'zinc', position: [2.0, 0.2, 0.5], rotation: [0, 0.4, 0] },
     ],
     pose: { tilt: [0.35, 0.5, 0] },
-    items: ['L bracket', 'Door bracket', 'T bracket', 'Square bracket', 'Hook'],
+    items: ['L bracket', 'C bracket', 'Press parts'],
     materials: [],
     notes: [],
   },
@@ -138,14 +121,14 @@ export const categories = [
     slug: 'brass-parts',
     code: '05',
     name: 'Brass Parts',
-    blurb: 'Brass pins and knurled inserts, turned to the size you need.',
+    blurb: 'Brass nozzles, pins and turned brass parts, made to the size you need.',
     callout: 'Ø6 knurl',
     parts: [
       { type: 'insert', head: 'knurled', diameter: 6, length: 12, finish: 'brass', position: [-0.6, 0, 0] },
       { type: 'insert', head: 'pin', diameter: 5, length: 30, finish: 'brass', position: [0.7, 0, 0] },
     ],
     pose: { tilt: [0, 0, -0.5] },
-    items: ['Brass pins', 'Knurled inserts'],
+    items: ['Nozzles', 'Turned brass parts', 'Pins'],
     materials: ['Brass'],
     notes: ['Size as required.'],
   },
@@ -153,7 +136,7 @@ export const categories = [
     slug: 'studs-pins-turned',
     code: '06',
     name: 'Studs, Pins & Turned Parts',
-    blurb: 'Studs, cotter pins, machine parts and precision turned parts.',
+    blurb: 'Studs, taper and cotter pins, and machine parts.',
     callout: 'M10 stud',
     parts: [
       { type: 'stud', diameter: 10, length: 60, finish: 'zinc', position: [-1.5, 0, 0] },
@@ -161,50 +144,30 @@ export const categories = [
       { type: 'turned', diameter: 14, length: 34, finish: 'brass', position: [1.4, -0.2, 0] },
     ],
     pose: { tilt: [0, 0, -0.35] },
-    items: ['Stud', 'Cotter pin', 'Machine parts', 'Precision turned parts'],
+    items: ['Studs', 'Taper pin', 'Cotter pin', 'Machine parts'],
     materials: [],
     notes: ['Made to your drawing or sample.'],
   },
   {
-    slug: 'castors',
-    code: '07',
-    name: 'Castors',
-    blurb: 'Plate castors with wheel and threaded-stem castors.',
-    callout: 'Ø50 wheel',
-    parts: [{ type: 'castor', head: 'plate', diameter: 50, finish: 'zinc' }],
-    pose: { tilt: [0.25, 0.6, 0] },
-    items: ['Plate castor with wheel', 'Threaded-stem castor'],
-    materials: [],
-    notes: [],
-  },
-  {
     slug: 'furniture-fittings',
-    code: '08',
+    code: '07',
     name: 'Furniture Fittings & Cams',
-    blurb: 'Cams, cam locks, threaded inserts, ferrules and complete furniture fitting kits.',
+    blurb: 'Cams, door and bed handles, and lock components.',
     callout: 'Ø15 cam',
     parts: [
       { type: 'cam', diameter: 5, finish: 'zinc', position: [-0.75, 0, 0] },
       { type: 'insert', head: 'threaded', diameter: 6, length: 13, finish: 'zinc', position: [0.85, 0.3, 0] },
     ],
     pose: { tilt: [0.5, -0.5, 0] },
-    items: ['Cam', 'Furniture fitting kits', 'Cam lock', 'Threaded insert', 'Ferrule / bush', 'Locks'],
+    items: ['Cams', 'Door handles', 'Bed handles', 'Lock components'],
     materials: [],
     notes: [],
   },
 ].map((c) => ({ ...c, image: `/products/${c.slug}.webp` }))
 
-/** Customers named in the catalogue (approved for the site; shown when SHOW_CUSTOMERS in content.js). Add `logo: '/brand/customers/<file>.svg'` when files arrive. */
-export const customers = [
-  { name: 'Godrej Interio', logo: null },
-  { name: 'IFB', logo: null },
-  { name: 'Elica', logo: null },
-  { name: 'Crompton Greaves', logo: null },
-  { name: 'Belden', logo: null },
-  { name: 'SmartLink', logo: null },
-  { name: 'Saakshi', logo: null },
-  { name: 'CA.BE Springs & Fasteners', logo: null },
-]
+/** Customers (approved for the site; shown when SHOW_CUSTOMERS in content.js). Names: CUSTOMER_NAMES in content.js (// CONFIRM). Set `logo: '/brand/customers/<file>.svg'` when files arrive. */
+const customerLogos = {}
+export const customers = CUSTOMER_NAMES.map((name) => ({ name, logo: customerLogos[name] ?? null }))
 
 /** Options for the customisation showcase (visual only). // CONFIRM: illustrative heads, sizes, grades and finishes, not supplied by the client. */
 export const customiser = {

@@ -39,9 +39,9 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - **All products**, categories, materials, sizes, finishes and customers live in **`src/data/products.js`** (real client lists since Phase 7A). Mark sample text `// PLACEHOLDER` and unconfirmed client facts `// CONFIRM`.
 - **No catalogue photos on the site**, ever (`client-assets/catalogue.pdf` is a shape reference only). Product images are our own renders: `public/products/*.webp` (transparent posters) and `*.jpg` (opaque) from `npm run render:products` (`scripts/render-products.mjs`, Playwright on `/lab?render=<slug>`). Configurator poster: `node scripts/render-posters.mjs` (re-run when that scene changes). The home hero still `public/posters/hero-still.webp` is a one-off render (10F); its scene is gone.
 - **Site URL** is one constant, `SITE_URL` in `src/config.js`, from `VITE_SITE_URL`, default `https://shreeashapuraindustries.vercel.app`. There is no custom domain yet; `shreeashapura.in` is **not** the client's domain, never use it.
-- **Capability numbers** (units 24 & 25 only): 5 cold-heading machines (1.6 to 7.5 mm), 8 thread-rolling machines (3 to 50 mm), 4 slotting/BT machines (4 to 55 mm). Single source: `machines` in `content.js`. Never mention units 31, 35, Sarita, drilling, grinding or length machines.
+- **Capability numbers** (units 24 & 25 only): 5 cold-heading machines (1.6 to 7.5 mm), 8 thread-rolling machines (3 to 50 mm), 4 slotting/BT machines (4 to 55 mm). Single source: `MACHINE_COUNTS` (= `machines`) in `content.js`. Never mention units 31, 35, Sarita or length machines. Since phase 11 a secondary list (Traub A25, drilling and tapping, grinding, milling, lathe, drum polish, welding) is shown on /manufacturing only (`capability.extra`), without changing the counts.
 - **Heat treatment and plating:** "via approved partners" `// CONFIRM`. Finishes allowed for high tensile and brass `// CONFIRM` (`src/data/materialFinishes.js`).
-- **Customers** are shown as styled text wordmarks (`customers` in `products.js`, `SHOW_CUSTOMERS = true`), each with a `logo` field (null for now) for real files later.
+- **Customers** are shown as styled text wordmarks (`customers` in `products.js`, names from `CUSTOMER_NAMES` in `content.js`, `SHOW_CUSTOMERS = true`), each with a `logo` field (null for now) for real files later.
 - 3D fastener models are generated **procedurally in code** (no external model files for now) and driven by parameters (type, head, diameter, length, pitch, finish) so they can be re-skinned later.
 
 ## Performance and quality
@@ -56,7 +56,7 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 ## Page sections (original concept; now split across routes, see Current status)
 1. **Intro loader** — thread being cut along a rod.
 2. **Hero** — static since 10F: copy + pre-rendered bolt-in-plate still (was a scroll-driven 3D bolt threading into a plate).
-3. **What we make** — 8 category cards with 3D spin on hover.
+3. **What we make** — 7 category cards with 3D spin on hover, plus a plain "made to your drawing" tile (castors removed in phase 11).
 4. **Exploded view** — removed in 10F.
 5. **Customisation showcase** — visual only: switch head, thread, finish; 3D morphs live; "Request a custom order" button opens WhatsApp with a prefilled message.
 6. **Manufacturing process** — horizontal scroll: wire coil, heading, thread rolling, heat treatment, plating, inspection.
@@ -76,7 +76,7 @@ Feels like a machined object crossed with an engineering blueprint. Tight, exact
 - Finishes live in `src/data/products.js` (`finishes`). Dimension tables live in `src/three/specs.js`.
 - Inspect parts at `/lab` (deep links: `/lab?type=nut&head=wing&finish=brass&normals=1`).
 
-## Current status (2026-11-13, after Phase 10F)
+## Current status (2026-11-14, after Phase 11)
 Built from the code, not from notes. Last commit before this refresh: `c70c1ae`.
 
 ### Completed phases
@@ -86,7 +86,7 @@ Built from the code, not from notes. Last commit before this refresh: `c70c1ae`.
 - **4 Categories + exploded view**: category cards with hover spin; the exploded view was removed in 10F.
 - **5 Configurator + manufacturing**: `/custom` customiser (head, size, pitch, length, material, finish; WhatsApp enquiry from the title block); horizontal-scroll process with SVG vignettes.
 - **6–7B Content**: loader, quality (ISO, in-process, instruments, PPAP, Lean, policy), capability ranges, about, industries + counters, customers marquee, gallery, contact, quote CTA, real client content (7A), SEO + JSON-LD (7B).
-- **8A Multi-page routing + prerender**: React Router 7 lazy routes, per-route SEO in `src/routes.js`, `scripts/prerender.mjs` writes static HTML for 17 pages, sitemap/robots, Vercel config.
+- **8A Multi-page routing + prerender**: React Router 7 lazy routes, per-route SEO in `src/routes.js`, `scripts/prerender.mjs` writes static HTML for every route (16 pages since phase 11), sitemap/robots, Vercel config.
 - **8B Configurator top view**: live SVG top view (`customise/TopView.jsx`) sharing proportions with the 3D heads via `three/headGeometry.js`.
 - **8C Safari scroll-drift fix**: `SyncCanvasRect` in `products/ProductViews.jsx` writes the live canvas rect each frame so drei Views stop drifting; `scripts/check-view-drift.mjs` measures it. Same commit: `SITE_URL` from `VITE_SITE_URL`.
 - **9A**: live 3D product cards on Home (`ProductsTeaser` reuses the shared-canvas grid), finishes by material (`data/materialFinishes.js`: swatches, spec, DWG code and WhatsApp text all read it), footer wordmark removed.
@@ -95,11 +95,12 @@ Built from the code, not from notes. Last commit before this refresh: `c70c1ae`.
 - **10 Blueprint navbar + spacing system**: nav is always visible (no auto-hide), shrinks 72 → 54 px past 80 px (logo scales, sub-line folds, blur + 1 px steel border); `--nav-h` stays 72 px for layout. Caliper indicator (`layout/NavLinksCaliper.jsx`, lazy, xl only, Framer `layoutId` + `domMax`) springs under the hovered / active link with its measured width. Scroll progress dimension line (`layout/NavProgress.jsx`, `useScrollProgress`: Lenis `scroll` event, window listener only when Lenis is absent). Mobile menu is a slide-down panel with 01–07 labels and Call / WhatsApp at the bottom. Spacing scale in `@theme` (`--spacing-section-sm/md/lg` 48 / 64 / 96, `--spacing-head` 48); `section-y` uses it, and every section boundary is one gap: same tone → the next section drops its top padding; tint change → half in each band; last section + footer → half each (CSS in `index.css` after `@utility section-y`). QuoteCTA, AboutStory, category items and the Home customers strip are `section-y` too, so the rules see them. `ui/SectionHead.jsx` = label + title + baseline-aligned aside, always 48 px above content. `lib/reveal.js` `revealOnce()` = one-shot reveal that snaps to the end state if unreachable / reduced motion (Capability, DimensionLine). Gallery real-photo mode uses the same grid, the last card spans the rest of its row. Footer product links: even 2 / 4-column grid.
 - **10D Performance**: no blank flash (`main.jsx` renders only after the first lazy route resolves); entry JS starts after `load` + first-contentful-paint (`deferEntry` in `vite.config.js`, 3 s cap, no modulepreload) so the prerendered page and its LCP paint first; static loader frame matches the loader's first frame; 3D takes the WebGL gate only after load + idle (posters until then); `StudioEnvironment` built with three directly (drei's HDR/EXR loaders gone, renders pixel-identical); customiser + category stage render from `gsap.ticker` via `three/TickerLoop.jsx`; geometry cache LRU 64; PageTransition uses WAAPI (Framer only in the mobile menu / caliper); vendor chunks `react`, `gsap`, `three` and a build assert that no 3D code is in the entry graph. Mobile Lighthouse (median before → single runs after the first-paint fixes): / 84 → 95-96, /products 83 → 93, /custom 77 → 91-93; LCP 3.9-4.4 s → 2.3-2.6 s.
 - **10E 3D quality + no layout shift**: DPR `min(devicePixelRatio, 2)` (1.5 only on low-end phones under 640 px), antialias on except low-end phones, full part detail except under 640 px (`lib/device.js` `maxDpr`, `dprCap`, `glAntialias`, `partDetail`); product cards now full detail with a 256 environment. Every 3D placeholder is a render of its own live scene's first frame, fitted with the same rule as the camera, so poster -> canvas is an opacity crossfade only: product posters `npm run render:products` (1600×1200, transparent, framed exactly like the live card; opaque `.jpg` copies for og:image, JSON-LD and the gallery); configurator poster `node scripts/render-posters.mjs` (captures the camera's fitted rect from the dev build at 2×; `public/posters/`). The products hint is CSS-picked, so the desktop-snapshotted prerender matches phones. Shared canvas: canvas document offset cached (resize, body/canvas ResizeObserver, ScrollTrigger refresh, fonts) and the viewport rect derived from scroll each ticker frame. `scripts/static-shell.js` is only the loader frame now (the hero shell was dead code).
+- **11 Catalogue content**: castors category removed (7 lines; 3D castor builder and /lab presets kept; `/products/castors` redirects to `/products`). Category 1 renamed "Screws, Bolts & Nuts" (slug unchanged); every category's `items` from the new catalogue. `content.products.catalogue`: range "M2 – M14 · #2 – #14 · L 3 – 100 mm", materials text list, kits line, shown in the /products head (range also in the /manufacturing Capability head). `capability.extra`: secondary machines list under the chart on /manufacturing. 8th grid tile `CustomCard` (links to /custom) replaces the separate callout strip under the /products grid. Facts awaiting the client are single `// CONFIRM` constants at the top of `content.js` (`FIRM_NAME`, `FOUNDED`, `ADDRESS`, `PHONES`, `EMAILS`, `MACHINE_COUNTS`, `CUSTOMER_NAMES`, `LEADER`, `ISO_TEXT`, `PPAP_TEXT`, `LEAN_TEXT`); every string reads them. Log: `CONFIRM.md`.
 - **10F Static hero, no exploded view**: hero (`components/hero/Hero.jsx`) is a plain `section-y bg-paper` section (top padding = chrome + `--section-y`): same eyebrow, headline, EST. 1990 line, lead and Call / WhatsApp buttons (one-shot GSAP entrance after the loader, no ScrollTrigger), `DriftingParts` with CSS drift only, and `public/posters/hero-still.webp` (seated bolt-in-plate, 1860×1600, rendered once from the old scene) with a CSS-only hover tilt (`.hero-still`, fine pointers, motion allowed). Removed: HeroScene, HeroDimensions, TorqueReadout, `components/exploded/`, `heroStore`, `explodedStore`, `TappedPlate` / `plate` builder, `heroBolt`, `content.exploded` and the hero scene copy, old hero posters. Home: Hero → ProductsTeaser → GearDivider → Capability → QualityTeaser → Customers → QuoteCTA; no pins on `/`.
 - **9B Logo**: client master `public/brand/sa-logo.svg` inlined via generated `ui/logoMark.js` in navbar, mobile menu, footer and loader; favicons / touch / manifest icons from `scripts/brand-icons.mjs`.
 
 ### Routes
-`/` Home · `/products` · `/products/:slug` (8 lines from `categories`) · `/custom` · `/manufacturing` · `/quality` · `/about` · `/gallery` · `/contact` · `*` styled 404 (with "Did you mean") · `/lab` outside the layout. Tree: `src/router.jsx`; SEO + JSON-LD: `src/routes.js`.
+`/` Home · `/products` · `/products/:slug` (7 lines from `categories`; `/products/castors` 301 → `/products` in vercel.json, serve-dist and the router) · `/custom` · `/manufacturing` · `/quality` · `/about` · `/gallery` · `/contact` · `*` styled 404 (with "Did you mean") · `/lab` outside the layout. Tree: `src/router.jsx`; SEO + JSON-LD: `src/routes.js`.
 
 ### Key folders
 - `src/pages/` one file per route · `src/layout/` RootLayout, PageTransition (Framer `LazyMotion`, opacity), RouteLifecycle, Seo
@@ -122,7 +123,7 @@ Built from the code, not from notes. Last commit before this refresh: `c70c1ae`.
 `npm run dev` (5173) · `npm run build` (vite build → sitemap → prerender) · `npm run preview` (Vercel-like server on 4173) · `npm run build:spa` · `npm run render:products` · `node scripts/brand-icons.mjs` · `node scripts/check-view-drift.mjs <outDir> [tag] [baseUrl] [route]`.
 
 ### Health check (2026-11-09)
-- `npm run build`: passes, 17 pages prerendered, sitemap 16 URLs.
+- `npm run build`: passes, 16 pages prerendered, sitemap 15 URLs (phase 11).
 - ScrollTrigger baseline (every route visited twice by in-app links, desktop Chromium): triggers and pin spacers identical on revisit for all routes; peak WebGL contexts 1. Dead-space audit at 1440: no band over 160 px between sections on any route, no grid row with columns more than 160 px apart.
 
 ### Half-finished or risky
@@ -136,7 +137,7 @@ Built from the code, not from notes. Last commit before this refresh: `c70c1ae`.
 - `Process.jsx` intro panel keeps its own header layout (it lives inside the pinned horizontal track), not `SectionHead`.
 - Large lazy chunk: `three` (three + R3F + drei) ~255 kB gzip, loaded only on 3D routes after idle.
 
-### Open items: `// CONFIRM` (client to confirm)
+### Open items: `// CONFIRM` (client to confirm; catalogue conflicts in `CONFIRM.md`)
 - [ ] ISO 9001:2015 certificate details (number, body, validity): `content.js` `company.iso`, `hero.eyebrow`, `quality.lead`, `quality.isoBadge`, `industries.iso`, `about.facts`; seal in `quality/Quality.jsx`
 - [ ] Machine counts and ranges (5 / 8 / 4 machines): `content.js` `machines` and the heading, slotting, rolling stations
 - [ ] Heat treatment and plating "via approved partners": `content.js` station `spec`, `tag`, `text` and `pages.manufacturing` (also in `public/llms.txt`)

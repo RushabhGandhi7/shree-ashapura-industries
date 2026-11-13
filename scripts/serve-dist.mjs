@@ -1,6 +1,7 @@
 // Small static server for dist/ that behaves like Vercel with cleanUrls:
 //   /products -> products.html, /products/brass-parts -> products/brass-parts.html,
-//   unknown paths -> 404.html (status 404), Brotli for text assets.
+//   exact-path `redirects` from vercel.json (301 / 307), unknown paths -> 404.html (status 404),
+//   Brotli for text assets.
 //   node scripts/serve-dist.mjs [port]      (also used by scripts/prerender.mjs)
 import http from 'node:http'
 import fs from 'node:fs'
@@ -10,11 +11,21 @@ import { pathToFileURL } from 'node:url'
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.txt': 'text/plain', '.xml': 'application/xml', '.json': 'application/json', '.mp4': 'video/mp4' }
 
+// Same redirects as Vercel (exact `source` paths only; that is all vercel.json uses).
+const REDIRECTS = new Map(
+  (JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, '../vercel.json'), 'utf8')).redirects ?? []).map((r) => [r.source, r]),
+)
+
 export function serveDist({ root = path.resolve('dist'), port = 4175, spaFallback = false } = {}) {
   const cache = new Map()
   const isFile = (f) => f.startsWith(root) && fs.existsSync(f) && fs.statSync(f).isFile()
   const server = http.createServer((req, res) => {
     const p = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/\/+$/, '') || '/'
+    const r = REDIRECTS.get(p)
+    if (r) {
+      res.writeHead(r.permanent ? 301 : 307, { Location: r.destination })
+      return res.end()
+    }
     let file = path.join(root, p === '/' ? 'index.html' : p)
     let status = 200
     if (!isFile(file)) file = path.join(root, `${p}.html`)

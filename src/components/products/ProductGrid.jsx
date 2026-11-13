@@ -94,6 +94,52 @@ function Card({ c, setSlot, touch, live, Hc, eager, compact }) {
 }
 
 /**
+ * The grid's last tile: custom parts made to your drawing. Plain (no 3D View), so the shared
+ * canvas never sees it. It also keeps the grid even (7 product lines + 1 = 2 / 4 per row).
+ */
+function CustomCard({ Hc, compact }) {
+  const c = t.custom
+  return (
+    <li>
+      <Link
+        to="/custom"
+        className="shine group flex h-full w-full flex-col bg-paper-2 text-left transition-colors duration-300 hover:bg-white focus-visible:z-10"
+      >
+        <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-steel-300/70">
+          <div className="bp-grid absolute inset-0 opacity-60" aria-hidden />
+          {/* title-block drawing: a stepped part with its length dimension */}
+          <svg viewBox="0 0 200 150" className="absolute inset-0 m-auto h-[70%] w-[70%]" fill="none" aria-hidden>
+            <rect x="6" y="6" width="188" height="138" stroke="var(--color-ink)" strokeWidth="1.2" />
+            <rect x="12" y="12" width="176" height="126" stroke="var(--color-steel-300)" />
+            <path d="M44 52 H118 V64 H152 V82 H118 V94 H44 Z" stroke="var(--color-ink)" strokeWidth="1.4" />
+            <path d="M36 73 H162" stroke="var(--color-steel-500)" strokeDasharray="6 3 1 3" />
+            <path d="M44 112 H152 M44 106 v12 M152 106 v12" stroke="var(--color-red)" strokeWidth="1.2" />
+          </svg>
+          <span className="label-mono absolute right-2 bottom-2 rounded-xs border border-red/40 bg-paper/85 px-1.5 py-0.5 text-[10px] text-red sm:right-3 sm:bottom-3">
+            {c.tag}
+          </span>
+        </div>
+        <div className={`flex flex-1 flex-col gap-2 ${compact ? 'p-3 sm:p-4' : 'p-4 sm:p-5'}`}>
+          <span className="font-mono text-small font-medium text-red">+</span>
+          <Hc className={compact ? 'font-display text-[0.98rem] leading-tight font-[760] [font-stretch:110%] sm:text-[1.1rem]' : 'text-[1.15rem] leading-tight sm:text-h3'}>
+            {compact ? c.shortTitle : c.title}
+          </Hc>
+          {!compact && <p className="text-small leading-relaxed text-steel-700">{c.text}</p>}
+          {!compact && (
+            <span className="label-mono mt-auto inline-flex items-center gap-2 pt-2 text-ink group-hover:text-red">
+              {c.cta}
+              <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
+            </span>
+          )}
+        </div>
+      </Link>
+    </li>
+  )
+}
+
+/**
  * @param compact  Home: two columns on phones, no blurb
  * @param Hc       card heading element
  */
@@ -133,6 +179,7 @@ export default function ProductGrid({ compact = false, Hc = 'h3', className = ''
         {categories.map((c, i) => (
           <Card key={c.slug} c={c} Hc={Hc} eager={i < 2} compact={compact} setSlot={setSlot} touch={profile.touch} live={live3D && !!ready[c.slug]} />
         ))}
+        <CustomCard Hc={Hc} compact={compact} />
       </ul>
       {live3D && (
         <Boundary onFail={() => setGlFailed(true)}>

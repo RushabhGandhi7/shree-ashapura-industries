@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { content } from '../data/content.js'
+import { content, FIRM_NAME } from '../data/content.js'
 import { useLenis } from '../lib/smoothScroll.jsx'
 import { LogoMark } from './ui/Logo.jsx'
 
@@ -215,7 +215,7 @@ export default function Loader({ onDone }) {
           <Stage idPrefix="ldt" />
           {/* client logo (light background, own clear space), above the rod; leaves with the top half */}
           <div className="ld-logo absolute inset-x-0 top-[calc(50%-12rem)] flex justify-center [--logo-h:3rem] md:top-[calc(50%-14rem)] md:[--logo-h:4rem]">
-            <LogoMark title="Shree Ashapura Industries" />
+            <LogoMark title={FIRM_NAME} />
           </div>
         </div>
       </div>

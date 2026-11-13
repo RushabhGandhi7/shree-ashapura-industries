@@ -2,7 +2,7 @@
 //
 //   <Fastener type="bolt" head="socket" diameter={8} length={40} pitch={1.25} finish="brass" />
 //
-// type:     bolt | nut | washer | screw | bracket | turned | clip | connector
+// type:     bolt | nut | washer | screw | bracket | turned | clip | connector | axle | ... (see `variants`)
 // head:     variant (see `variants` in src/data/products.js), e.g. bolt: hex | socket | pan | countersunk
 // diameter: mm (bracket: width; turned: largest Ø; clip: stem Ø; connector: bolt shank Ø)
 // length:   mm (ignored for nuts / washers)
@@ -15,6 +15,7 @@
 import { forwardRef, useMemo } from 'react'
 import { buildPart } from './parts.js'
 import { getMaterial } from './materials.js'
+import { finishFor } from '../data/products.js'
 
 export const Fastener = forwardRef(function Fastener(
   { type = 'bolt', head, variant, diameter, length, pitch, finish = 'zinc', detail = 'high', quality, wireframe = false, materialFor, children, ...props },
@@ -25,10 +26,11 @@ export const Fastener = forwardRef(function Fastener(
     [type, head, variant, diameter, length, pitch, detail],
   )
   const q = quality ?? detail
+  const fin = finishFor(type, finish) // washers: never brass
   return (
     <group ref={ref} {...props}>
       {Object.entries(part.geos).map(([role, geo]) => (
-        <mesh key={role} geometry={geo} material={wireframe ? undefined : (materialFor?.(role) ?? getMaterial(finish, role, q))}>
+        <mesh key={role} geometry={geo} material={wireframe ? undefined : (materialFor?.(role) ?? getMaterial(fin, role, q))}>
           {wireframe && <meshBasicMaterial wireframe color="#55575A" />}
         </mesh>
       ))}
@@ -48,6 +50,7 @@ export const Washer = typed('washer')
 export const Screw = typed('screw')
 export const Bracket = typed('bracket')
 export const TurnedPart = typed('turned')
+export const Axle = typed('axle')
 export const MouldedClip = typed('clip')
 export const FurnitureConnector = typed('connector')
 

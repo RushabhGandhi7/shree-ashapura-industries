@@ -70,7 +70,6 @@ export function structuredData(p) {
     },
     contactPoint: [
       { '@type': 'ContactPoint', telephone: company.phone.e164, email: company.emails[0], contactType: 'sales', availableLanguage: ['en', 'hi', 'gu'] },
-      { '@type': 'ContactPoint', telephone: company.landline.e164, email: company.emails[1], contactType: 'customer service' },
     ],
     areaServed: 'IN',
   }

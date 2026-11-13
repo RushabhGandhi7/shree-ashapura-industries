@@ -59,3 +59,9 @@ Customers (text only, behind SHOW_CUSTOMERS flag, CONFIRM permission): Godrej In
 - Kits for furniture and locks; parts to customer drawings and raw material.
 - Secondary machines may be listed on /manufacturing (replaces the "do not mention drilling, grinding" rule above): Traub A25 1.6 to 25 mm, drilling and tapping, grinding, milling, lathe, drum polish, welding. Counted machines (5 / 8 / 4) unchanged.
 - Conflicting facts (firm name, since year, address, phones, emails, machine counts, customers, Bharat Jain's title, ISO / PPAP / Lean) stay as on the site until the client confirms: see CONFIRM.md.
+
+## PHASE 12A OVERRIDES (2026-11-14)
+- Landline removed. The only phone is +91 70215 80583 (call and WhatsApp).
+- Address, written once (`ADDRESS_TEXT` in content.js): Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump, Dahisar (East), Mumbai 400068. CONFIRM spelling Agarwal vs Agrawal.
+- Washers: zinc, steel or black only (never brass).
+- Brass Parts card shows the knurled brass turned bush only. Studs, Pins & Turned Parts adds an axle / rod with double-side knurling.

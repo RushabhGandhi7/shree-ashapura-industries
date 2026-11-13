@@ -104,7 +104,7 @@ Edit `categories` in `src/data/products.js`: name, blurb, `items`, `materials`, 
 parts: [{ type: 'bolt', head: 'hex', diameter: 10, length: 30, finish: 'zinc' }]
 ```
 
-The available types and heads are listed in `variants` in the same file (screws, washers, brackets, inserts, castors, studs, cotter pins, levellers and more). Use `/lab` to try combinations, then re-run `npm run render:products`.
+The available types and heads are listed in `variants` in the same file (screws, washers, brackets, inserts, studs, cotter pins, knurled axles, levellers and more). Use `/lab` to try combinations, then re-run `npm run render:products`.
 
 ### Customer logos
 `customers` in `src/data/products.js` renders as text wordmarks. Add `logo: '/brand/customers/<file>.svg'` to a customer to show its logo instead. Set `SHOW_CUSTOMERS = false` to hide the strip.

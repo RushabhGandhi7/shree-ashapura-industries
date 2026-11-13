@@ -17,7 +17,10 @@ export default function Footer() {
       <div className="container-x relative pt-[calc(var(--section-y)/2)] pb-10">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12">
           <div className="sm:col-span-2 lg:col-span-5">
-            <Logo size="footer" />
+            <Link to="/" className="-ml-1 inline-block p-1">
+              <Logo size="footer" />
+              <span className="sr-only">{content.nav.homeLabel}</span>
+            </Link>
             <p className="mt-6 max-w-[38ch] text-steel-700">{t.blurb}</p>
           </div>
 
@@ -52,14 +55,6 @@ export default function Footer() {
                 </dd>
               </div>
               <div>
-                <dt className="text-steel-700">{t.landline}</dt>
-                <dd>
-                  <a href={telHref(company.landline.e164)} className="inline-block py-1 font-medium hover:text-red">
-                    {company.landline.display}
-                  </a>
-                </dd>
-              </div>
-              <div>
                 <dt className="text-steel-700">{t.email}</dt>
                 <dd>
                   {company.emails.map((e) => (
@@ -82,11 +77,6 @@ export default function Footer() {
           <div className="lg:col-span-3">
             <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.linksTitle}</h2>
             <ul className="space-y-2 text-small">
-              <li>
-                <Link to="/" className="font-medium hover:text-red">
-                  {content.pages.home_crumb}
-                </Link>
-              </li>
               {content.nav.links.map((l) => (
                 <li key={l.to}>
                   <Link to={l.to} className="font-medium hover:text-red">
@@ -98,7 +88,7 @@ export default function Footer() {
           </div>
           <div className="lg:col-span-9">
             <h2 className="label-mono mb-4 font-medium [font-stretch:100%] text-steel-500">{t.productsTitle}</h2>
-            {/* even grid: 8 lines = 2 full rows of 4 on desktop, 4 rows of 2 below */}
+            {/* 7 lines: rows of 4 on desktop, 2 below */}
             <ul className="grid grid-cols-2 gap-x-8 gap-y-2 text-small lg:grid-cols-4">
               {categories.map((c) => (
                 <li key={c.slug}>

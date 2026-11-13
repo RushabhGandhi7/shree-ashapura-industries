@@ -84,6 +84,6 @@ export const DEFAULTS = {
   stud: { head: 'collar', diameter: 10, length: 60, finish: 'zinc' }, // length = overall
   cotterPin: { head: 'split', diameter: 3, length: 28, finish: 'zinc' }, // diameter = wire Ø
   leveller: { head: 'hex', diameter: 8, length: 28, finish: 'zinc' }, // diameter = stud Ø
-  insert: { head: 'threaded', diameter: 6, length: 13, finish: 'zinc' }, // diameter = inner thread / pin Ø
-  castor: { head: 'plate', diameter: 50, finish: 'zinc' }, // diameter = wheel Ø
+  insert: { head: 'threaded', diameter: 6, length: 13, finish: 'zinc' }, // diameter = inner thread Ø
+  axle: { head: 'knurled', diameter: 8, length: 60, finish: 'mildSteel' }, // diameter = knurl Ø, length = overall
 }

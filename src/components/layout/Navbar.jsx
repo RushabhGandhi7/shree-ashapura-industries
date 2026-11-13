@@ -18,7 +18,7 @@ const t = content.nav
 const CONDENSE_AT = 80 // px scrolled before the bar shrinks
 
 export const navLinkClass = ({ isActive }) =>
-  `group relative inline-flex items-baseline gap-1.5 px-3 py-2 text-small font-medium transition-colors hover:text-red ${isActive ? 'is-active text-red' : 'text-ink'}`
+  `group relative inline-flex items-baseline gap-1.5 px-3 py-2 xl:max-2xl:px-2 text-small font-medium transition-colors hover:text-red ${isActive ? 'is-active text-red' : 'text-ink'}`
 
 /** The desktop links without the caliper (first paint, prerender, until the chunk loads). */
 export function NavLinksPlain() {
@@ -26,7 +26,7 @@ export function NavLinksPlain() {
     <ul className="flex items-center gap-1">
       {t.links.map((l, i) => (
         <li key={l.to}>
-          <NavLink to={l.to} className={navLinkClass}>
+          <NavLink to={l.to} end={l.to === '/'} className={navLinkClass}>
             <span className="label-mono text-[0.6rem] text-steel-500 group-hover:text-red" aria-hidden>
               0{i + 1}
             </span>
@@ -104,7 +104,7 @@ export default function Navbar() {
         }`}
       >
         <div
-          className={`container-x flex items-center justify-between gap-2 transition-[height] duration-300 ease-[var(--ease-out)] motion-reduce:transition-none sm:gap-6 ${
+          className={`container-x flex items-center justify-between gap-2 transition-[height] duration-300 ease-[var(--ease-out)] motion-reduce:transition-none sm:gap-6 xl:max-2xl:gap-4 ${
             condensed ? 'h-[calc(var(--nav-h)*0.75)]' : 'h-[var(--nav-h)]'
           }`}
         >
@@ -132,7 +132,8 @@ export default function Navbar() {
                 icon={<PhoneIcon size={16} />}
                 aria-label={`${t.call} ${company.phone.display}`}
               >
-                {t.call}
+                {/* 8 nav links: at xl (1280–1535) the Call button is icon-only so the bar fits */}
+                <span className="xl:max-2xl:sr-only">{t.call}</span>
               </Button>
               <Button href={whatsappHref(content.whatsappMessages.general)} size="sm" icon={<WhatsAppIcon size={16} />}>
                 {t.whatsapp}

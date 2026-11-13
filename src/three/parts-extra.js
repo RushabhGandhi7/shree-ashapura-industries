@@ -1,13 +1,13 @@
-// Catalogue part builders (Phase 7A): washers (star / circlip / cap), brackets (T / square /
-// hook), rivet, male-female screw, leveller, inserts (threaded / knurled / pin / bush),
-// stud, cotter pin and castors (plate / stem).
+// Catalogue part builders (Phase 7A, 12A): washers (star / circlip / cap), brackets (T /
+// square / hook), rivet, male-female screw, leveller, inserts (threaded / knurled), stud,
+// cotter pin and the double-side knurled axle.
 // Same conventions as parts.js: 1 = 10 mm, Y is the axis, origin on the bearing face.
 // parts.js imports this module and this module imports helpers from parts.js. That
 // circular import is safe because only hoisted function declarations are used, and only
 // at call time.
 import * as THREE from 'three'
 import { makeBuilders, ring, stitch, up, down, arc, TAU } from './lib/builder.js'
-import { lathe, roundedRectProfile } from './lib/lathe.js'
+import { lathe } from './lib/lathe.js'
 import { threadSurface, minorRadius } from './lib/thread.js'
 import { hexPrism } from './lib/hex.js'
 import { plate, roundedRect2, circle2, roundedSection } from './lib/sheet.js'
@@ -327,7 +327,7 @@ function leveller(B, p) {
   return { extras: [upwardThread({ R, L, P, threadLen: L, N, detail: p.detail }, 0)] }
 }
 
-/** Inserts: threaded (furniture), knurled (brass), pin (brass), bush (flanged ferrule). */
+/** Inserts: threaded (furniture) and knurled (brass turned bush: two knurled bands, centre groove, threaded bore). */
 function insert(B, p) {
   const N = SEG[p.detail]
   const d = p.diameter
@@ -380,161 +380,50 @@ function insert(B, p) {
       bore(0, L)
       return
     }
-    case 'pin': {
-      const c = R * 0.2
-      const Rk = R * 1.06
-      lathe(
-        [
-          { pts: [[0, 0], [R - c, 0]], builder: m },
-          { pts: [[R - c, 0], [R, c]], builder: m },
-          { pts: [[R, c], [R, L * 0.3]], builder: m },
-          { pts: [[R, L * 0.3], [Rk, L * 0.33]], builder: m },
-          { pts: [[Rk, L * 0.33], [Rk, L * 0.62]], builder: B.knurl },
-          { pts: [[Rk, L * 0.62], [R, L * 0.65]], builder: m },
-          { pts: [[R, L * 0.65], [R, L - c * 1.6], ...arc(R - c * 1.6, L - c * 1.6, c * 1.6, 0, Math.PI / 2, 5).slice(1), [0, L]], builder: m },
-        ],
-        { segments: N },
-      )
-      return
-    }
-    case 'bush': {
-      const ri = R
-      const Ro = D * 0.8
-      const Rf = D * 1.2
-      const Fh = D * 0.2
-      const c = Fh * 0.25
-      lathe(
-        [
-          { pts: [[ri, 0], [Ro - c, 0]], builder: m },
-          { pts: [[Ro - c, 0], [Ro, c]], builder: m },
-          { pts: [[Ro, c], [Ro, L - Fh]], builder: m },
-          { pts: [[Ro, L - Fh], [Rf, L - Fh]], builder: m },
-          { pts: [[Rf, L - Fh], [Rf, L - c], [Rf - c, L]], builder: m },
-          { pts: [[Rf - c, L], [ri, L]], builder: m },
-          { pts: [[ri, L], [ri, 0]], builder: B.dark },
-        ],
-        { segments: N },
-      )
-      return
-    }
     default:
       throw new Error(`Unknown insert: ${p.head}`)
   }
 }
 
-/* ───────────────────────── castors ───────────────────────── */
+/* ───────────────────────── axle ───────────────────────── */
 
 /**
- * Castor, hanging below the mounting face (y = 0). diameter = wheel Ø.
- * plate: square top plate with 4 holes, black pressed fork, cream nylon wheel.
- * stem:  threaded stem, black fork and black twin wheels.
+ * Axle / rod with double-side knurling: a turned steel rod, y = 0 .. L. Straight-knurled
+ * bands at both ends (the knurl normal map, like the brass bush), a short 30° step down to a
+ * plain centre at 0.92 × the knurl Ø, chamfered end faces with 60° centre holes.
+ * diameter = knurl Ø, length = overall.
  */
-function castor(B, p) {
-  const N = SEG[p.detail]
-  const isStem = p.head === 'stem'
-  const Dw = mm(p.diameter)
-  const Rw = Dw / 2
-  const Ww = Dw * 0.4
-  const tp = isStem ? 0 : Dw * 0.05
-  const hr = Dw * 0.1
-  const yTop = -tp - hr
-  const ya = yTop - Dw * 0.12 - Rw * 0.95 // axle height
-  const rAx = Dw * 0.05
-  const gap = Dw * 0.03
-  const tf = Dw * 0.035
-  const xIn = Ww / 2 + gap
-  const extras = []
-  const toX = new THREE.Matrix4().makeRotationZ(-Math.PI / 2)
-
-  // wheel(s), built around Y then turned onto the X axis
-  const wheel = (x, width, role) => {
-    const Bw = makeBuilders()
-    const b = Bw[role]
-    lathe(
-      [
-        { pts: roundedRectProfile(Rw * 0.66, Rw, -width / 2, width / 2, Math.min(width * 0.3, Rw * 0.15), p.detail === 'low' ? 2 : 4), closed: true, builder: b },
-        { pts: roundedRectProfile(rAx, Rw * 0.68, -width * 0.38, width * 0.38, width * 0.06, 2), closed: true, builder: b },
-      ],
-      { segments: Math.max(N, 40) },
-    )
-    extras.push({ B: Bw, matrix: new THREE.Matrix4().makeTranslation(x, ya, 0).multiply(toX) })
-  }
-  if (isStem) {
-    wheel(-Ww * 0.27, Ww * 0.46, 'black')
-    wheel(Ww * 0.27, Ww * 0.46, 'black')
-  } else wheel(0, Ww, 'cream')
-
-  // axle with domed rivet ends
-  const Ba = makeBuilders()
-  const ax = xIn + tf + rAx * 0.8
+function axle(B, p) {
+  const N = p.detail === 'low' ? 32 : 64 // round stock: same smoothness as the turned part
+  const R = mm(p.diameter) / 2
+  const L = mm(p.length)
+  const Rc = R * 0.92 // plain centre
+  const c = R * 0.12 // end chamfer
+  const Lk = L * 0.22 // each knurled band
+  const s = (R - Rc) * Math.sqrt(3) // 30° step
+  const rh = R * 0.2 // centre hole
+  const dh = rh * 0.58 // 120° cone depth
+  const m = B.main
   lathe(
     [
-      {
-        pts: [...arc(0, -ax, rAx * 1.5, -Math.PI / 2, 0, 4), [rAx, -ax], [rAx, ax], ...arc(0, ax, rAx * 1.5, 0, Math.PI / 2, 4)],
-        builder: Ba.main,
-      },
-    ],
-    { segments: 20 },
-  )
-  extras.push({ B: Ba, matrix: new THREE.Matrix4().makeTranslation(0, ya, 0).multiply(toX) })
-
-  // pressed fork: two side cheeks and a top bridge
-  const fork = B.black
-  const Zh = Rw * 0.55
-  const ra = Rw * 0.42
-  const yF = yTop
-  for (const s of [-1, 1]) {
-    const outline = [[Zh, yF], [-Zh, yF]]
-    for (let i = 0; i <= 12; i++) {
-      const a = Math.PI + (Math.PI * i) / 12
-      outline.push([ra * Math.cos(a), ya + ra * Math.sin(a)])
-    }
-    plate(fork, {
-      outline,
-      holes: [circle2(0, ya, rAx * 1.02, 16)],
-      t: tf,
-      basis: { O: [s > 0 ? xIn : -xIn - tf, 0, 0], U: [0, 0, 1], W: [0, 1, 0], H: [1, 0, 0] },
-    })
-  }
-  plate(fork, {
-    outline: roundedRect2(-xIn - tf, -Zh, xIn + tf, Zh, tf, 3),
-    t: tf * 1.2,
-    basis: { O: [0, yF - tf * 1.2, 0], U: [1, 0, 0], W: [0, 0, 1], H: [0, 1, 0] },
-  })
-
-  // swivel race
-  const Rr = Rw * 0.62
-  lathe(
-    [
-      { pts: [[0, yF], [Rr * 0.8, yF]], builder: B.main },
-      { pts: [[Rr * 0.8, yF], [Rr, yF + hr * 0.45], [Rr * 0.92, yF + hr]], builder: B.main },
-      { pts: [[Rr * 0.92, yF + hr], [Rr * 0.3, yF + hr]], builder: B.main },
+      { pts: [[0, dh], [rh, 0]], builder: B.dark },
+      { pts: [[rh, 0], [R - c, 0]], builder: m },
+      { pts: [[R - c, 0], [R, c]], builder: m },
+      { pts: [[R, c], [R, Lk]], builder: B.knurl },
+      { pts: [[R, Lk], [Rc, Lk + s]], builder: m },
+      { pts: [[Rc, Lk + s], [Rc, L - Lk - s]], builder: m },
+      { pts: [[Rc, L - Lk - s], [R, L - Lk]], builder: m },
+      { pts: [[R, L - Lk], [R, L - c]], builder: B.knurl },
+      { pts: [[R, L - c], [R - c, L]], builder: m },
+      { pts: [[R - c, L], [rh, L]], builder: m },
+      { pts: [[rh, L], [0, L - dh]], builder: B.dark },
     ],
     { segments: N },
   )
-
-  if (isStem) {
-    const d = Math.max(6, Math.round(p.diameter * 0.2))
-    const R = mm(d) / 2
-    extras.push(upwardThread({ R, L: Dw * 0.55, P: mm(pitchFor(d)), threadLen: Dw * 0.55, N, detail: p.detail }, 0))
-  } else {
-    const A = Rw * 0.95
-    const h = A * 0.68
-    plate(B.main, {
-      outline: roundedRect2(-A, -A, A, A, A * 0.12, 5),
-      holes: [[-h, -h], [h, -h], [h, h], [-h, h]].map(([u, w]) => circle2(u, w, A * 0.09, 16)),
-      t: tp,
-      basis: { O: [0, -tp, 0], U: [1, 0, 0], W: [0, 0, 1], H: [0, 1, 0] },
-      chamfer: tp * 0.15,
-    })
-    const rd = Rr * 0.28
-    lathe([{ pts: [[rd, 0], ...arc(0, 0, rd, 0, Math.PI / 2, 5).slice(1)], builder: B.main }], { segments: 24 })
-  }
-  return { extras }
 }
 
 export const EXTRA = {
   washerVariant: { star, circlip, cap },
   bracketVariant: { T: tBracket, square: squarePlate, hook },
-  builders: { rivet, maleFemale, stud, cotterPin, leveller, insert, castor },
+  builders: { rivet, maleFemale, stud, cotterPin, leveller, insert, axle },
 }

@@ -40,7 +40,7 @@ export function knurlNormalMap() {
  */
 export function finishParams(finish = 'zinc', role = 'main') {
   // fixed-material roles ignore the part's finish
-  const fixed = { nylon: 'nylon', cream: 'nylon', black: 'nylonBlack' }[role]
+  const fixed = { nylon: 'nylon', black: 'nylonBlack' }[role]
   const f = finishes[fixed ?? finish] ?? finishes.zinc
   const color = new THREE.Color(f.color)
   let roughness = f.roughness

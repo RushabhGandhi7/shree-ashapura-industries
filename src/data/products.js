@@ -1,6 +1,6 @@
 // Product catalogue: real categories and lists from the client's catalogue
 // (client-assets/CLIENT_FACTS.md), plus the parameters the procedural 3D library reads:
-//   type: see `variants` below (bolt, screw, nut, washer, bracket, insert, castor, ...)
+//   type: see `variants` below (bolt, screw, nut, washer, bracket, insert, axle, ...)
 //   head: variant key from `variants[type]`
 //   diameter / length / pitch in mm, finish: key of `finishes`.
 
@@ -19,6 +19,11 @@ export const finishes = {
   nylon: { label: 'Nylon (natural)', color: '#EEE8D9', metalness: 0, roughness: 0.55 },
   nylonBlack: { label: 'Nylon (black)', color: '#2A2A2B', metalness: 0, roughness: 0.6 },
 }
+
+/** Washers are never brass: zinc, steel (bright mild steel / stainless) or black oxide only. */
+export const washerFinishes = ['zinc', 'mildSteel', 'stainless', 'blackOxide']
+/** The finish a part is actually drawn in: a washer outside `washerFinishes` falls back to zinc. */
+export const finishFor = (type, finish) => (type === 'washer' && !washerFinishes.includes(finish) ? 'zinc' : finish)
 
 /** The five finishes offered for metal parts (customiser, lab). */
 export const metalFinishes = ['zinc', 'blackOxide', 'brass', 'stainless', 'redAnodised']
@@ -49,8 +54,8 @@ export const variants = {
   stud: { collar: 'Stud with hex collar' },
   cotterPin: { split: 'Cotter pin' },
   leveller: { hex: 'Leveller' },
-  insert: { threaded: 'Threaded insert', knurled: 'Knurled insert', pin: 'Brass pin', bush: 'Ferrule / bush' },
-  castor: { plate: 'Plate castor', stem: 'Threaded-stem castor' },
+  insert: { threaded: 'Threaded insert', knurled: 'Knurled brass bush' },
+  axle: { knurled: 'Axle / rod, double-side knurl' },
 }
 
 // The 7 "What we make" cards. Item lists from the client's new catalogue (phase 11, client-assets/CLIENT_FACTS.md).
@@ -123,11 +128,8 @@ export const categories = [
     name: 'Brass Parts',
     blurb: 'Brass nozzles, pins and turned brass parts, made to the size you need.',
     callout: 'Ø6 knurl',
-    parts: [
-      { type: 'insert', head: 'knurled', diameter: 6, length: 12, finish: 'brass', position: [-0.6, 0, 0] },
-      { type: 'insert', head: 'pin', diameter: 5, length: 30, finish: 'brass', position: [0.7, 0, 0] },
-    ],
-    pose: { tilt: [0, 0, -0.5] },
+    parts: [{ type: 'insert', head: 'knurled', diameter: 6, length: 14, finish: 'brass' }], // the knurled brass turned bush only
+    pose: { tilt: [0.55, 0, 0.3] },
     items: ['Nozzles', 'Turned brass parts', 'Pins'],
     materials: ['Brass'],
     notes: ['Size as required.'],
@@ -136,15 +138,15 @@ export const categories = [
     slug: 'studs-pins-turned',
     code: '06',
     name: 'Studs, Pins & Turned Parts',
-    blurb: 'Studs, taper and cotter pins, and machine parts.',
+    blurb: 'Studs, taper and cotter pins, knurled axles and machine parts.',
     callout: 'M10 stud',
     parts: [
       { type: 'stud', diameter: 10, length: 60, finish: 'zinc', position: [-1.5, 0, 0] },
       { type: 'cotterPin', diameter: 3, length: 28, finish: 'zinc', position: [0, 1.6, 0] },
-      { type: 'turned', diameter: 14, length: 34, finish: 'brass', position: [1.4, -0.2, 0] },
+      { type: 'axle', head: 'knurled', diameter: 8, length: 50, finish: 'mildSteel', position: [1.5, -0.4, 0] },
     ],
     pose: { tilt: [0, 0, -0.35] },
-    items: ['Studs', 'Taper pin', 'Cotter pin', 'Machine parts'],
+    items: ['Studs', 'Taper pin', 'Cotter pin', 'Axle / rod with double-side knurling', 'Machine parts'],
     materials: [],
     notes: ['Made to your drawing or sample.'],
   },

@@ -6,7 +6,7 @@ import { MailIcon, PhoneIcon, WhatsAppIcon, ArrowUpRight } from '../ui/Icons.jsx
 
 const t = content.contact
 const f = t.form
-const address = company.address.lines.join(', ')
+const address = company.address.text
 const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${company.name}, ${address}`)}&z=16&output=embed`
 const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`
 
@@ -171,10 +171,6 @@ export default function Contact({ h1 = false } = {}) {
                 <p className="text-small">
                   <a href={telHref()} className="inline-block py-1 font-medium hover:text-red">
                     {company.phone.display}
-                  </a>
-                  <br />
-                  <a href={telHref(company.landline.e164)} className="inline-block py-1 font-medium hover:text-red">
-                    {company.landline.display}
                   </a>
                 </p>
                 <Hs className="label-mono mt-5 mb-2 font-medium [font-stretch:100%] text-steel-500">{t.emailTitle}</Hs>

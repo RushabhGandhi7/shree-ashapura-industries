@@ -11,17 +11,20 @@
    are not shown anywhere until the client supplies them. */
 export const FIRM_NAME = 'Shree Ashapura Industries'
 export const FOUNDED = 1990
+/** The address, written once. Every place that shows it (contact, footer, map, JSON-LD, SEO) derives from this. */
+export const ADDRESS_TEXT = 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump, Dahisar (East), Mumbai 400068' // CONFIRM Agarwal vs Agrawal
+// Display lines: "Gala … Ltd." / "121 S.V. Road, near … Pump" / "Dahisar (East), Mumbai 400068".
+const addressLines = ADDRESS_TEXT.replace(/(Ltd\.|Pump),\s*/g, '$1\n').split('\n')
 export const ADDRESS = {
-  lines: ['Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd.', '121 S.V. Road, near Dahisar Petrol Pump', 'Dahisar (East), Mumbai 400068'],
-  street: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump',
-  short: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate, S.V. Road, Dahisar (East), Mumbai 400068',
-  locality: 'Dahisar (East), Mumbai',
-  postalCode: '400068',
-  mapQuery: 'Agarwal Co-op Industrial Estate, 121 S.V. Road, Dahisar East, Mumbai 400068',
+  text: ADDRESS_TEXT,
+  lines: addressLines,
+  street: addressLines.slice(0, -1).join(', '),
+  locality: addressLines.at(-1).replace(/\s*\d{6}$/, ''),
+  postalCode: ADDRESS_TEXT.match(/\d{6}$/)[0],
 }
+/** The only phone number (mobile + WhatsApp). The landline was removed in phase 12A. */
 export const PHONES = {
   mobile: { display: '+91 70215 80583', e164: '+917021580583', wa: '917021580583' },
-  landline: { display: '022-2089 1665', e164: '+912220891665' },
 }
 export const EMAILS = ['ashapura56@gmail.com', 'b_jaan@hotmail.com'] // first = primary
 /** Machines in units 24 & 25 only. Read by Capability and the Manufacturing stations. */
@@ -64,7 +67,6 @@ export const company = {
   iso: ISO_TEXT,
   address: ADDRESS,
   phone: PHONES.mobile,
-  landline: PHONES.landline,
   emails: EMAILS,
   email: EMAILS[0], // primary (mailto from the enquiry form)
 }
@@ -88,6 +90,7 @@ const en = {
   nav: {
     label: 'Primary',
     links: [
+      { to: '/', label: 'Home' },
       { to: '/products', label: 'Products' },
       { to: '/custom', label: 'Custom' },
       { to: '/manufacturing', label: 'Manufacturing' },
@@ -422,7 +425,6 @@ const en = {
     linksTitle: 'Site',
     productsTitle: 'Products',
     mobile: 'Mobile / WhatsApp',
-    landline: 'Landline',
     email: 'Email',
     rights: 'All rights reserved.',
   },
@@ -438,7 +440,7 @@ const en = {
     quality: { title: `Quality & Certifications: ${ISO_TEXT}, PPAP, Inspection`, description: `${ISO_TEXT} quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.`, crumb: 'Quality' },
     about: { title: `About Us: Fastener Makers Since ${FOUNDED}`, description: `${FIRM_NAME} has made fasteners and machine components for the lock and furniture industry since ${FOUNDED}. Meet the team, our industries and customers.`, crumb: 'About' },
     gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, and the cold-heading, thread-rolling and slotting areas of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },
-    contact: { title: 'Contact: Call, WhatsApp or Visit Us in Dahisar (East), Mumbai', description: `Send your requirement on WhatsApp or email, call ${PHONES.mobile.display}, or visit ${ADDRESS.short}.`, crumb: 'Contact' },
+    contact: { title: 'Contact: Call, WhatsApp or Visit Us in Dahisar (East), Mumbai', description: `Send your requirement on WhatsApp or email, call ${PHONES.mobile.display}, or visit ${ADDRESS_TEXT}.`, crumb: 'Contact' },
     notFound: { title: 'Page not found', description: `This page does not exist. Browse our products or contact ${FIRM_NAME}.`, crumb: 'Not found' },
     home_crumb: 'Home',
     titleSuffix: ` | ${FIRM_NAME}`,

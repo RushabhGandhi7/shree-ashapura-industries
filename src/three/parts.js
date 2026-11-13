@@ -18,7 +18,7 @@ import { HEAD } from './headGeometry.js'
 
 export const mm = (v) => v / 10
 export const SEGMENTS = { high: 48, low: 24 }
-const ROLES = ['main', 'dark', 'nylon', 'knurl', 'black', 'cream']
+const ROLES = ['main', 'dark', 'nylon', 'knurl', 'black']
 
 /* ───────────────────────── shared pieces ───────────────────────── */
 

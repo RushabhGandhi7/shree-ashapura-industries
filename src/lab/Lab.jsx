@@ -8,7 +8,7 @@ import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHel
 import { Fastener, buildPart } from '../three/Fastener.jsx'
 import StudioEnvironment from '../three/StudioEnvironment.jsx'
 import { DEFAULTS, metricSizes, pitchFor } from '../three/specs.js'
-import { categories, finishes, metalFinishes, variants } from '../data/products.js'
+import { categories, finishes, finishFor, metalFinishes, variants, washerFinishes } from '../data/products.js'
 import { CARD_FOV, fitDistance, measure } from '../three/categoryFit.js'
 
 const TYPES = {
@@ -26,8 +26,8 @@ const TYPES = {
   stud: 'Stud',
   cotterPin: 'Cotter pin',
   leveller: 'Leveller',
-  insert: 'Insert / pin / bush',
-  castor: 'Castor',
+  insert: 'Insert / bush',
+  axle: 'Axle / rod',
 }
 const DIAMETERS = {
   bolt: metricSizes,
@@ -45,7 +45,7 @@ const DIAMETERS = {
   cotterPin: [1.6, 2, 2.5, 3, 4, 5],
   leveller: [6, 8, 10, 12],
   insert: [4, 5, 6, 8, 10],
-  castor: [30, 40, 50, 65, 75],
+  axle: [5, 6, 8, 10, 12, 16],
 }
 const LENGTHS = {
   bolt: [6, 100],
@@ -59,6 +59,7 @@ const LENGTHS = {
   cotterPin: [10, 60],
   leveller: [12, 60],
   insert: [6, 40],
+  axle: [20, 120],
 }
 const FINISH_KEYS = [...metalFinishes, 'yellowZinc', 'mildSteel', 'nylon', 'nylonBlack']
 
@@ -97,12 +98,9 @@ const GALLERY = [
   { type: 'bracket', head: 'door', finish: 'zinc' },
   { type: 'insert', head: 'threaded', finish: 'zinc' },
   { type: 'insert', head: 'knurled', length: 12, finish: 'brass' },
-  { type: 'insert', head: 'pin', diameter: 5, length: 30, finish: 'brass' },
-  { type: 'insert', head: 'bush', diameter: 8, length: 12, finish: 'brass' },
+  { type: 'axle', finish: 'mildSteel' },
   { type: 'stud', finish: 'zinc' },
   { type: 'cotterPin', finish: 'zinc' },
-  { type: 'castor', head: 'plate', finish: 'zinc' },
-  { type: 'castor', head: 'stem', finish: 'zinc' },
   { type: 'cam', finish: 'zinc' },
 ]
 
@@ -472,17 +470,17 @@ function LabUI() {
                 </Field>
               )}
 
-              <Field label="Finish" hint={finishes[item.finish]?.label}>
+              <Field label="Finish" hint={finishes[finishFor(item.type, item.finish)]?.label}>
                 <div className="flex flex-wrap gap-1.5">
-                  {FINISH_KEYS.map((f) => (
+                  {(item.type === 'washer' ? washerFinishes : FINISH_KEYS).map((f) => (
                     <button
                       key={f}
                       type="button"
                       title={finishes[f].label}
                       aria-label={finishes[f].label}
-                      aria-pressed={item.finish === f}
+                      aria-pressed={finishFor(item.type, item.finish) === f}
                       onClick={() => set({ finish: f })}
-                      className={`size-7 rounded-full border-2 transition-transform ${item.finish === f ? 'scale-110 border-ink' : 'border-paper shadow-[0_0_0_1px_var(--color-steel-300)]'}`}
+                      className={`size-7 rounded-full border-2 transition-transform ${finishFor(item.type, item.finish) === f ? 'scale-110 border-ink' : 'border-paper shadow-[0_0_0_1px_var(--color-steel-300)]'}`}
                       style={{ background: `radial-gradient(circle at 35% 30%, #fff 0%, ${finishes[f].color} 45%, ${finishes[f].color} 100%)` }}
                     />
                   ))}

@@ -32,8 +32,8 @@ const drawings = t.illustrations.map((i) => ({
 }))
 
 export const hasRealPhotos = real.photos.length > 0
-// Without photos: the 8 renders, then the 3 machine-area drawings. All are 4:3, so the
-// gallery lays them out as a regular grid (4 renders per row, then 3 drawings) with no gaps.
+// Without photos: the renders (one per category), then the 3 machine-area drawings. All
+// are 4:3; Gallery.jsx lays them out 4 per row (a short last row spread out), then 3 drawings.
 const fallback = [...renders, ...drawings]
 export const gallery = hasRealPhotos ? [...real.photos, ...renders] : fallback
 export const unitVideo = real.video

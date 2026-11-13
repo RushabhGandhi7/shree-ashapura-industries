@@ -168,8 +168,19 @@ function UnitVideo() {
 // Grid cell per item. Real photos: 4 per row on lg, 2 below; the last card stretches over
 // the rest of a short last row (literal classes so Tailwind sees them).
 const LAST_LG = { 1: 'lg:col-span-4', 2: 'lg:col-span-3', 3: 'lg:col-span-2' }
+// Renders only (no photos, 12-column lg grid): 4 per row; a short last row is spread evenly
+// (3 left -> 4 columns each, 2 -> 6, 1 -> 12), and an odd count fills the phone row.
+const RENDER_COUNT = gallery.filter((g) => g.kind === 'render').length
+const REST_LG = { 1: 'lg:col-span-12', 2: 'lg:col-span-6', 3: 'lg:col-span-4' }
+function renderClass(i) {
+  const rest = RENDER_COUNT % 4
+  const inLastRow = rest && i >= RENDER_COUNT - rest
+  const lg = inLastRow ? REST_LG[rest] : 'lg:col-span-3'
+  const sm = RENDER_COUNT % 2 && i === RENDER_COUNT - 1 ? 'col-span-2' : ''
+  return `${sm} ${lg}`.trim()
+}
 function cellClass(g, i) {
-  if (!hasRealPhotos) return g.kind === 'drawing' ? 'col-span-2 lg:col-span-4' : 'lg:col-span-3'
+  if (!hasRealPhotos) return g.kind === 'drawing' ? 'col-span-2 lg:col-span-4' : renderClass(i)
   if (i !== gallery.length - 1) return ''
   const sm = gallery.length % 2 ? 'col-span-2' : ''
   return `${sm} ${LAST_LG[gallery.length % 4] ?? ''}`.trim()

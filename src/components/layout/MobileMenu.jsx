@@ -105,6 +105,7 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
                     >
                       <NavLink
                         to={l.to}
+                        end={l.to === '/'}
                         onClick={onClose}
                         className={({ isActive }) =>
                           `group flex items-baseline gap-4 py-3.5 font-display text-[clamp(1.35rem,5.5vw,1.9rem)] leading-none font-[760] tracking-[-0.02em] [font-stretch:118%] active:text-red ${isActive ? 'text-red' : 'text-ink'}`

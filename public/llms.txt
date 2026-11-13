@@ -32,6 +32,7 @@ Range: M2 to M14 / #2 to #14, length 3 to 100 mm. Materials: M.S., S.S., brass, 
 - Slotting and BT: 4 machines, 4 – 55 mm
 - Heat treatment and plating via approved partners
 - Also: Traub A25 (1.6 – 25 mm), drilling and tapping, grinding, milling, lathe, drum polish, welding
+- Inspection with Go / No-Go thread gauges: a good part passes Go and fails No-Go
 
 ## Quality
 

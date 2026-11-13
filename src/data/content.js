@@ -361,12 +361,28 @@ const en = {
         key: 'inspection',
         name: 'Inspection, packing & dispatch',
         short: 'Inspect & pack',
-        spec: 'In-process check every 2 hours',
-        text: 'Parts are checked with verniers, micrometers, thread gauges and hardness testing, then packed in our standard packing format and dispatched.',
+        spec: 'In-process check every 2 hours · then packed & dispatched',
+        text: 'Go checks the part is not too tight. No-Go checks it is not too loose. A good part passes Go and fails No-Go.',
+        wide: true, // the Go / No-Go vignette tells two cases, so its panel is wider
+        gauge: {
+          go: 'GO',
+          nogo: 'NO-GO',
+          goPass: 'GO: must pass ✓',
+          nogoHold: 'NO-GO: must NOT pass ✓',
+          nogoEntered: 'NO-GO: entered ✗',
+          accepted: 'PART ACCEPTED',
+          rejected: 'PART REJECTED',
+          case1: 'CASE 1 · GOOD PART',
+          case2: 'CASE 2 · WORN / OVERSIZE',
+          min: 'MIN',
+          max: 'MAX',
+          part: 'PART',
+        },
       },
     ],
     track: 'Part journey',
     scrollCue: 'Scroll',
+    hint: 'Scroll up / down to continue',
   },
   capability: {
     label: 'Capability',
@@ -389,6 +405,39 @@ const en = {
       message: `Hello ${FIRM_NAME}, I would like a part made to my drawing. Part / size / quantity: `,
       tags: ['AutoCAD 2D', 'AutoCAD 3D', 'Sample to part'],
     },
+  },
+  // Machining (phase 12C): secondary operations, same blueprint style. Capacities only where
+  // given: turning on the Traub A25.
+  machining: {
+    label: 'Machining',
+    title: ['Turned, drilled,', 'finished in-house.'],
+    lead: 'Secondary operations that take a headed or rolled part to its final shape and finish.',
+    steps: [
+      { key: 'turning', name: 'Turning', spec: 'Traub A25 · 1.6 – 25 mm · 0.02 mm accuracy', text: 'Bar stock is turned to profile: shafts, pins, bushes and special parts.' }, // CONFIRM 0.02 mm accuracy (given in the phase 12C brief, not in the client facts)
+      { key: 'drilling', name: 'Drilling & tapping', spec: 'Holes and internal threads', text: 'Cross holes are drilled and internal threads are tapped.' },
+      { key: 'milling', name: 'Milling', spec: 'Flats, slots and steps', text: 'Flats, slots and steps are milled where a part needs them.' },
+      { key: 'grinding', name: 'Grinding', spec: 'Fine size and finish', text: 'Grinding brings diameters to size with a fine surface finish.' },
+      { key: 'slotting', name: 'Slotting', spec: 'Screwdriver slots', text: 'A slitting saw cuts the drive slot across the head.' },
+      { key: 'polishing', name: 'Drum polishing', spec: 'Deburring and finish', text: 'Parts tumble in a drum to remove burrs and brighten the surface.' },
+      { key: 'welding', name: 'Welding', spec: 'Joined assemblies', text: 'Parts are welded where an assembly needs a permanent joint.' },
+    ],
+  },
+  // Types of machines (phase 12C). `count` reads MACHINE_COUNTS by key (never typed here).
+  // video / poster: drop files into public/videos/ and set the paths; null = "Video coming".
+  machineTypes: {
+    label: 'Types of machines',
+    title: ['The machines', 'behind the parts.'],
+    lead: 'What each machine does on the shop floor. Short silent clips of each one are on the way.',
+    videoComing: 'Video coming',
+    playLabel: (name) => `${name}: silent video`,
+    cards: [
+      { key: 'heading', machine: 'heading', name: 'Header (cold heading)', text: 'Cuts wire and forms the head cold between dies.', video: null, poster: null },
+      { key: 'rolling', machine: 'rolling', name: 'Thread rolling', text: 'Rolls the thread into the blank between flat dies.', video: null, poster: null },
+      { key: 'slotting', machine: 'slotting', name: 'Slotting', text: 'Cuts the screwdriver slot across the head.', video: null, poster: null },
+      { key: 'turning', machine: null, name: 'Traub / turning', text: 'Turns bar stock to profile, 1.6 – 25 mm.', video: null, poster: null }, // CONFIRM range shown as in the brief
+      { key: 'drilling', machine: null, name: 'Drilling & tapping', text: 'Drills holes and taps internal threads.', video: null, poster: null },
+      { key: 'grinding', machine: null, name: 'Grinding, milling & lathe', text: 'Brings parts to size, cuts flats and steps, finishes diameters.', video: null, poster: null },
+    ],
   },
   quality: {
     label: 'Quality & certifications',
@@ -571,7 +620,7 @@ const en = {
       description: (c) => `${c.name} from ${FIRM_NAME}, Mumbai: ${c.items.join(', ')}. Made to your drawing; request a quote on WhatsApp.`.slice(0, 300),
     },
     custom: { title: 'Custom Fasteners & Parts Made to Your Drawing', description: `Configure a custom bolt or screw, or send your drawing or sample. ${FIRM_NAME} develops special-purpose parts to your requirement, drawn in AutoCAD 2D & 3D.`, crumb: 'Custom orders' },
-    manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting and BT, thread rolling, heat treatment and plating via approved partners, inspection and packing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' }, // CONFIRM approved partners
+    manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting, thread rolling, heat treatment and plating via approved partners, Go / No-Go inspection, plus turning, drilling, milling, grinding and polishing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' }, // CONFIRM approved partners
     quality: { title: `Quality & Certifications: ${ISO_TEXT}, PPAP, Inspection`, description: `${ISO_TEXT} quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.`, crumb: 'Quality' },
     about: { title: `About Us: Fastener Makers Since ${FOUNDED}`, description: `${FIRM_NAME} has made fasteners and machine components for the lock and furniture industry since ${FOUNDED}. Meet the team, our industries and customers.`, crumb: 'About' },
     gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, and the cold-heading, thread-rolling and slotting areas of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },

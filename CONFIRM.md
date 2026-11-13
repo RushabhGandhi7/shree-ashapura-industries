@@ -16,6 +16,9 @@ The items below are still open. Each fact lives in one constant at the top of [`
 | 7 | Unnamed "new solutions" parts (names are ours) | Cream nylon ring, Brown 2-hole plate, Cream nylon disc, Black moulded part (Plastic Components); Metal cup, Zinc cam housing (Furniture Fittings & Cams) | TBD | `catalogueItems` in `content.js` (`// CONFIRM name`) |
 | 8 | Fibre / coloured washer | Listed under Washers | TBD | `catalogueItems` `fibre-washer` (`// CONFIRM`) |
 
+| 9 | Traub A25 accuracy | "0.02 mm accuracy" (turning step, Machining) and the 1.6 – 25 mm range | TBD | `content.js` `machining.steps[0].spec`, `machineTypes.cards` turning (`// CONFIRM`) |
+| 10 | Machine videos and posters | None yet; cards show "Video coming" | TBD | `content.js` `machineTypes.cards[].video` / `.poster` → files in `public/videos/` |
+
 Items 4 and 5 were not in the client's confirmation, so they stay open. Delete them here and remove their `// CONFIRM` in `content.js` once they are confirmed.
 
 ## Logged, not changed (from phase 11)
@@ -37,3 +40,11 @@ Items 4 and 5 were not in the client's confirmation, so they stay open. Delete t
 7. Washers show "Zinc / steel / black" as their spec line, not separate items.
 8. "Philips" is spelled "Phillips" (the drive's name).
 9. The list on /products shows text rows (no 3D) so the page stays light; 3D is on the category pages.
+
+## Assumptions logged in phase 12C
+
+1. Phones now get the pinned side-scroll (it used to be a stacked list) so sideways swipes can move it; reduced motion keeps the stacked list. Panels don't snap.
+2. Step 06's carton / caliper animation is replaced by the Go / No-Go story; packing and dispatch stay in its spec line.
+3. Capability's "Also on the shop floor" list stays alongside the new Machining section.
+4. The hint chip keeps your exact copy, "Scroll up / down to continue"; on touch screens it also shows ←→ arrows.
+5. Machine-type placeholders reuse the gallery's machine-area drawings (header, roller, slotter) and the Machining drawings (turning, drilling, grinding).

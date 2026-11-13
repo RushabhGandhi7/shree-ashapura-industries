@@ -37,6 +37,9 @@
   --color-red: #c8102e;
   --color-red-deep: #a00d25;
   --color-red-tint: #f4e3e5;
+  /* calm green: ONLY for small "accepted" chips (Go / No-Go, phase 12C) */
+  --color-green: #2f7a4d;
+  --color-green-tint: #e3efe6;
   --color-white: #ffffff;
   --color-transparent: transparent;
   --color-current: currentColor;
@@ -351,6 +354,58 @@ main > div > .section-y:last-of-type {
   }
   .hero-still:hover img {
     transform: rotateX(4deg) rotateY(-6deg) scale(1.015);
+  }
+}
+
+/* Process scroll hint (phase 12C): fades / slides in, chevrons nudge. */
+.scroll-hint {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.35s var(--ease-out);
+}
+.scroll-hint[data-on='true'] {
+  opacity: 1;
+  transform: none;
+}
+.scroll-hint-arrows svg:first-child {
+  animation: sa-nudge-up 1.4s var(--ease-machine) infinite;
+}
+.scroll-hint-arrows svg:last-child {
+  animation: sa-nudge-down 1.4s var(--ease-machine) infinite;
+}
+.scroll-hint-swipe svg:first-child {
+  animation: sa-nudge-left 1.4s var(--ease-machine) infinite;
+}
+.scroll-hint-swipe svg:last-child {
+  animation: sa-nudge-right 1.4s var(--ease-machine) infinite;
+}
+@keyframes sa-nudge-up {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes sa-nudge-down {
+  50% {
+    transform: translateY(2px);
+  }
+}
+@keyframes sa-nudge-left {
+  50% {
+    transform: translateX(-2px);
+  }
+}
+@keyframes sa-nudge-right {
+  50% {
+    transform: translateX(2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint,
+  .scroll-hint * {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

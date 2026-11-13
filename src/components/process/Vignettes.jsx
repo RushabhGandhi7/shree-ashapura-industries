@@ -1,4 +1,4 @@
-// Six manufacturing vignettes (SVG). Each is driven by a local progress p in [0, 1] via
+// Six manufacturing vignettes (SVG; 06 is the Go / No-Go story, phase 12C). Each is driven by a local progress p in [0, 1] via
 // an imperative set(p), so scroll scrubs them (and reverses them) without re-renders.
 // Only transforms / attributes / colours change: no SVG filters, for mobile performance.
 import { forwardRef, useId, useImperativeHandle, useRef } from 'react'
@@ -309,92 +309,150 @@ export const HeatPlating = forwardRef(function HeatPlating({ label, tag }, ref) 
   )
 })
 
-/* 06 — inspection: GO gauge runs on, NO-GO holds, caliper reads the diameter */
-export const InspectionPack = forwardRef(function InspectionPack({ label }, ref) {
-  const box = useRef(null)
-  const flaps = useRef(null)
-  const go = useRef(null)
-  const nogo = useRef(null)
-  const jawT = useRef(null)
-  const jawB = useRef(null)
-  const stamp = useRef(null)
-  const out = useRef(null)
+/* 06 — inspection (phase 12C): Go / No-Go thread plug gauges on a nut, two cases.
+   Case 1 (good part): GO screws fully in -> "must pass"; NO-GO stops within 2 turns ->
+   "must NOT pass"; PART ACCEPTED. Case 2 (worn / oversize hole): GO passes, NO-GO runs
+   fully in -> "entered"; PART REJECTED. A min–max tolerance band shows where the part is. */
+const GREEN = 'var(--color-green)'
+const GREEN_TINT = 'var(--color-green-tint)'
+const RED_TINT = 'var(--color-red-tint)'
+export const GoNoGo = forwardRef(function GoNoGo({ label, gauge: g }, ref) {
+  const id = useId().replace(/:/g, '')
+  const r = {
+    caseText: useRef(null),
+    go: useRef(null),
+    nogo: useRef(null),
+    goHatch: useRef(null),
+    nogoHatch: useRef(null),
+    wallsL: useRef([]),
+    wallsR: useRef([]),
+    goLabel: useRef(null),
+    nogoLabel: useRef(null),
+    chip: useRef(null),
+    chipBox: useRef(null),
+    chipText: useRef(null),
+    part: useRef(null),
+    partLine: useRef(null),
+  }
+  const GX = [140, 340] // gauge / nut centres
+  const TURN = 9 // px of travel per turn (thread pitch in the drawing)
   useImperativeHandle(ref, () => ({
-    set(pAll) {
-      const p = seg(pAll, 0, 0.66)
-      const k = ease(seg(pAll, 0.7, 0.86))
-      box.current.setAttribute('transform', `translate(${lerp(260, 0, k)} 0)`)
-      box.current.style.opacity = String(seg(pAll, 0.68, 0.72))
-      flaps.current.style.opacity = String(seg(pAll, 0.9, 0.96))
-      const g = ease(seg(p, 0, 0.38))
-      go.current.setAttribute('transform', `translate(${lerp(170, -150, g)} 0)`)
-      go.current.style.opacity = String(p < 0.42 ? 1 : 1 - seg(p, 0.42, 0.48))
-      const n = seg(p, 0.45, 0.65)
-      const nx = lerp(170, 10, ease(Math.min(1, n * 1.6)))
-      nogo.current.setAttribute('transform', `translate(${nx} 0)`)
-      nogo.current.style.opacity = String(n > 0 ? (p < 0.7 ? 1 : 1 - seg(p, 0.7, 0.76)) : 0)
-      const c = ease(seg(p, 0.72, 0.9))
-      jawT.current.setAttribute('transform', `translate(0 ${lerp(-34, 0, c)})`)
-      jawB.current.setAttribute('transform', `translate(0 ${lerp(34, 0, c)})`)
-      stamp.current.style.opacity = String(seg(p, 0.9, 0.98))
-      out.current.textContent =
-        pAll >= 0.9 ? 'PACKED · DISPATCH' : pAll >= 0.7 ? 'PACKING' : p < 0.42 ? 'GO ·  RUNS' : p < 0.72 ? 'NO-GO · HOLDS' : 'VERNIER CHECK'
+    set(p) {
+      const case2 = p >= 0.52
+      const q = case2 ? seg(p, 0.56, 1) : seg(p, 0, 0.5) // progress inside the current case
+      // hole: oversize in case 2 (walls step out)
+      const widen = ease(seg(p, 0.5, 0.56)) * 5
+      r.wallsL.current.forEach((w) => w?.setAttribute('transform', `translate(${-widen} 0)`))
+      r.wallsR.current.forEach((w) => w?.setAttribute('transform', `translate(${widen} 0)`))
+      r.caseText.current.textContent = case2 ? g.case2 : g.case1
+      // gauges: drop in; reset (lift) between the cases
+      const lift = seg(p, 0.46, 0.52) * (1 - seg(p, 0.52, 0.56))
+      const goDepth = ease(seg(q, 0.04, 0.36)) * 78
+      const nogoFull = case2 ? ease(seg(q, 0.44, 0.78)) * 78 : ease(seg(q, 0.46, 0.66)) * TURN * 1.8 // ≤ 2 turns
+      const up = lift * 90
+      r.go.current.setAttribute('transform', `translate(0 ${goDepth - up})`)
+      r.nogo.current.setAttribute('transform', `translate(0 ${nogoFull - up})`)
+      // thread hatching scrolls with depth (reads as the gauge turning)
+      r.goHatch.current.setAttribute('transform', `translate(0 ${-(goDepth % TURN)})`)
+      r.nogoHatch.current.setAttribute('transform', `translate(0 ${-(nogoFull % TURN)})`)
+      // labels in the bottom line
+      const goOn = seg(q, 0.36, 0.42) * (1 - lift)
+      r.goLabel.current.style.opacity = String(goOn)
+      const nogoOn = (case2 ? seg(q, 0.78, 0.84) : seg(q, 0.66, 0.72)) * (1 - lift)
+      r.nogoLabel.current.style.opacity = String(nogoOn)
+      r.nogoLabel.current.textContent = case2 ? g.nogoEntered : g.nogoHold
+      r.nogoLabel.current.setAttribute('fill', case2 ? RED : INK)
+      // result chip
+      const chipOn = (case2 ? seg(q, 0.86, 0.94) : seg(q, 0.76, 0.84)) * (1 - lift)
+      r.chip.current.style.opacity = String(chipOn)
+      r.chipText.current.textContent = case2 ? g.rejected : g.accepted
+      r.chipText.current.setAttribute('fill', case2 ? RED : GREEN)
+      r.chipBox.current.setAttribute('stroke', case2 ? RED : GREEN)
+      r.chipBox.current.setAttribute('fill', case2 ? RED_TINT : GREEN_TINT)
+      // tolerance band: the part's size sits inside (case 1), then past MAX (case 2)
+      const px = lerp(250, 352, ease(seg(p, 0.5, 0.58)))
+      r.part.current.setAttribute('transform', `translate(${px} 0)`)
+      r.partLine.current.setAttribute('stroke', case2 ? RED : INK)
     },
   }))
-  const teeth = []
-  for (let x = 120; x < 400; x += 12) teeth.push(x)
-  return (
-    <Frame label={label} readoutRef={out} readout="GO ·  RUNS">
-      {(steel) => (
-        <>
-          {/* bolt, horizontal */}
-          <rect x="40" y="132" width="40" height="56" rx="3" fill={steel} stroke="#55575A" strokeOpacity=".4" />
-          <rect x="80" y="144" width="40" height="32" fill={steel} />
-          <rect x="120" y="144" width="280" height="32" fill={steel} />
-          {teeth.map((x) => (
-            <line key={x} x1={x} y1="144" x2={x + 6} y2="176" stroke="#55575A" strokeOpacity=".45" />
+
+  const nut = (cx, i) => (
+    <g key={cx}>
+      {/* nut section: two halves with the threaded hole between them */}
+      <g ref={(el) => (r.wallsL.current[i] = el)}>
+        <rect x={cx - 74} y="132" width="58" height="66" fill="#D7D8D5" stroke={INK} strokeWidth="1.2" />
+        <path d={`M${cx - 16} 132 ${Array.from({ length: 7 }, (_, k) => `L${cx - 21} ${136 + k * 9} L${cx - 16} ${140.5 + k * 9}`).join(' ')} L${cx - 16} 198`} fill="none" stroke="#55575A" strokeWidth="1" />
+      </g>
+      <g ref={(el) => (r.wallsR.current[i] = el)}>
+        <rect x={cx + 16} y="132" width="58" height="66" fill="#D7D8D5" stroke={INK} strokeWidth="1.2" />
+        <path d={`M${cx + 16} 132 ${Array.from({ length: 7 }, (_, k) => `L${cx + 21} ${136 + k * 9} L${cx + 16} ${140.5 + k * 9}`).join(' ')} L${cx + 16} 198`} fill="none" stroke="#55575A" strokeWidth="1" />
+      </g>
+    </g>
+  )
+
+  // plug gauge: handle + threaded plug (bottom of the plug at y = 128 before it drops)
+  const plug = (cx, gref, href, name, w, tone) => (
+    <g ref={gref}>
+      <rect x={cx - 26} y="22" width="52" height="34" rx="3" fill={tone} stroke={INK} strokeWidth="1.2" />
+      <text x={cx} y="43" textAnchor="middle" className="font-mono" fontSize="11" fontWeight="500" letterSpacing="1" fill={INK}>
+        {name}
+      </text>
+      <rect x={cx - 5} y="56" width="10" height="12" fill="#BFC0BD" stroke={INK} strokeWidth="1" />
+      <clipPath id={`${id}-${name}`}>
+        <rect x={cx - w / 2} y="68" width={w} height="60" />
+      </clipPath>
+      <rect x={cx - w / 2} y="68" width={w} height="60" fill="#C9CAC7" stroke={INK} strokeWidth="1.2" />
+      <g clipPath={`url(#${id}-${name})`}>
+        <g ref={href}>
+          {Array.from({ length: 9 }, (_, k) => (
+            <line key={k} x1={cx - w / 2} y1={66 + k * TURN} x2={cx + w / 2} y2={70 + k * TURN} stroke="#55575A" strokeOpacity=".7" />
           ))}
-          {/* GO ring gauge */}
-          <g ref={go}>
-            <rect x="230" y="124" width="26" height="72" rx="3" fill="#E7E6E2" stroke={INK} strokeWidth="1.2" />
-            <text x="243" y="116" textAnchor="middle" className="font-mono" fontSize="10" letterSpacing="1.5" fill={INK}>
-              GO
+        </g>
+      </g>
+    </g>
+  )
+
+  return (
+    <Frame label={label} readout="">
+      {() => (
+        <>
+          <text ref={r.caseText} x="16" y="24" className="font-mono" fontSize="11" letterSpacing="1.4" fill={STEEL}>
+            {g.case1}
+          </text>
+          {/* gauges first, so the nut halves draw over the part of the plug that is inside */}
+          {plug(GX[0], r.go, r.goHatch, g.go, 30, '#E7E6E2')}
+          {plug(GX[1], r.nogo, r.nogoHatch, g.nogo, 36, RED_TINT)}
+          {nut(GX[0], 0)}
+          {nut(GX[1], 1)}
+          {/* bottom line: the two verdicts side by side */}
+          <text ref={r.goLabel} x={GX[0]} y="226" textAnchor="middle" className="font-mono" fontSize="14" fontWeight="500" letterSpacing="0.6" fill={INK} style={{ opacity: 0 }}>
+            {g.goPass}
+          </text>
+          <text ref={r.nogoLabel} x={GX[1]} y="226" textAnchor="middle" className="font-mono" fontSize="14" fontWeight="500" letterSpacing="0.6" fill={INK} style={{ opacity: 0 }}>
+            {g.nogoHold}
+          </text>
+          <g ref={r.chip} style={{ opacity: 0 }}>
+            <rect ref={r.chipBox} x="170" y="240" width="140" height="24" rx="3" fill={GREEN_TINT} stroke={GREEN} strokeWidth="1.2" />
+            <text ref={r.chipText} x="240" y="256.5" textAnchor="middle" className="font-mono" fontSize="11.5" fontWeight="500" letterSpacing="2" fill={GREEN}>
+              {g.accepted}
             </text>
           </g>
-          {/* NO-GO ring gauge, stops at the thread entry */}
-          <g ref={nogo} style={{ opacity: 0 }}>
-            <rect x="398" y="124" width="26" height="72" rx="3" fill="#F4E3E5" stroke={RED} strokeWidth="1.2" />
-            <text x="411" y="116" textAnchor="middle" className="font-mono" fontSize="10" letterSpacing="1.5" fill={RED}>
-              NO-GO
+          {/* tolerance band: MIN (GO) .. MAX (NO-GO) */}
+          <g>
+            <line x1="120" y1="296" x2="380" y2="296" stroke={STEEL} strokeWidth="1" />
+            <rect x="180" y="291" width="140" height="10" fill="var(--color-steel-100)" stroke={INK} strokeWidth="1" />
+            <path d="M180 286v20M320 286v20" stroke={INK} strokeWidth="1.2" />
+            <text x="180" y="283" textAnchor="middle" className="font-mono" fontSize="9" letterSpacing="1" fill={INK}>
+              {g.min} · {g.go}
             </text>
-          </g>
-          {/* caliper */}
-          <g transform="translate(300 0)">
-            <rect x="-4" y="40" width="8" height="240" fill="#D3D4D1" stroke={INK} strokeWidth="1" />
-            <g ref={jawT}>
-              <path d="M-14 110 h28 v30 l-14 4 l-14 -4 Z" fill="#C4C5C3" stroke={INK} strokeWidth="1" />
-            </g>
-            <g ref={jawB}>
-              <path d="M-14 210 h28 v-30 l-14 -4 l-14 4 Z" fill="#C4C5C3" stroke={INK} strokeWidth="1" />
-            </g>
-          </g>
-          <g ref={stamp} style={{ opacity: 0 }} transform="translate(92 62) rotate(-8)">
-            <rect x="-6" y="-24" width="92" height="34" rx="3" fill="none" stroke={RED} strokeWidth="2" />
-            <text x="40" y="0" textAnchor="middle" className="font-mono" fontSize="16" fontWeight="500" letterSpacing="3" fill={RED}>
-              PASS
+            <text x="320" y="283" textAnchor="middle" className="font-mono" fontSize="9" letterSpacing="1" fill={INK}>
+              {g.max} · {g.nogo}
             </text>
-          </g>
-          {/* carton slides in over the part, flaps close */}
-          <g ref={box} style={{ opacity: 0 }}>
-            <rect x="150" y="96" width="210" height="150" rx="2" fill="#D8C9A8" stroke={INK} strokeWidth="1.2" />
-            <rect x="150" y="96" width="210" height="18" fill="#CBB993" stroke={INK} strokeWidth="1.2" />
-            <rect x="180" y="150" width="90" height="44" fill="var(--color-paper)" stroke={STEEL} />
-            <text x="190" y="168" className="font-mono" fontSize="9" letterSpacing="1" fill={INK}>
-              SAI · LOT
-            </text>
-            <line x1="190" y1="180" x2="258" y2="180" stroke={INK} strokeWidth="3" strokeDasharray="2 2" />
-            <g ref={flaps} style={{ opacity: 0 }}>
-              <path d="M150 96 l52 -26 h106 l52 26 Z" fill="#CBB993" stroke={INK} strokeWidth="1.2" />
+            <g ref={r.part} transform="translate(250 0)">
+              <line ref={r.partLine} x1="0" y1="288" x2="0" y2="304" stroke={INK} strokeWidth="2" />
+              <text x="0" y="316" textAnchor="middle" className="font-mono" fontSize="8.5" letterSpacing="1" fill={STEEL}>
+                {g.part}
+              </text>
             </g>
           </g>
         </>
@@ -461,4 +519,4 @@ export const Slotting = forwardRef(function Slotting({ label }, ref) {
   )
 })
 
-export const VIGNETTES = { coil: Coil, heading: Heading, slotting: Slotting, rolling: Rolling, heatPlating: HeatPlating, inspection: InspectionPack }
+export const VIGNETTES = { coil: Coil, heading: Heading, slotting: Slotting, rolling: Rolling, heatPlating: HeatPlating, inspection: GoNoGo }

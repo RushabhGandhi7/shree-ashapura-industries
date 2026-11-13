@@ -5,19 +5,27 @@ import { useGSAP } from '@gsap/react'
 import { content, company } from '../../data/content.js'
 import { telHref, whatsappHref } from '../../lib/contact.js'
 import { heroStore, requestFrame, range } from '../../lib/heroStore.js'
-import { dprCap, hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
+import { dprCap, hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, partDetail, prefersReducedMotion } from '../../lib/device.js'
 import Button from '../ui/Button.jsx'
 import MonoLabel from '../ui/MonoLabel.jsx'
 import DimensionLine from '../ui/DimensionLine.jsx'
 import { PhoneIcon, WhatsAppIcon } from '../ui/Icons.jsx'
 import DriftingParts from '../DriftingParts.jsx'
-import HeroPoster from './HeroPoster.jsx'
 import { useGLGate, useGLHold } from '../../lib/glGate.js'
 import HeroDimensions from './HeroDimensions.jsx'
 import TorqueReadout from './TorqueReadout.jsx'
 
 const HeroScene = lazy(() => import('./HeroScene.jsx'))
 const t = content.hero
+// Poster renders of the hero scene (scripts/render-posters.mjs): rest pose, and the seated
+// pose shown under reduced motion. Each is the camera's fitted rect grown by GROW (so the
+// contact shadows are included); contain-fitted into the frame box and scaled up by GROW,
+// the part lands exactly where the live camera draws it.
+const GROW = 1.2
+const POSTER = {
+  rest: { src: '/posters/hero.webp', w: 1688, h: 2088 },
+  seated: { src: '/posters/hero-seated.webp', w: 1860, h: 1600 },
+}
 
 /** Keeps the poster if the 3D chunk or WebGL fails. */
 class SceneBoundary extends Component {
@@ -50,7 +58,17 @@ export default function Hero() {
   const stage = useRef(null)
   const copy = useRef(null)
   const cue = useRef(null)
-  const readout = useRef(null)
+  // Two readouts are always rendered (phone strip / desktop card) and CSS shows one, so the
+  // prerendered page (snapshotted on desktop) has the same layout as phones once React runs.
+  // `readout` drives both.
+  const readoutSm = useRef(null)
+  const readoutLg = useRef(null)
+  const readout = useRef({
+    update: (p) => {
+      readoutSm.current?.update(p)
+      readoutLg.current?.update(p)
+    },
+  })
   const stage3d = useRef(null)
   const frame = useRef(null)
   const readoutBox = useRef(null)
@@ -67,7 +85,7 @@ export default function Hero() {
       small,
       low,
       webgl: hasWebGL(),
-      detail: small || low ? 'low' : 'high',
+      detail: partDetail(),
       dpr: dprCap(),
       tilt: !reduced && !small && hasFinePointer(),
       parts: small ? 4 : 9,
@@ -292,33 +310,33 @@ export default function Hero() {
           </div>
         </div>
 
-        {profile.small && (
-          <div className="container-x relative z-10 mt-5">
-            <TorqueReadout ref={readout} compact />
-          </div>
-        )}
+        <div className="container-x relative z-10 mt-5 md:hidden">
+          <TorqueReadout ref={readoutSm} compact />
+        </div>
 
         {/* 3D stage: poster -> lazy canvas, with projected dimensions and the readout.
-            `frame` is the box the subject is fitted into (HeroScene reads it, see heroStore.frame);
-            the readout sits in the stage's bottom-right corner with equal margins, and the
-            camera framing keeps the model clear of it. */}
+            `frame` is the box the subject is fitted into: HeroScene fits the model into it
+            (heroStore.frame) and the poster, a render of the same scene (public/posters, from
+            scripts/render-posters.mjs), is contain-fitted into the same box, so the swap is an
+            opacity crossfade with no size or position change. The box is laid out in CSS
+            only (it stays clear of the readout, bottom-right with equal margins), so it is the
+            same before and after the 3D loads. */}
         <div ref={stage3d} className="relative min-h-0 flex-1 lg:absolute lg:inset-0">
           <div
             ref={frame}
-            className="pointer-events-none absolute inset-x-[var(--gutter)] top-3 bottom-3 lg:top-[calc(var(--chrome-h-max)+clamp(1rem,3svh,2.5rem))] lg:right-[var(--gutter)] lg:bottom-[var(--gutter)] lg:left-[44%]"
+            className="pointer-events-none absolute inset-x-[var(--gutter)] top-3 bottom-3 md:right-[calc(var(--gutter)+15.5rem+0.75rem)] lg:top-[calc(var(--chrome-h-max)+clamp(1rem,3svh,2.5rem))] lg:bottom-[var(--gutter)] lg:left-[44%]"
             aria-hidden
-          />
-          <div
-            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 lg:top-[var(--chrome-h-max)] lg:left-[44%] ${ready ? 'opacity-0' : 'opacity-100'}`}
-            aria-hidden={ready || undefined}
           >
-            {/* Prerendered HTML ships the poster as an <img>: it is the largest element at first
-                paint, so it stays the LCP when React later renders the (inline SVG) poster. */}
-            {window.__prerender ? (
-              <img src="/hero-poster.svg" alt="" width="600" height="720" fetchPriority="high" decoding="async" className="h-[88%] w-auto max-w-full lg:h-[86%]" />
-            ) : (
-              <HeroPoster seated={profile.reduced} className="h-[88%] w-auto max-w-full lg:h-[86%]" />
-            )}
+            <img
+              src={(profile.reduced ? POSTER.seated : POSTER.rest).src}
+              alt=""
+              width={(profile.reduced ? POSTER.seated : POSTER.rest).w}
+              height={(profile.reduced ? POSTER.seated : POSTER.rest).h}
+              fetchPriority="high"
+              decoding="async"
+              style={{ transform: `scale(${GROW})` }}
+              className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${ready ? 'opacity-0' : 'opacity-100'}`}
+            />
           </div>
           {mount3D && (
             <SceneBoundary>
@@ -330,11 +348,9 @@ export default function Hero() {
           <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
             <HeroDimensions compact={profile.small} />
           </div>
-          {!profile.small && (
-            <div ref={readoutBox} className="absolute right-[var(--gutter)] bottom-[var(--gutter)]">
-              <TorqueReadout ref={readout} />
-            </div>
-          )}
+          <div ref={readoutBox} className="absolute right-[var(--gutter)] bottom-[var(--gutter)] hidden md:block">
+            <TorqueReadout ref={readoutLg} />
+          </div>
         </div>
       </div>
     </section>

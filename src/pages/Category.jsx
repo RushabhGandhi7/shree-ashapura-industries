@@ -4,7 +4,7 @@ import { content } from '../data/content.js'
 import { categories } from '../data/products.js'
 import { findPage } from '../routes.js'
 import { whatsappHref, telHref } from '../lib/contact.js'
-import { dprCap, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../lib/device.js'
+import { dprCap, hasWebGL, partDetail, prefersReducedMotion } from '../lib/device.js'
 import Seo from '../layout/Seo.jsx'
 import Breadcrumbs from '../components/ui/Breadcrumbs.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -40,7 +40,7 @@ function Related({ current }) {
           {list.map((c) => (
             <li key={c.slug}>
               <Link to={`/products/${c.slug}`} className="shine group flex h-full bg-paper hover:bg-white max-sm:items-center sm:flex-col">
-                <img src={c.image} alt="" width="1200" height="900" loading="lazy" decoding="async" className="aspect-[4/3] w-full border-steel-300/70 object-contain max-sm:w-32 max-sm:shrink-0 max-sm:border-r sm:border-b" />
+                <img src={c.image} alt="" width="1600" height="1200" loading="lazy" decoding="async" className="aspect-[4/3] w-full border-steel-300/70 object-contain max-sm:w-32 max-sm:shrink-0 max-sm:border-r sm:border-b" />
                 <span className="flex flex-1 items-center justify-between gap-3 p-4">
                   <span className="font-display text-[1.05rem] leading-tight font-[760] [font-stretch:110%]">{c.name}</span>
                   <span className="label-mono text-steel-700 group-hover:text-red">{t.view} →</span>
@@ -59,7 +59,7 @@ export default function Category() {
   const [slug] = useState(useParams().slug)
   const c = categories.find((x) => x.slug === slug)
   const profile = useMemo(
-    () => ({ three: hasWebGL() && !prefersReducedMotion(), detail: isSmallScreen() || isLowEnd() ? 'low' : 'high', dpr: dprCap() }),
+    () => ({ three: hasWebGL() && !prefersReducedMotion(), detail: partDetail(), dpr: dprCap() }),
     [],
   )
   const [ready, setReady] = useState(false)
@@ -99,8 +99,8 @@ export default function Category() {
             <img
               src={c.image}
               alt={t.imageAlt(c.name)}
-              width="1200"
-              height="900"
+              width="1600"
+              height="1200"
               fetchPriority="high"
               className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${ready ? 'opacity-0' : 'opacity-100'}`}
             />

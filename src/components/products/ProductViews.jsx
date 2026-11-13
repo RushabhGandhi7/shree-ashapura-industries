@@ -12,6 +12,7 @@
 // changed (a spin, a scroll, a resize) and only while the grid is on screen.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createPortal } from 'react-dom'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerspectiveCamera, View } from '@react-three/drei'
@@ -21,7 +22,7 @@ import StudioEnvironment from '../../three/StudioEnvironment.jsx'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { useLenis } from '../../lib/smoothScroll.jsx'
-import { glAntialias } from '../../lib/device.js'
+import { glAntialias, maxDpr } from '../../lib/device.js'
 import { useReleaseGL } from '../../lib/glGate.js'
 
 // one render request flag, shared by the DOM side and the canvas
@@ -57,14 +58,14 @@ function CardScene({ c, quality, reduced, visible }) {
   return (
     <>
       <PerspectiveCamera ref={cam} makeDefault fov={FOV} position={[0, dist * 0.16, dist]} near={0.05} far={dist * 4} />
-      <StudioEnvironment resolution={64} />
+      <StudioEnvironment resolution={quality === 'low' ? 64 : 256} />
       <ambientLight intensity={0.3} />
       <directionalLight position={[3, 6, 5]} intensity={1} />
       <group rotation={c.pose.tilt}>
         <group ref={inner}>
           <group position={[-center.x, -center.y, -center.z]}>
             {c.parts.map((p, i) => (
-              <Fastener key={i} {...p} detail="low" quality={quality} />
+              <Fastener key={i} {...p} detail={quality} quality={quality} />
             ))}
           </group>
         </group>
@@ -73,12 +74,45 @@ function CardScene({ c, quality, reduced, visible }) {
   )
 }
 
-/** Live canvas rect into the store, before any View renders (priority −1). */
+/**
+ * Canvas rect into the store, before any View renders (priority −1). drei places each View
+ * at (slot rect − canvas rect); the canvas scrolls with the page, so its viewport position
+ * changes every scroll frame (8C: R3F's own re-measure lags by 50 ms -> drift in Safari).
+ * Its position in the DOCUMENT only changes with layout, so it is measured on resize, on
+ * layout changes (ResizeObserver on the canvas and the body, ScrollTrigger refresh = pin
+ * spacers) and after fonts load, and each frame derives the viewport position from the
+ * scroll offset. TickerBridge runs on gsap.ticker after Lenis has applied this tick's
+ * scroll, so rects and render use the same scroll position.
+ */
 function SyncCanvasRect() {
+  const gl = useThree((s) => s.gl)
+  const doc = useRef({ top: 0, left: 0 })
+  useEffect(() => {
+    const el = gl.domElement
+    const measure = () => {
+      const r = el.getBoundingClientRect()
+      doc.current = { top: r.top + window.scrollY, left: r.left + window.scrollX }
+      requestRender()
+    }
+    measure()
+    // measure() only reads layout, so these observers cannot feed back into a resize loop
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    ro.observe(document.body)
+    window.addEventListener('resize', measure)
+    ScrollTrigger.addEventListener('refresh', measure)
+    let alive = true
+    document.fonts?.ready.then(() => alive && measure())
+    return () => {
+      alive = false
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+      ScrollTrigger.removeEventListener('refresh', measure)
+    }
+  }, [gl])
   useFrame((state) => {
-    const r = state.gl.domElement.getBoundingClientRect()
-    state.size.top = r.top
-    state.size.left = r.left
+    state.size.top = doc.current.top - window.scrollY
+    state.size.left = doc.current.left - window.scrollX
   }, -1)
   return null
 }
@@ -115,11 +149,12 @@ export default function ProductViews({ slots, container, touch, quality, reduced
   const [dpr, setDpr] = useState(1)
   const [onScreen, setOnScreen] = useState({})
 
-  // DPR: 1.5 desktop / 1.25 touch, clamped so neither buffer side exceeds MAX_BUFFER
+  // DPR: the screen's own up to 2 (lib/device maxDpr), clamped so neither buffer side
+  // exceeds MAX_BUFFER. Only re-set when the value changes (no resize feedback loop).
   useEffect(() => {
     const el = container.current
     const ro = new ResizeObserver(() => {
-      const cap = Math.min(touch ? 1.25 : 1.5, window.devicePixelRatio || 1)
+      const cap = maxDpr()
       const fit = MAX_BUFFER / Math.max(el.offsetHeight, el.offsetWidth, 1)
       setDpr(Math.max(0.75, Math.min(cap, fit)))
       requestRender()

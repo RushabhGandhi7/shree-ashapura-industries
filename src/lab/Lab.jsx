@@ -298,27 +298,18 @@ function fromQuery() {
 }
 
 /* ─────────── render mode: /lab?render=<category slug> ───────────
-   Used by scripts/render-products.mjs. Frames the category's parts exactly like its
-   card (pose, fit) on a plain paper background, with no UI, then sets
-   window.__renderReady so the script can screenshot the canvas. */
+   Used by scripts/render-products.mjs. Renders the category exactly like its live card /
+   category stage at rest (same parts and detail, fit, camera, environment and lights; a
+   transparent background), so the poster image and the live 3D that replaces it are the
+   same picture: the swap is an opacity crossfade with no jump. Sets window.__renderReady. */
 function RenderScene({ category }) {
   const { invalidate } = useThree()
   const frames = useRef(0)
-  const fit = useMemo(() => measure(category.parts, 'high'), [category])
-  const dist = useMemo(() => fitDistance(category.pose.tilt, fit, 4 / 3, 1.04), [category, fit])
   const cam = useRef(null)
-  const posed = useRef(null)
-  // A still image does not spin, so frame the posed group's actual bounds (tighter than the card).
+  const { c: center, radius, height } = useMemo(() => measure(category.parts), [category])
+  const dist = useMemo(() => fitDistance(category.pose.tilt, { radius, height }), [category.pose.tilt, height, radius])
   useLayoutEffect(() => {
-    const box = new THREE.Box3().setFromObject(posed.current)
-    const c = box.getCenter(new THREE.Vector3())
-    const s = box.getSize(new THREE.Vector3())
-    const tan = Math.tan(((CARD_FOV / 2) * Math.PI) / 180)
-    const d = Math.max(s.y / (2 * tan), s.x / (2 * tan * (4 / 3))) * 1.22 + s.z / 2
-    cam.current.position.set(c.x, c.y + d * 0.16, c.z + d)
-    cam.current.far = d * 4
-    cam.current.lookAt(c)
-    cam.current.updateProjectionMatrix()
+    cam.current?.lookAt(0, 0, 0)
     invalidate()
   }, [dist, invalidate])
   useFrame(() => {
@@ -328,12 +319,11 @@ function RenderScene({ category }) {
   return (
     <>
       <PerspectiveCamera ref={cam} makeDefault fov={CARD_FOV} position={[0, dist * 0.16, dist]} near={0.05} far={dist * 4} />
-      <color attach="background" args={['#F6F4EF']} />
-      <StudioEnvironment />
+      <StudioEnvironment resolution={256} />
       <ambientLight intensity={0.3} />
       <directionalLight position={[3, 6, 5]} intensity={1} />
-      <group ref={posed} rotation={category.pose.tilt}>
-        <group position={[-fit.c.x, -fit.c.y, -fit.c.z]}>
+      <group rotation={category.pose.tilt}>
+        <group position={[-center.x, -center.y, -center.z]}>
           {category.parts.map((p, i) => (
             <Fastener key={i} {...p} detail="high" quality="high" />
           ))}
@@ -347,8 +337,8 @@ function RenderMode({ slug }) {
   const category = categories.find((c) => c.slug === slug)
   if (!category) return <p className="p-6 font-mono">Unknown category: {slug}</p>
   return (
-    <div className="fixed inset-0 bg-paper">
-      <Canvas className="!absolute inset-0" dpr={1} gl={{ antialias: true, preserveDrawingBuffer: true }} frameloop="demand">
+    <div className="fixed inset-0">
+      <Canvas className="!absolute inset-0" dpr={1} gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }} frameloop="demand">
         <Suspense fallback={null}>
           <RenderScene category={category} />
         </Suspense>

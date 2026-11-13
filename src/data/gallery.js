@@ -14,9 +14,10 @@ const partName = (p) => {
   return v[p.head] ?? Object.values(v)[0] ?? p.type
 }
 const renders = categories.map((c) => ({
-  src: c.image,
-  width: 1200,
-  height: 900,
+  // the opaque copy: the .webp poster is transparent (it sits over the card's grid)
+  src: c.image.replace(/\.webp$/, '.jpg'),
+  width: 1600,
+  height: 1200,
   alt: t.renderAlt(c.name, [...new Set(c.parts.map(partName))].join(', ')),
   caption: t.renderCaption(c.name),
   kind: 'render',

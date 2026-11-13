@@ -4,7 +4,7 @@ import SectionHead from '../ui/SectionHead.jsx'
 import { customiser as C, finishes } from '../../data/products.js'
 import { pitchFor } from '../../three/specs.js'
 import { whatsappHref } from '../../lib/contact.js'
-import { dprCap, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
+import { dprCap, hasWebGL, partDetail, prefersReducedMotion } from '../../lib/device.js'
 import Button from '../ui/Button.jsx'
 import { WhatsAppIcon } from '../ui/Icons.jsx'
 import Annotations from '../annotate/Annotations.jsx'
@@ -100,8 +100,7 @@ export default function Customiser({ h1 = false } = {}) {
   const [lmin, lmax] = C.lengthRange(o.diameter)
 
   const profile = useMemo(() => {
-    const low = isSmallScreen() || isLowEnd()
-    return { reduced: prefersReducedMotion(), webgl: hasWebGL(), dpr: dprCap(), detail: low ? 'low' : 'high' }
+    return { reduced: prefersReducedMotion(), webgl: hasWebGL(), dpr: dprCap(), detail: partDetail() }
   }, [])
 
   // Live canvas only while this section holds the page's WebGL slot (near the viewport,
@@ -174,15 +173,18 @@ export default function Customiser({ h1 = false } = {}) {
               role="img"
             >
               <div className="bp-grid bp-grid-fade absolute inset-0" aria-hidden />
-              {/* poster until the 3D part is ready (also the first paint of the prerendered page) */}
+              {/* Poster until the 3D part is ready (also the first paint of the prerendered page):
+                  a render of this scene's default part (scripts/render-posters.mjs) with the
+                  camera's fitted aspect, contain-fitted into the same box as the canvas, so the
+                  swap is an opacity crossfade only. */}
               <img
-                src="/hero-poster.svg"
+                src="/posters/custom.webp"
                 alt=""
-                width="600"
-                height="720"
+                width="882"
+                height="1280"
                 fetchPriority="high"
                 decoding="async"
-                className={`pointer-events-none absolute inset-0 m-auto h-[82%] w-auto transition-opacity duration-500 ${ready ? 'opacity-0' : 'opacity-100'}`}
+                className={`pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${ready ? 'opacity-0' : 'opacity-100'}`}
               />
               {mount3D && (
                 <Boundary>

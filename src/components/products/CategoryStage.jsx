@@ -13,7 +13,9 @@ import { useReleaseGL } from '../../lib/glGate.js'
 function Scene({ category, detail, onReady }) {
   const spin = useRef(null)
   const fit = useMemo(() => measure(category.parts, detail), [category, detail])
-  const dist = useMemo(() => fitDistance(category.pose.tilt, fit, 4 / 3, 1.05), [category, fit])
+  // same fit as the product card and its poster image (categoryFit default margin), so the
+  // poster -> live swap is a pure crossfade
+  const dist = useMemo(() => fitDistance(category.pose.tilt, fit), [category, fit])
   const cam = useRef(null)
   const first = useRef(true)
   useFrame((_, dt) => {

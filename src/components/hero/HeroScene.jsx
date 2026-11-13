@@ -108,6 +108,13 @@ function Rig({ tilt }) {
     camera.lookAt(0, targetY, 0)
     camera.filmOffset = 0
     camera.setViewOffset(W, H, W / 2 - (box.x0 + box.x1) / 2, H / 2 - (box.y0 + box.y1) / 2, W, H)
+    // Dev: the canvas-px rect the subject is fitted into (ext × the 1.06 margin, centred in
+    // the box). scripts/render-posters.mjs captures exactly this rect as the poster image,
+    // which Hero.jsx contain-fits into the same box: poster and live 3D line up.
+    if (import.meta.env.DEV) {
+      const k = 1 / (2 * TAN_HALF_FOV * dist)
+      window.__heroFit = { cx: (box.x0 + box.x1) / 2, cy: (box.y0 + box.y1) / 2, w: extW * k * (W / aspect) * 1.06, h: extH * k * H * 1.06, p: heroStore.p }
+    }
     camera.updateProjectionMatrix()
     camera.updateMatrixWorld()
 
@@ -203,7 +210,7 @@ function Rig({ tilt }) {
 function Lights({ lowEnd }) {
   return (
     <>
-      <StudioEnvironment resolution={lowEnd ? 64 : 128} intensity={0.95} warm />
+      <StudioEnvironment resolution={heroStore.detail === 'low' ? 64 : 128} intensity={0.95} warm />
       <ambientLight intensity={0.3} />
       <directionalLight position={[4, 9, 6]} intensity={1.2} />
       <directionalLight position={[-6, 3, -4]} intensity={0.3} />

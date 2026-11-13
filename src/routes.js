@@ -27,7 +27,7 @@ export const pages = [
       { name: P.products.crumb, path: '/products' },
       { name: c.name, path: `/products/${c.slug}` },
     ],
-    image: c.image,
+    image: c.image.replace(/\.webp$/, '.jpg'), // opaque copy (the .webp poster is transparent)
     category: c.slug,
     priority: 0.8,
   })),
@@ -86,7 +86,7 @@ export function structuredData(p) {
       '@context': 'https://schema.org',
       '@type': 'ItemList',
       name: P.products.crumb,
-      itemListElement: categories.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, url: `${SITE}/products/${c.slug}`, image: `${SITE}${c.image}` })),
+      itemListElement: categories.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, url: `${SITE}/products/${c.slug}`, image: `${SITE}${c.image.replace(/\.webp$/, '.jpg')}` })),
     })
   const cat = p.category && categories.find((c) => c.slug === p.category)
   if (cat)
@@ -101,7 +101,7 @@ export function structuredData(p) {
           '@type': 'Product',
           name: item,
           category: cat.name,
-          image: `${SITE}${cat.image}`,
+          image: `${SITE}${cat.image.replace(/\.webp$/, '.jpg')}`,
           brand: { '@type': 'Brand', name: company.name },
           manufacturer: { '@id': `${SITE}/#business` },
           ...(cat.materials.length ? { material: cat.materials.join(', ') } : {}),

@@ -1,6 +1,7 @@
 // Renders one product image per category from the procedural 3D parts (never from
 // catalogue photos): opens /lab?render=<slug> in Playwright, waits for the scene, and
-// saves public/products/<slug>.webp (1200×900) plus an Open Graph collage
+// saves public/products/<slug>.webp (1600×1200, transparent: the card's grid shows through,
+// exactly like behind the live canvas) plus an Open Graph collage
 // (public/products/og-products.webp, 1200×630).
 //
 //   npm run render:products            # starts Vite on :5179 for the run
@@ -17,8 +18,8 @@ import { MARK } from '../src/components/ui/logoMark.js'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const OUT = path.join(ROOT, 'public/products')
-const W = 1200
-const H = 900
+const W = 1600 // ≥ 2× every container that shows it (cards, category stage)
+const H = 1200
 
 const { categories } = await import(pathToFileURL(path.join(ROOT, 'src/data/products.js')).href)
 
@@ -49,18 +50,21 @@ async function launch() {
 const server = await startServer()
 const browser = await launch()
 await mkdir(OUT, { recursive: true })
-const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2 })
+const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 })
 page.on('pageerror', (e) => console.error('page error:', e.message))
 const files = []
 try {
   for (const c of categories) {
     await page.goto(`${server.url}/lab?render=${c.slug}`)
     await page.waitForFunction(() => window.__renderReady === true, null, { timeout: 30000 })
+    await page.addStyleTag({ content: 'html, body { background: transparent !important }' })
     await page.waitForTimeout(300)
-    const png = await page.locator('canvas').screenshot()
+    const png = await page.locator('canvas').screenshot({ omitBackground: true })
     const file = path.join(OUT, `${c.slug}.webp`)
-    const info = await sharp(png).resize(W, H).webp({ quality: 80, effort: 6 }).toFile(file)
+    const info = await sharp(png).resize(W, H).webp({ quality: 82, alphaQuality: 90, effort: 6 }).toFile(file)
     files.push(file)
+    // opaque copy on paper for og:image / JSON-LD (link previews render transparency black)
+    await sharp(png).resize(W, H).flatten({ background: '#F6F4EF' }).jpeg({ quality: 84, mozjpeg: true }).toFile(file.replace(/\.webp$/, '.jpg'))
     console.log(`${c.slug}.webp  ${(info.size / 1024).toFixed(0)} kB`)
   }
 

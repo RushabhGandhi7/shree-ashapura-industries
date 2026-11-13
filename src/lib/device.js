@@ -21,11 +21,23 @@ export const isLowEnd = () => {
 
 export const isSmallScreen = () => !!mq('(max-width: 767px)')
 
-/** Cap devicePixelRatio for WebGL canvases: at most 1.5, and 1 on low-end hardware. */
-export const dprCap = () => (isLowEnd() ? [1, 1] : [1, 1.5])
+/** Phones narrower than 640 px: the only screens that get reduced 3D detail. */
+export const isTinyScreen = () => !!mq('(max-width: 639px)')
 
-/** MSAA for WebGL canvases: off on phones / tablets and low-end hardware (fill-rate bound). */
-export const glAntialias = () => hasFinePointer() && !isLowEnd()
+/** Low-end phone: a tiny screen on low-end hardware (the one case that trades sharpness). */
+export const isLowEndPhone = () => isTinyScreen() && isLowEnd()
+
+/** Highest DPR a WebGL canvas may use: the screen's own, up to 2 (1.5 on low-end phones). */
+export const maxDpr = () => Math.min(typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1, isLowEndPhone() ? 1.5 : 2)
+
+/** DPR range for R3F canvases: [1, min(devicePixelRatio, 2)]; 1.5 cap on low-end phones. */
+export const dprCap = () => [1, maxDpr()]
+
+/** MSAA for WebGL canvases: on everywhere except low-end phones. */
+export const glAntialias = () => !isLowEndPhone()
+
+/** Geometry detail for 3D parts: full detail except on screens under 640 px. */
+export const partDetail = () => (isTinyScreen() ? 'low' : 'high')
 
 // Probed once per page load: each probe creates a real WebGL context, and Safari warns
 // (then drops the oldest context) when too many have been created.

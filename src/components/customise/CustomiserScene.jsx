@@ -156,6 +156,12 @@ function Stage({ opts, detail, reduced, dragTarget, store, onReady }) {
     }
     F.dist += (want - F.dist) * (1 - Math.exp(-5 * dt))
     camera.position.set(F.dist * 0.42, F.dist * 0.16, F.dist * 0.9)
+    // Dev: the canvas-px rect the camera fits (part + callout room), centred; captured by
+    // scripts/render-posters.mjs as the poster, which Customiser contain-fits into the canvas box.
+    if (import.meta.env.DEV) {
+      const k = 1 / (2 * TAN * F.dist)
+      window.__customFit = { cx: size.width / 2, cy: size.height / 2, w: ((w * 2.6) / aspect) * k * size.width, h: h * 1.25 * k * size.height, angle: st.angle }
+    }
     camera.lookAt(0, 0, 0)
     camera.updateMatrixWorld()
 

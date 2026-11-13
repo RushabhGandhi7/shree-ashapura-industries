@@ -1,15 +1,12 @@
-import { useMemo } from 'react'
 import { content } from '../../data/content.js'
 import SectionHead from '../ui/SectionHead.jsx'
 import { whatsappHref } from '../../lib/contact.js'
-import { hasFinePointer } from '../../lib/device.js'
 import ProductGrid from './ProductGrid.jsx'
 
 const t = content.products
 
 export default function Products({ h1 = false } = {}) {
   const H = h1 ? 'h1' : 'h2'
-  const touch = useMemo(() => !hasFinePointer(), [])
 
   return (
     <section id="products" aria-labelledby="products-title" className="relative section-y bg-paper">
@@ -23,7 +20,13 @@ export default function Products({ h1 = false } = {}) {
           aside={
             <>
               <p className="max-w-[44ch]">{t.lead}</p>
-              <p className="label-mono mt-4 text-steel-500">{touch ? t.hintTouch : t.hint}</p>
+              {/* Both hints are in the markup and CSS picks one by pointer type (same media query
+                  as hasFinePointer), so the prerendered page already shows the right one and
+                  the cards below never move when React renders. */}
+              <p className="label-mono mt-4 text-steel-500">
+                <span className="hidden [@media(hover:hover)_and_(pointer:fine)]:inline">{t.hint}</span>
+                <span className="[@media(hover:hover)_and_(pointer:fine)]:hidden">{t.hintTouch}</span>
+              </p>
             </>
           }
         />

@@ -8,7 +8,7 @@ import { content } from '../../data/content.js'
 import { categories } from '../../data/products.js'
 import { spinStore } from '../../lib/spinStore.js'
 import { useGLGate, useGLHold } from '../../lib/glGate.js'
-import { hasFinePointer, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
+import { hasFinePointer, hasWebGL, partDetail, prefersReducedMotion } from '../../lib/device.js'
 
 const ProductViews = lazy(() => import('./ProductViews.jsx'))
 const t = content.products
@@ -62,8 +62,8 @@ function Card({ c, setSlot, touch, live, Hc, eager, compact }) {
           <img
             src={c.image}
             alt=""
-            width="1200"
-            height="900"
+            width="1600"
+            height="1200"
             loading={eager ? 'eager' : 'lazy'}
             fetchPriority={eager ? 'high' : undefined}
             decoding="async"
@@ -109,7 +109,7 @@ export default function ProductGrid({ compact = false, Hc = 'h3', className = ''
       touch: !hasFinePointer(),
       reduced: prefersReducedMotion(),
       webgl: hasWebGL(),
-      quality: isSmallScreen() || isLowEnd() ? 'low' : 'high',
+      quality: partDetail(),
     }),
     [],
   )

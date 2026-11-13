@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { content } from '../../data/content.js'
 import { explodedStore, range } from '../../lib/explodedStore.js'
-import { dprCap, hasWebGL, isLowEnd, isSmallScreen, prefersReducedMotion } from '../../lib/device.js'
+import { dprCap, hasWebGL, isSmallScreen, partDetail, prefersReducedMotion } from '../../lib/device.js'
 import Annotations from '../annotate/Annotations.jsx'
 import { useGLGate, useGLHold } from '../../lib/glGate.js'
 
@@ -55,7 +55,7 @@ export default function Exploded() {
       small,
       webgl: hasWebGL(),
       dpr: dprCap(),
-      detail: small || isLowEnd() ? 'low' : 'high',
+      detail: partDetail(),
     }
   }, [])
 

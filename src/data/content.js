@@ -3,14 +3,15 @@
 
 // Real company facts: client-assets/CLIENT_FACTS.md (its OVERRIDES win).
 
-/* ── Facts awaiting client confirmation (phase 11) ───────────────────────────────────
-   The new catalogue differs from the site on these. Each value lives in ONE constant
-   below and every string on the site reads it from here. Current vs catalogue values:
-   CONFIRM.md (repo root). Change a value here and the whole site follows. */
-export const FIRM_NAME = 'Shree Ashapura Industries' // CONFIRM firm name
-export const FOUNDED = 1990 // CONFIRM year established ("since")
+/* ── Company facts ──────────────────────────────────────────────────────────────────
+   Each value lives in ONE constant below and every string on the site reads it from here.
+   Confirmed by the client (phase 11b): firm name, year, address, phones, emails, machine
+   counts, Bharat Jain as CEO, ISO 9001:2015. Still open (// CONFIRM, see CONFIRM.md):
+   customer list and logos, PPAP and Lean text. The ISO certificate number and validity
+   are not shown anywhere until the client supplies them. */
+export const FIRM_NAME = 'Shree Ashapura Industries'
+export const FOUNDED = 1990
 export const ADDRESS = {
-  // CONFIRM address
   lines: ['Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd.', '121 S.V. Road, near Dahisar Petrol Pump', 'Dahisar (East), Mumbai 400068'],
   street: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate Ltd., 121 S.V. Road, near Dahisar Petrol Pump',
   short: 'Gala No. 24 & 25, Agarwal Co-op. Industrial Estate, S.V. Road, Dahisar (East), Mumbai 400068',
@@ -19,22 +20,20 @@ export const ADDRESS = {
   mapQuery: 'Agarwal Co-op Industrial Estate, 121 S.V. Road, Dahisar East, Mumbai 400068',
 }
 export const PHONES = {
-  // CONFIRM phone numbers
   mobile: { display: '+91 70215 80583', e164: '+917021580583', wa: '917021580583' },
   landline: { display: '022-2089 1665', e164: '+912220891665' },
 }
-export const EMAILS = ['ashapura56@gmail.com', 'b_jaan@hotmail.com'] // CONFIRM email addresses (first = primary)
+export const EMAILS = ['ashapura56@gmail.com', 'b_jaan@hotmail.com'] // first = primary
 /** Machines in units 24 & 25 only. Read by Capability and the Manufacturing stations. */
 export const MACHINE_COUNTS = [
-  // CONFIRM machine counts and ranges
   { key: 'heading', name: 'Cold heading', count: 5, min: 1.6, max: 7.5, unit: 'mm' },
   { key: 'rolling', name: 'Thread rolling', count: 8, min: 3, max: 50, unit: 'mm' },
   { key: 'slotting', name: 'Slotting & BT', count: 4, min: 4, max: 55, unit: 'mm' },
 ]
 /** Customer names (wordmarks; `customers` in products.js adds the logo field). */
-export const CUSTOMER_NAMES = ['Godrej Interio', 'IFB', 'Elica', 'Crompton Greaves', 'Belden', 'SmartLink', 'Saakshi', 'CA.BE Springs & Fasteners'] // CONFIRM customer names
-export const LEADER = { name: 'Bharat Jain', title: 'Chief Executive Officer' } // CONFIRM Bharat Jain's title
-export const ISO_TEXT = 'ISO 9001:2015' // CONFIRM ISO text and certificate details (number, body, validity)
+export const CUSTOMER_NAMES = ['Godrej Interio', 'IFB', 'Elica', 'Crompton Greaves', 'Belden', 'SmartLink', 'Saakshi', 'CA.BE Springs & Fasteners'] // CONFIRM customer list (and logo files)
+export const LEADER = { name: 'Bharat Jain', title: 'Chief Executive Officer' }
+export const ISO_TEXT = 'ISO 9001:2015' // certificate number and validity: open in CONFIRM.md, not shown yet
 export const PPAP_TEXT = [
   // CONFIRM PPAP document list
   'PSW',
@@ -209,9 +208,9 @@ const en = {
         spec: 'Raw-material test reports',
         text: "Wire is checked against the supplier's chemical test report and third-party lab reports before it reaches the machines.",
       },
-      { key: 'heading', name: 'Cold heading', short: 'Heading', spec: mSpec('heading'), text: 'Wire is cut and struck cold between dies to form the head. The first piece is approved before the run starts.' }, // CONFIRM
-      { key: 'slotting', name: 'Slotting & BT', short: 'Slotting', spec: mSpec('slotting'), text: 'Slotting and BT machines finish the head before the thread is formed.' }, // CONFIRM
-      { key: 'rolling', name: 'Thread rolling', short: 'Rolling', spec: mSpec('rolling'), text: 'Dies roll the thread into the blank, checked with calibrated thread ring gauges.' }, // CONFIRM
+      { key: 'heading', name: 'Cold heading', short: 'Heading', spec: mSpec('heading'), text: 'Wire is cut and struck cold between dies to form the head. The first piece is approved before the run starts.' },
+      { key: 'slotting', name: 'Slotting & BT', short: 'Slotting', spec: mSpec('slotting'), text: 'Slotting and BT machines finish the head before the thread is formed.' },
+      { key: 'rolling', name: 'Thread rolling', short: 'Rolling', spec: mSpec('rolling'), text: 'Dies roll the thread into the blank, checked with calibrated thread ring gauges.' },
       {
         key: 'heatPlating',
         name: 'Heat treatment & plating',

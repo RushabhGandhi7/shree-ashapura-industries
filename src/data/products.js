@@ -165,7 +165,7 @@ export const categories = [
   },
 ].map((c) => ({ ...c, image: `/products/${c.slug}.webp` }))
 
-/** Customers (approved for the site; shown when SHOW_CUSTOMERS in content.js). Names: CUSTOMER_NAMES in content.js (// CONFIRM). Set `logo: '/brand/customers/<file>.svg'` when files arrive. */
+/** Customers (approved for the site; shown when SHOW_CUSTOMERS in content.js). Names: CUSTOMER_NAMES in content.js (// CONFIRM list and logo files). Set `logo: '/brand/customers/<file>.svg'` when files arrive. */
 const customerLogos = {}
 export const customers = CUSTOMER_NAMES.map((name) => ({ name, logo: customerLogos[name] ?? null }))
 

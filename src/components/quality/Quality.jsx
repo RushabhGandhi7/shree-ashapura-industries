@@ -15,10 +15,10 @@ const Heading = ({ children, id, as: Tag = 'h3' }) => (
   </Tag>
 )
 
-// "ISO" / "9001:2015" from ISO_TEXT (// CONFIRM in content.js).
+// "ISO" / "9001:2015" from ISO_TEXT in content.js.
 const ISO_SEAL = [ISO_TEXT.split(' ')[0], ISO_TEXT.split(' ').slice(1).join(' ')]
 
-/** ISO seal (certificate details // CONFIRM in content.js). */
+/** ISO seal. */
 export function IsoSeal() {
   const teeth = Array.from({ length: 24 }, (_, i) => i)
   return (

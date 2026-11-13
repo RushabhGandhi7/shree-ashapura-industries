@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { content } from '../../data/content.js'
 import SectionHead from '../ui/SectionHead.jsx'
-import { gallery, hasRealPhotos, unitVideo } from '../../data/gallery.js'
+import { gallery, hasRealPhotos, realPhotos, renders, unitVideo } from '../../data/gallery.js'
+import VideoSlot from '../ui/VideoSlot.jsx'
 import { useLenis } from '../../lib/smoothScroll.jsx'
 
 const t = content.gallery
@@ -98,141 +99,130 @@ function Lightbox({ index, onClose, onStep }) {
   )
 }
 
-/** Unit walkthrough slot: blueprint poster until public/gallery/real/unit-video.mp4 exists. */
-function UnitVideo() {
-  const v = t.video
-  const [play, setPlay] = useState(false)
-  // No video yet: a compact strip instead of an empty 21:9 box.
-  if (!unitVideo)
-    return (
-      <figure className="relative mt-3 flex items-center gap-5 overflow-hidden rounded-xs border border-steel-300 bg-paper px-5 py-5 md:mt-4 md:px-7">
-        <div className="bp-grid absolute inset-0 opacity-60" aria-hidden />
-        <span className="relative grid size-12 shrink-0 place-items-center rounded-full border-2 border-dashed border-steel-500 text-steel-500" aria-hidden>
-          <svg viewBox="0 0 24 24" className="ml-0.5 size-5" fill="currentColor">
-            <path d="M7 4.5v15l12-7.5z" />
-          </svg>
-        </span>
-        <figcaption className="relative">
-          <p className="font-display text-[1.15rem] font-[760] [font-stretch:115%]">{v.title}</p>
-          <p className="label-mono mt-1 text-steel-500">
-            {v.soon} · {v.text}
-          </p>
-        </figcaption>
-      </figure>
-    )
+// Image grids (12 columns on lg): 4 per row; a short last row is spread evenly (3 left ->
+// 4 columns each, 2 -> 6, 1 -> 12) and an odd count fills the phone row. Literal classes.
+const REST_LG = { 1: 'lg:col-span-12', 2: 'lg:col-span-6', 3: 'lg:col-span-4' }
+function spreadClass(count, i) {
+  const rest = count % 4
+  const lg = rest && i >= count - rest ? REST_LG[rest] : 'lg:col-span-3'
+  const sm = count % 2 && i === count - 1 ? 'col-span-2' : ''
+  return `${sm} ${lg}`.trim()
+}
+
+function BlockTitle({ children, count }) {
   return (
-    <figure className="relative mt-3 overflow-hidden rounded-xs border border-steel-300 bg-paper md:mt-4">
-      <div className="relative aspect-video md:aspect-[21/9]">
-        {unitVideo && play ? (
-          <video className="absolute inset-0 h-full w-full bg-ink object-contain" controls autoPlay playsInline preload="none" poster={unitVideo.poster ?? undefined}>
-            <source src={unitVideo.src} type={unitVideo.type} />
-          </video>
-        ) : (
-          <>
-            {unitVideo?.poster ? (
-              <img src={unitVideo.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-            ) : (
-              <div className="bp-grid absolute inset-0" aria-hidden />
-            )}
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
-              {unitVideo ? (
-                <button
-                  type="button"
-                  onClick={() => setPlay(true)}
-                  aria-label={v.play}
-                  className="grid size-20 place-items-center rounded-full bg-red text-paper shadow-[0_12px_32px_-12px_rgb(200_16_46/0.7)] transition-transform hover:scale-105"
-                >
-                  <svg viewBox="0 0 24 24" className="ml-1 size-8" fill="currentColor" aria-hidden>
-                    <path d="M7 4.5v15l12-7.5z" />
-                  </svg>
-                </button>
-              ) : (
-                <span className="grid size-20 place-items-center rounded-full border-2 border-dashed border-steel-500 text-steel-500" aria-hidden>
-                  <svg viewBox="0 0 24 24" className="ml-1 size-8" fill="currentColor">
-                    <path d="M7 4.5v15l12-7.5z" />
-                  </svg>
-                </span>
-              )}
-              <div>
-                <p className="font-display text-[1.3rem] font-[760] [font-stretch:115%]">{v.title}</p>
-                <p className="label-mono mt-1 text-steel-500">{unitVideo ? v.text : v.soon}</p>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </figure>
+    <h3 className="label-mono mt-10 mb-4 flex items-center gap-3 text-steel-700 first:mt-0">
+      <span className="h-px w-6 bg-red" aria-hidden />
+      {children}
+      {count != null && <span className="text-steel-500">· {String(count).padStart(2, '0')}</span>}
+    </h3>
   )
 }
 
-// Grid cell per item. Real photos: 4 per row on lg, 2 below; the last card stretches over
-// the rest of a short last row (literal classes so Tailwind sees them).
-const LAST_LG = { 1: 'lg:col-span-4', 2: 'lg:col-span-3', 3: 'lg:col-span-2' }
-// Renders only (no photos, 12-column lg grid): 4 per row; a short last row is spread evenly
-// (3 left -> 4 columns each, 2 -> 6, 1 -> 12), and an odd count fills the phone row.
-const RENDER_COUNT = gallery.filter((g) => g.kind === 'render').length
-const REST_LG = { 1: 'lg:col-span-12', 2: 'lg:col-span-6', 3: 'lg:col-span-4' }
-function renderClass(i) {
-  const rest = RENDER_COUNT % 4
-  const inLastRow = rest && i >= RENDER_COUNT - rest
-  const lg = inLastRow ? REST_LG[rest] : 'lg:col-span-3'
-  const sm = RENDER_COUNT % 2 && i === RENDER_COUNT - 1 ? 'col-span-2' : ''
-  return `${sm} ${lg}`.trim()
+/** A block of lightbox images (renders or real photos); `offset` = index of the first one in `gallery`. */
+function ImageBlock({ items, offset, onOpen, crop }) {
+  return (
+    <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-12">
+      {items.map((g, k) => (
+        <li key={g.src} className={spreadClass(items.length, k)}>
+          <button
+            type="button"
+            onClick={() => onOpen(offset + k)}
+            className={`group relative block w-full overflow-hidden rounded-xs border border-steel-300 bg-paper ${g.small ? 'bp-grid p-6' : ''}`}
+          >
+            <img
+              src={g.src}
+              alt={g.alt}
+              width={g.width}
+              height={g.height}
+              loading="lazy"
+              decoding="async"
+              style={g.small ? { maxWidth: g.width } : undefined}
+              className={`mx-auto block w-full ${crop && !g.small ? 'aspect-[4/3] object-cover' : 'h-auto'} transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.045] motion-reduce:transition-none`}
+            />
+            <span className="sr-only">{t.open}: </span>
+            {/* caption strip: always readable, no dark overlay on light renders */}
+            <span className={`relative flex items-center justify-between gap-3 border-t border-steel-300 bg-paper px-3 py-2 text-left ${g.small ? '-mx-6 -mb-6 mt-6' : ''}`}>
+              <span className="label-mono line-clamp-2 text-[10px] text-steel-700 group-hover:text-red">{g.caption}</span>
+              <span className="label-mono text-[10px] text-steel-500" aria-hidden>
+                {String(offset + k + 1).padStart(2, '0')}
+              </span>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
 }
-function cellClass(g, i) {
-  if (!hasRealPhotos) return g.kind === 'drawing' ? 'col-span-2 lg:col-span-4' : renderClass(i)
-  if (i !== gallery.length - 1) return ''
-  const sm = gallery.length % 2 ? 'col-span-2' : ''
-  return `${sm} ${LAST_LG[gallery.length % 4] ?? ''}`.trim()
+
+/** Slot frame: a blueprint placeholder with a mono title, or the real media inside. */
+function SlotCard({ title, children }) {
+  return (
+    <li className="overflow-hidden rounded-xs border border-steel-300 bg-paper">
+      <div className="relative aspect-video overflow-hidden">
+        <div className="bp-grid absolute inset-0 opacity-60" aria-hidden />
+        {children}
+      </div>
+      <p className="label-mono border-t border-steel-300 px-3 py-2 text-[10px] text-steel-700">{title}</p>
+    </li>
+  )
 }
+
+const PlaceholderMark = ({ kind }) => (
+  <svg viewBox="0 0 160 90" className="absolute inset-0 m-auto h-1/2 w-1/2 text-steel-500" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden>
+    <rect x="20" y="10" width="120" height="70" rx="2" strokeDasharray="4 3" />
+    {kind === 'video' ? <path d="M72 32v26l22-13Z" fill="currentColor" stroke="none" opacity=".55" /> : <path d="M34 70l28-26 18 16 14-12 32 22M98 30a6 6 0 1 0 0 .1" />}
+  </svg>
+)
 
 export default function Gallery({ h1 = false } = {}) {
   const H = h1 ? 'h1' : 'h2'
   const [open, setOpen] = useState(null)
   const close = useCallback(() => setOpen(null), [])
   const step = useCallback((d) => setOpen((i) => (i + d + gallery.length) % gallery.length), [])
+  // the unit walkthrough dropped into public/gallery/real/ fills the first video slot
+  const videos = t.videos.map((v, i) => (i === 0 && !v.src && unitVideo ? { ...v, src: unitVideo.src, poster: unitVideo.poster } : v))
 
   return (
     <section id="gallery" aria-labelledby="gallery-title" className="relative section-y bg-paper-2">
       <div className="container-x">
         <SectionHead id="gallery-title" as={H} label={t.label} titleClassName="text-h2" title={t.title} aside={<p className="max-w-[44ch]">{t.lead}</p>} />
 
-        {/* Real photos: masonry via CSS columns (mixed aspect ratios). Renders + drawings only
-            (all 4:3): a regular grid, renders 4 per row and drawings 3 per row on lg.
-            With real photos: the same 4-column grid with 4:3 crops, and the last card spans
-            whatever is left of its row. Either way no row has an empty cell. */}
-        <ul className={`grid grid-cols-2 gap-3 md:gap-4 ${hasRealPhotos ? 'lg:grid-cols-4' : 'lg:grid-cols-12'}`}>
-          {gallery.map((g, i) => (
-            <li key={g.src} className={cellClass(g, i)}>
-              <button
-                type="button"
-                onClick={() => setOpen(i)}
-                className={`group relative block w-full overflow-hidden rounded-xs border border-steel-300 bg-paper ${g.small ? 'bp-grid p-6' : ''}`}
-              >
-                <img
-                  src={g.src}
-                  alt={g.alt}
-                  width={g.width}
-                  height={g.height}
-                  loading="lazy"
-                  decoding="async"
-                  style={g.small ? { maxWidth: g.width } : undefined}
-                  className={`mx-auto block w-full ${hasRealPhotos && !g.small ? 'aspect-[4/3] object-cover' : 'h-auto'} transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.045] motion-reduce:transition-none`}
-                />
-                <span className="sr-only">{t.open}: </span>
-                {/* caption strip: always readable, no dark overlay on light renders */}
-                <span className={`relative flex items-center justify-between gap-3 border-t border-steel-300 bg-paper px-3 py-2 text-left ${g.small ? '-mx-6 -mb-6 mt-6' : ''}`}>
-                  <span className="label-mono line-clamp-2 text-[10px] text-steel-700 group-hover:text-red">{g.caption}</span>
-                  <span className="label-mono text-[10px] text-steel-500" aria-hidden>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </span>
-              </button>
-            </li>
+        {/* every grid has full rows: renders / photos spread a short last row, slots are 4 */}
+        <BlockTitle count={renders.length}>{t.blocks.parts}</BlockTitle>
+        <ImageBlock items={renders} offset={0} onOpen={setOpen} />
+
+        {hasRealPhotos && (
+          <>
+            <BlockTitle count={realPhotos.length}>{t.blocks.real}</BlockTitle>
+            <ImageBlock items={realPhotos} offset={renders.length} onOpen={setOpen} crop />
+          </>
+        )}
+
+        <BlockTitle count={videos.length}>{t.blocks.videos}</BlockTitle>
+        <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+          {videos.map((v) => (
+            <SlotCard key={v.key} title={v.title}>
+              <VideoSlot src={v.src} poster={v.poster} label={t.videoLabel(v.title)} coming={t.videoComing} placeholder={<PlaceholderMark kind="video" />} />
+            </SlotCard>
           ))}
         </ul>
 
-        <UnitVideo />
+        <BlockTitle count={t.photos.length}>{t.blocks.photos}</BlockTitle>
+        <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+          {t.photos.map((ph) => (
+            <SlotCard key={ph.key} title={ph.title}>
+              {ph.src ? (
+                <img src={ph.src} alt={ph.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <>
+                  <PlaceholderMark kind="photo" />
+                  <span className="label-mono absolute top-2 right-2 rounded-xs border border-dashed border-steel-300 bg-paper/90 px-2 py-1 text-[10px] text-steel-700">{t.photoComing}</span>
+                </>
+              )}
+            </SlotCard>
+          ))}
+        </ul>
       </div>
       {open !== null && <Lightbox index={open} onClose={close} onStep={step} />}
     </section>

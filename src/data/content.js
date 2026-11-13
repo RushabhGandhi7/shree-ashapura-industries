@@ -241,7 +241,7 @@ const en = {
   hero: {
     eyebrow: `Since ${FOUNDED} · ${ISO_TEXT}`,
     title: ['Your trust,', 'our mission.'],
-    lead: 'Fasteners and machine components for the lock and furniture industry, plus precision turned, press and plastic moulded parts. Special products developed to your requirement and design.',
+    lead: 'Fasteners and fittings for household furniture: cams, inserts, handles, screws and kits. Also lock and appliance parts, and parts made to your drawing.',
     callCta: 'Call now',
     whatsappCta: 'WhatsApp us',
     tolerance: `EST. ${FOUNDED}`,
@@ -269,6 +269,33 @@ const en = {
       materialsLabel: 'Materials',
       materials: ['M.S.', 'S.S.', 'Brass', 'Aluminium', 'Copper', 'EN8 high tensile', 'Plastic'],
       kits: 'We make kits for furniture and locks, and parts to your drawing and raw material.',
+    },
+    // Types of heads and drives (phase 12D). `item` = catalogue anchor (/products/<category>#<slug>)
+    // where the shape is in the client's catalogue; null = shown for reference only.
+    heads: {
+      label: 'Heads & drives',
+      title: 'Types of heads.',
+      lead: 'The common head shapes and drives, drawn side-on and from the top. Shapes marked "In catalogue" are in our product list.',
+      headsTitle: 'Heads',
+      drivesTitle: 'Drives',
+      inCatalogue: 'In catalogue',
+      side: 'Side',
+      top: 'Top',
+      list: [
+        { key: 'hex', name: 'Hex', item: 'screws-fasteners#hex-bolt' },
+        { key: 'pan', name: 'Pan', item: 'screws-fasteners#phillips-pan-head-screw' },
+        { key: 'countersunk', name: 'Countersunk', item: 'screws-fasteners#countersunk-screw' },
+        { key: 'cheese', name: 'Cheese', item: null },
+        { key: 'button', name: 'Round / button', item: null },
+        { key: 'flange', name: 'Flange', item: 'screws-fasteners#flange-bolt' },
+        { key: 'truss', name: 'Truss / mushroom (carriage)', item: 'screws-fasteners#carriage-bolt' },
+        { key: 'socket', name: 'Socket cap', item: null },
+      ],
+      drives: [
+        { key: 'slotted', name: 'Slotted', item: 'screws-fasteners#slotted-screw' },
+        { key: 'phillips', name: 'Phillips', item: 'screws-fasteners#phillips-pan-head-screw' },
+        { key: 'hexSocket', name: 'Hex socket', item: null },
+      ],
     },
     // searchable list of every catalogue item (phase 12B)
     index: {
@@ -522,7 +549,7 @@ const en = {
   gallery: {
     label: 'Gallery',
     title: 'Parts, machines and the works.',
-    lead: 'Our parts, rendered from their drawings, and the machine areas of units 24 & 25. Workshop photos and a unit video are on the way.',
+    lead: 'Our parts, rendered from their drawings. Shop floor videos and photos of units 24 & 25 are on the way.',
     open: 'Open image',
     close: 'Close',
     prev: 'Previous image',
@@ -531,17 +558,24 @@ const en = {
     count: (i, n) => `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`,
     renderAlt: (name, items) => `Rendered ${name}: ${items}`,
     renderCaption: (name) => name,
-    illustrations: [
-      { file: 'header', alt: 'Line drawing of a cold-heading machine: wire feed, cut-off, dies and punch', caption: 'Cold-heading area' },
-      { file: 'thread-roller', alt: 'Line drawing of a flat-die thread rolling machine with a blank between the dies', caption: 'Thread-rolling area' },
-      { file: 'slotter', alt: 'Line drawing of a slotting machine: slitting saw above a screw head in its fixture', caption: 'Slotting & BT area' },
+    // Blocks (phase 12D). Set `src` (and a `poster` for videos) when the files arrive:
+    // videos in public/videos/, photos in public/gallery/photos/. null = placeholder.
+    blocks: { parts: 'Our parts', real: 'From the shop floor', videos: 'Shop floor videos', photos: 'Photos' },
+    videoComing: 'Video coming',
+    photoComing: 'Photo coming',
+    videoLabel: (title) => `${title}: silent video`,
+    videos: [
+      { key: 'heading', title: 'Cold heading', src: null, poster: null },
+      { key: 'rolling', title: 'Thread rolling', src: null, poster: null },
+      { key: 'slotting', title: 'Slotting', src: null, poster: null },
+      { key: 'packing', title: 'Inspection & packing', src: null, poster: null },
     ],
-    video: {
-      title: 'Unit walkthrough',
-      soon: 'Video coming soon',
-      text: 'A short walk through units 24 & 25.',
-      play: 'Play the unit video',
-    },
+    photos: [
+      { key: 'machines', title: 'Machines', src: null, alt: 'Machines in units 24 & 25' },
+      { key: 'shopfloor', title: 'Shop floor', src: null, alt: 'The shop floor of units 24 & 25' },
+      { key: 'packed', title: 'Packed goods', src: null, alt: 'Packed goods ready for dispatch' },
+      { key: 'team', title: 'Team', src: null, alt: 'The team' },
+    ],
   },
   quote: {
     title: ['Request a', 'custom quote.'],
@@ -613,7 +647,7 @@ const en = {
     rights: 'All rights reserved.',
   },
   pages: {
-    home: { title: 'Fastener Manufacturer in Mumbai | Screws, Turned Parts & Furniture Fittings', description: `${FIRM_NAME}, Mumbai, since ${FOUNDED}: screws, bolts, nuts, washers, turned and brass parts, and kits for furniture and locks, made to your drawing.` },
+    home: { title: 'Fastener Manufacturer in Mumbai | Screws, Turned Parts & Furniture Fittings', description: `${FIRM_NAME}, Mumbai, since ${FOUNDED}: fasteners and fittings for household furniture (cams, inserts, handles, screws, kits), plus bolts, nuts, washers, turned and brass parts, made to your drawing.` },
     products: { title: 'Products: Screws, Bolts, Nuts, Washers, Brackets & Furniture Fittings', description: `Seven product lines from ${FIRM_NAME}, Mumbai: screws, bolts and nuts, washers, plastic components, brackets and press parts, brass parts, studs and turned parts, furniture fittings and cams. M2 to M14, length 3 to 100 mm.`, crumb: 'Products' },
     category: {
       title: (c) => `${c.name}: ${c.items.slice(0, 3).join(', ')}`,
@@ -623,11 +657,30 @@ const en = {
     manufacturing: { title: 'Manufacturing: Cold Heading, Slotting & Thread Rolling', description: 'From wire coil to dispatch: cold heading, slotting, thread rolling, heat treatment and plating via approved partners, Go / No-Go inspection, plus turning, drilling, milling, grinding and polishing, in units 24 & 25, Dahisar (East), Mumbai.', crumb: 'Manufacturing' }, // CONFIRM approved partners
     quality: { title: `Quality & Certifications: ${ISO_TEXT}, PPAP, Inspection`, description: `${ISO_TEXT} quality system, first-piece approval and in-process checks every 2 hours, calibrated gauges, HRC testing, full PPAP documents and Lean practices.`, crumb: 'Quality' },
     about: { title: `About Us: Fastener Makers Since ${FOUNDED}`, description: `${FIRM_NAME} has made fasteners and machine components for the lock and furniture industry since ${FOUNDED}. Meet the team, our industries and customers.`, crumb: 'About' },
-    gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, and the cold-heading, thread-rolling and slotting areas of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },
+    gallery: { title: 'Gallery: Parts, Machines & the Works', description: 'Our parts rendered from their drawings, with shop floor videos and photos of units 24 & 25 in Dahisar (East), Mumbai.', crumb: 'Gallery' },
     contact: { title: 'Contact: Call, WhatsApp or Visit Us in Dahisar (East), Mumbai', description: `Send your requirement on WhatsApp or email, call ${PHONES.mobile.display}, or visit ${ADDRESS_TEXT}.`, crumb: 'Contact' },
     notFound: { title: 'Page not found', description: `This page does not exist. Browse our products or contact ${FIRM_NAME}.`, crumb: 'Not found' },
     home_crumb: 'Home',
     titleSuffix: ` | ${FIRM_NAME}`,
+  },
+  // Home: household furniture focus (phase 12D). `photo`: real shot when supplied (null = our
+  // own render / drawing with a "Photo coming" tag). `href` = category page or item anchor.
+  furniture: {
+    label: 'Household furniture',
+    title: ['Fasteners for', 'household furniture.'],
+    lead: 'The fittings that hold furniture together, made in Mumbai. Also lock and appliance parts.',
+    photoComing: 'Photo coming',
+    all: 'All furniture fittings',
+    allText: 'Cams, handles, inserts, dowels, kits and more.',
+    cards: [
+      { key: 'cams', name: 'Cams', href: '/products/furniture-fittings#cam', render: 'cam', drawing: null, photo: null },
+      { key: 'handles', name: 'Handles', href: '/products/furniture-fittings#door-handle', render: null, drawing: 'handle', photo: null },
+      { key: 'inserts', name: 'Inserts', href: '/products/furniture-fittings#threaded-insert', render: null, drawing: 'insert', photo: null },
+      { key: 'dowels', name: 'Dowels', href: '/products/furniture-fittings#wooden-dowel', render: null, drawing: 'woodDowel', photo: null },
+      { key: 'kits', name: 'Kits', href: '/products/furniture-fittings#furniture-lock-fastener-kits', render: null, drawing: 'kit', photo: null },
+      { key: 'screws', name: 'Screws', href: '/products/screws-fasteners#chipboard-screw', render: 'chipboardScrew', drawing: null, photo: null },
+      { key: 'legs', name: 'Legs & levellers', href: '/products/plastic-components#leveller', render: 'levellerBolt', drawing: null, photo: null },
+    ],
   },
   teasers: {
     products: { label: 'What we make', title: 'Seven product lines.', lead: 'From screws, bolts and nuts to washers, brass parts, and fittings for furniture and locks.', cta: 'All products' },
@@ -687,6 +740,22 @@ const en = {
       { k: 'Design', v: 'AutoCAD 2D & 3D' },
     ],
     leader: { name: LEADER.name, role: LEADER.title, quote: 'Our mission: high-quality parts for manufacturing industries.' },
+    // History timeline (phase 12D). Real data only; add milestones to this one array.
+    // `year`: a number (spans between numeric years are labelled) or text such as 'Today'.
+    timeline: {
+      label: 'History',
+      title: ['From one unit', 'to today.'],
+      span: (n) => `${n} YEARS`,
+    },
+    milestones: [
+      // CONFIRM milestones: only founding and today are known; add dated milestones here
+      { year: FOUNDED, title: 'Founded', text: 'Founded in Dahisar (East), Mumbai.' },
+      {
+        year: 'Today',
+        title: 'Today',
+        points: ['Units 24 & 25, Dahisar (East)', `${ISO_TEXT} quality system`, `Part of ${LEAN_TEXT.cluster}`, 'Parts made to your drawing'],
+      },
+    ],
   },
   notFound: {
     code: 'ERR 404',

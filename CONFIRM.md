@@ -19,6 +19,9 @@ The items below are still open. Each fact lives in one constant at the top of [`
 | 9 | Traub A25 accuracy | "0.02 mm accuracy" (turning step, Machining) and the 1.6 – 25 mm range | TBD | `content.js` `machining.steps[0].spec`, `machineTypes.cards` turning (`// CONFIRM`) |
 | 10 | Machine videos and posters | None yet; cards show "Video coming" | TBD | `content.js` `machineTypes.cards[].video` / `.poster` → files in `public/videos/` |
 
+| 11 | Company history milestones | 1990 founded (Dahisar East) and Today only | TBD | `content.about.milestones` (`// CONFIRM milestones`) |
+| 12 | Gallery videos and photos, home furniture photos | Placeholders ("Video coming" / "Photo coming") | TBD | `content.gallery.videos` / `.photos`, `content.furniture.cards[].photo` |
+
 Items 4 and 5 were not in the client's confirmation, so they stay open. Delete them here and remove their `// CONFIRM` in `content.js` once they are confirmed.
 
 ## Logged, not changed (from phase 11)
@@ -48,3 +51,11 @@ Items 4 and 5 were not in the client's confirmation, so they stay open. Delete t
 3. Capability's "Also on the shop floor" list stays alongside the new Machining section.
 4. The hint chip keeps your exact copy, "Scroll up / down to continue"; on touch screens it also shows ←→ arrows.
 5. Machine-type placeholders reuse the gallery's machine-area drawings (header, roller, slotter) and the Machining drawings (turning, drilling, grinding).
+
+## Assumptions logged in phase 12D
+
+1. The timeline's "Today" points use confirmed facts only (units 24 & 25, ISO 9001:2015, Lean Cluster Mumbai, made to drawing).
+2. The slotted and Phillips drives are marked "In catalogue" (the slotted countersunk and Phillips pan screws are in it).
+3. The machine-area drawings left the gallery but stay as /manufacturing placeholders.
+4. The home furniture cards show our renders / drawings, tagged "Photo coming", until real shots arrive.
+5. Hero lead now leads with household furniture; lock and appliance parts follow in the same sentence.
